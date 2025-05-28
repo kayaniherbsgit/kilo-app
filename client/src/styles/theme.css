@@ -75,3 +75,26 @@ p {
   50% { transform: scale(1.4); opacity: 0.6; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+.audio-btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.progress-container input[type="range"] {
+  flex: 1;
+  height: 6px;
+  accent-color: var(--accent);
+  background: #333;
+  border-radius: 4px;
+}

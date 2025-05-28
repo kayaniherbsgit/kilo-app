@@ -1,0 +1,108 @@
+/* UserProfile.css */
+
+.user-profile {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #121212;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(180, 255, 57, 0.1);
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.user-profile h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 2rem;
+  color: #b4ff39;
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+}
+
+.avatar-ring {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 4px solid #b4ff39;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  overflow: hidden;
+}
+
+.avatar-ring img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-details p {
+  margin: 0.3rem 0;
+  font-size: 1rem;
+}
+
+.user-details .badge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 4px 10px;
+  background: #b4ff39;
+  color: #111;
+  font-weight: bold;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.lessons-list {
+  margin-top: 2rem;
+}
+
+.lessons-list h3 {
+  color: #b4ff39;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.5rem;
+}
+
+.lesson-item {
+  background: #1e1e1e;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #b4ff39;
+}
+
+.lesson-item p {
+  margin: 0.2rem 0;
+}
+
+.back-btn {
+  display: block;
+  margin: 2rem auto 0;
+  padding: 0.6rem 1.2rem;
+  background: #b4ff39;
+  color: #000;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.back-btn:hover {
+  background: #d7ff74;
+}

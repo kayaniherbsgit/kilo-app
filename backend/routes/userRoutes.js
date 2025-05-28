@@ -1,33 +1,50 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
+const Notification = require('../models/Notification-Log'); // ✅ make sure path is correct
 
-// ✅ GET streak for a specific user
-router.get('/streak/:username', authController.getStreak);
 
-router.get('/leaderboard', async (req, res) => {
+// ✅ Admin only: Get all users
+router.get('/all', auth, isAdmin, async (req, res) => {
   try {
-    const top = await User.find({}, 'username streak')
-      .sort({ streak: -1 })
-      .limit(10);
-
-    res.status(200).json(top);
+    const users = await User.find().sort({ createdAt: -1 });
+    res.status(200).json(users);
   } catch (err) {
-    res.status(500).json({ message: 'Leaderboard error', error: err.message });
+    res.status(500).json({ message: 'Failed to fetch users', error: err.message });
   }
 });
 
-
-// ✅ GET completed lessons (if needed)
-router.get('/:username', async (req, res) => {
+// ✅ Admin only: Delete a user
+router.delete('/:id', auth, isAdmin, async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.params.username });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    res.status(200).json({ completedLessons: user.completedLessons || [] });
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: 'User deleted' });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch user data', error: err.message });
+    res.status(500).json({ message: 'Failed to delete user', error: err.message });
+  }
+});
+
+router.post('/progress', auth, async (req, res) => {
+  const { lessonId } = req.body;
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user.completedLessons.includes(lessonId)) {
+      user.completedLessons.push(lessonId);
+      await user.save();
+
+      // ✅ create notification
+      await Notification.create({
+        title: `🎉 ${user.username} completed a lesson`,
+        message: `They finished lesson ID: ${lessonId}`,
+        createdBy: user.username,
+      });
+    }
+
+    res.json({ message: 'Progress updated' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update progress' });
   }
 });
 

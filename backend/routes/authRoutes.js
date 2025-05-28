@@ -1,22 +1,26 @@
+// routes/authRoutes.js
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
 const multer = require('multer');
 const path = require('path');
+const { register, login } = require('../controllers/authController');
 
-// Multer setup
+// Avatar storage config
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => {
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Make sure 'uploads/' folder exists
+  },
+  filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
-    cb(null, Date.now() + '-' + Math.round(Math.random() * 1e9) + ext);
+    cb(null, `${Date.now()}-${file.fieldname}${ext}`);
   }
 });
 const upload = multer({ storage });
 
-// Routes
-router.post('/register', upload.single('avatar'), authController.register);
-router.post('/login', authController.login);
-router.post('/progress', authController.updateProgress);
+// Register with avatar upload
+router.post('/register', upload.single('avatar'), register);
+
+// Login
+router.post('/login', login);
 
 module.exports = router;

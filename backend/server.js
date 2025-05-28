@@ -27,6 +27,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.set('io', io);
+
 // ✅ Middleware
 app.use(cors());
 app.use(express.json());
@@ -38,12 +40,16 @@ const lessonRoutes = require('./routes/lessonRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const userRoutes = require('./routes/userRoutes');
 const communityRoutes = require('./routes/communityRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
 
 app.use('/api/auth', authRoutes);
-app.use('/api/lessons', lessonRoutes);
+app.use('/api/lessons', require('./routes/lessonRoutes'));
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/community', communityRoutes);
+app.use('/api/admin', adminRoutes);
+
 
 // ✅ Auto-create admin
 const createAdminIfNotExists = async () => {
@@ -61,6 +67,14 @@ const createAdminIfNotExists = async () => {
     console.log('✅ Admin already exists');
   }
 };
+
+// Socket connection
+io.on('connection', (socket) => {
+  console.log('⚡ Client connected');
+  socket.on('disconnect', () => {
+    console.log('🚫 Client disconnected');
+  });
+  });
 
 // ✅ MongoDB connection and server start
 mongoose.connect(process.env.MONGO_URI, {

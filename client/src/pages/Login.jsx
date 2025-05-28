@@ -17,7 +17,7 @@ const Login = () => {
       localStorage.setItem('user', JSON.stringify(res.data.user));
       alert('Login successful!');
       if (res.data.user.username === 'kayaniadmin') {
-        navigate('/admin/upload');
+        navigate('/admin');
       } else {
         navigate('/home');
       }

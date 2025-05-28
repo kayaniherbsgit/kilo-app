@@ -4,6 +4,13 @@ const CommunityPost = require('../models/CommunityPost');
 const User = require('../models/User');
 const multer = require('multer');
 const path = require('path');
+const auth = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
+
+router.get('/admin/secret', auth, isAdmin, (req, res) => {
+  res.json({ message: 'This is a protected admin-only route.' });
+});
+
 
 // Multer config
 const storage = multer.diskStorage({
