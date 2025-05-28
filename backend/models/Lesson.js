@@ -1,9 +1,9 @@
-// models/Lesson.js
 const mongoose = require('mongoose');
 
 const lessonSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  audio: { type: String }, // path to the audio file
+  audio: { type: String },
+  thumbnail: { type: String }, // ✅ added
   description: { type: String },
   day: { type: Number, required: true },
   duration: { type: String },

@@ -1,3 +1,4 @@
+// Updated AdminDashboard.jsx with Circular Thumbnail & Drag-Drop Support
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/AdminDashboard.css';
@@ -5,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend } from 'chart.js';
 import io from 'socket.io-client';
+import DropZone from '../components/DropZone';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend);
 
@@ -15,13 +17,13 @@ const AdminDashboard = () => {
   const [logs, setLogs] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [editLesson, setEditLesson] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [lessonData, setLessonData] = useState({
+    title: '', description: '', day: '', duration: '', level: '', audio: null, thumbnail: null
+  });
+
   const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalLessons: 0,
-    averageStreak: 0,
-    usersByDay: [],
-    lessonsByDay: []
+    totalUsers: 0, totalLessons: 0, averageStreak: 0, usersByDay: [], lessonsByDay: []
   });
 
   const navigate = useNavigate();
@@ -38,7 +40,6 @@ const AdminDashboard = () => {
 
     const newSocket = io('http://localhost:5000');
     setSocket(newSocket);
-
     fetchAllData();
 
     newSocket.on('statsUpdated', fetchStats);
@@ -50,7 +51,6 @@ const AdminDashboard = () => {
     });
 
     const interval = setInterval(fetchAllData, 30000);
-
     return () => {
       newSocket.disconnect();
       clearInterval(interval);
@@ -65,26 +65,70 @@ const AdminDashboard = () => {
     fetchStats();
   };
 
-      const [lessonData, setLessonData] = useState({
-      title: '',
-      description: '',
-      day: '',
-      duration: '',
-      level: '',
-      audio: null
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    Object.entries(lessonData).forEach(([key, val]) => {
+      if (val) formData.append(key, val);
     });
 
-
-  const fetchStats = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/stats', {
+      await axios.post('http://localhost:5000/api/lessons', formData, {
+        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
+      });
+      alert('Lesson uploaded!');
+      setLessonData({ title: '', description: '', day: '', duration: '', level: '', audio: null, thumbnail: null });
+      setPreview(null);
+      fetchAllData();
+    } catch (err) {
+      alert('Upload failed');
+      console.error(err);
+    }
+  };
+
+  const handleEditLesson = (lesson) => {
+    setEditLesson(lesson);
+    setLessonData({
+      title: lesson.title, description: lesson.description, day: lesson.day, duration: lesson.duration,
+      level: lesson.level, audio: null, thumbnail: null
+    });
+    setPreview(null);
+    setTab('upload');
+  };
+
+  const handleUpdateLesson = async () => {
+    const formData = new FormData();
+    Object.entries(lessonData).forEach(([key, val]) => {
+      if (val) formData.append(key, val);
+    });
+
+    try {
+      await axios.put(`http://localhost:5000/api/lessons/${editLesson._id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
+      });
+      alert('Lesson updated!');
+      setEditLesson(null);
+      setLessonData({ title: '', description: '', day: '', duration: '', level: '', audio: null, thumbnail: null });
+      setPreview(null);
+      fetchLessons();
+    } catch (err) {
+      alert('Update failed');
+      console.error(err);
+    }
+  };
+
+  const handleDeleteLesson = async (id) => {
+    if (window.confirm('Delete this lesson?')) {
+      await axios.delete(`http://localhost:5000/api/lessons/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setStats(res.data);
-    } catch (err) {
-      console.error('Failed to fetch stats', err);
+      fetchLessons();
     }
+  };
 
+  const handleDrop = (field) => (file) => {
+    setLessonData(prev => ({ ...prev, [field]: file }));
+    if (field === 'thumbnail') setPreview(URL.createObjectURL(file));
   };
 
   const fetchLessons = async () => {
@@ -121,115 +165,30 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setLessonData({ ...lessonData, [name]: files ? files[0] : value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    Object.entries(lessonData).forEach(([key, val]) => {
-      if (val) formData.append(key, val);
-    });
-
+  const fetchStats = async () => {
     try {
-      await axios.post('http://localhost:5000/api/lessons', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      alert('Lesson uploaded!');
-      setLessonData({ title: '', description: '', day: '', duration: '', level: '', audio: null });
-      fetchAllData();
-    } catch (err) {
-      alert('Upload failed');
-      console.error(err);
-    }
-  };
-
-  const handleUpdateLesson = async () => {
-    const formData = new FormData();
-    Object.entries(lessonData).forEach(([key, val]) => {
-      if (val) formData.append(key, val);
-    });
-
-    try {
-      await axios.put(`http://localhost:5000/api/lessons/${editLesson._id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      alert('Lesson updated!');
-      setEditLesson(null);
-      setLessonData({ title: '', description: '', day: '', duration: '', level: '', audio: null });
-      fetchLessons(); fetchLogs(); fetchStats();
-    } catch (err) {
-      alert('Update failed');
-      console.error(err);
-    }
-  };
-
-  const handleEditLesson = (lesson) => {
-    setEditLesson(lesson);
-    setLessonData({
-      title: lesson.title,
-      description: lesson.description,
-      day: lesson.day,
-      duration: lesson.duration,
-      level: lesson.level,
-      audio: null,
-    });
-    setTab('upload');
-  };
-
-  const handleDeleteLesson = async (id) => {
-    if (window.confirm('Delete this lesson?')) {
-      await axios.delete(`http://localhost:5000/api/lessons/${id}`, {
+      const res = await axios.get('http://localhost:5000/api/admin/stats', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchLessons(); fetchLogs(); fetchStats();
+      setStats(res.data);
+    } catch (err) {
+      console.error('Failed to fetch stats', err);
     }
   };
 
-  const handleDeleteUser = async (id) => {
-    if (window.confirm('Delete this user?')) {
-      await axios.delete(`http://localhost:5000/api/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchUsers(); fetchLogs(); fetchStats();
-    }
-  };
+  const tabItems = [
+    { key: 'overview', label: '📊 Overview' },
+    { key: 'upload', label: editLesson ? '✏️ Edit Lesson' : '📤 Upload Lesson' },
+    { key: 'lessons', label: '🎧 All Lessons' },
+    { key: 'users', label: '👥 Users' },
+    { key: 'logs', label: '📋 Logs' },
+    { key: 'notifications', label: '🔔 Notifications' },
+  ];
 
   const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
   };
-
-
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: { labels: { color: '#ccc', font: { size: 12 } } },
-      tooltip: { backgroundColor: '#333', titleColor: '#fff', bodyColor: '#eee' },
-    },
-    scales: {
-      x: { ticks: { color: '#aaa' }, grid: { color: '#444' } },
-      y: { ticks: { color: '#aaa' }, grid: { color: '#444' } },
-    }
-  };
-
-   const tabItems = [
-    { key: 'overview', label: '📊 Overview' },
-    { key: 'upload', label: editLesson ? '✏️ Edit Lesson' : '📤 Upload Lesson' },
-    { key: 'lessons', label: '🎧 All Lessons' },
-    { key: 'users', label: '👥 Users' },
-    { key: 'logs', label: '📄 Logs' },
-    { key: 'notifications', label: '🔔 Notifications' },
-    { key: 'analytics', label: '📈 Analytics' },
-  ];
 
   return (
     <div className="admin-dashboard">
@@ -244,210 +203,51 @@ const AdminDashboard = () => {
         <div className="tab-card logout" onClick={handleLogout}>🚪 Logout</div>
       </div>
 
-      {tab === 'overview' && (
-        <div className="admin-overview">
-          <h3>Overview Stats</h3>
-        <div className="stat-cards">
-  <div className="stat-card">👤 Users: {stats.totalUsers || 'Loading...'}</div>
-  <div className="stat-card">🎧 Lessons: {stats.totalLessons || 'Loading...'}</div>
-  <div className="stat-card">🔥 Avg Streak: {stats.averageStreak || 'Loading...'}</div>
-</div>
-
-        </div>
-      )}
-
       {tab === 'upload' && (
-        <form className="upload-form" onSubmit={(e) => { e.preventDefault(); editLesson ? handleUpdateLesson() : handleSubmit(e); }}>
-          <input type="text" name="title" placeholder="Lesson Title" value={lessonData.title} onChange={handleChange} required />
-          <textarea name="description" placeholder="Lesson Description" value={lessonData.description} onChange={handleChange} rows="4" required />
-          <input type="number" name="day" placeholder="Day" value={lessonData.day} onChange={handleChange} required />
-          <input type="text" name="duration" placeholder="Duration" value={lessonData.duration} onChange={handleChange} required />
-          <input type="text" name="level" placeholder="Level" value={lessonData.level} onChange={handleChange} required />
-          <input type="file" name="audio" accept="audio/*" onChange={handleChange} />
-          <button type="submit">{editLesson ? 'Update' : 'Upload'}</button>
+        <form className="upload-form" onSubmit={(e) => {
+          e.preventDefault();
+          editLesson ? handleUpdateLesson() : handleSubmit(e);
+        }}>
+          <input type="text" name="title" placeholder="Lesson Title" value={lessonData.title} onChange={(e) => setLessonData({ ...lessonData, title: e.target.value })} required />
+          <textarea name="description" placeholder="Lesson Description" value={lessonData.description} onChange={(e) => setLessonData({ ...lessonData, description: e.target.value })} required />
+          <input type="number" name="day" placeholder="Day (e.g., 1)" value={lessonData.day} onChange={(e) => setLessonData({ ...lessonData, day: e.target.value })} required />
+          <input type="text" name="duration" placeholder="Duration (e.g., 5 min)" value={lessonData.duration} onChange={(e) => setLessonData({ ...lessonData, duration: e.target.value })} required />
+          <input type="text" name="level" placeholder="Level (e.g., Beginner)" value={lessonData.level} onChange={(e) => setLessonData({ ...lessonData, level: e.target.value })} required />
+
+          <DropZone label="🎧 Upload Audio File" accept="audio/*" onFileDrop={handleDrop('audio')} />
+          <DropZone label="🖼️ Upload Thumbnail Image" accept="image/*" onFileDrop={handleDrop('thumbnail')} />
+
+          {preview && (
+            <div style={{ marginTop: '10px' }}>
+              <p style={{ color: '#fff' }}>📷 Thumbnail Preview:</p>
+              <img src={preview} alt="Preview" style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover' }} />
+            </div>
+          )}
+
+          <button type="submit" style={{ marginTop: '15px' }}>{editLesson ? 'Update Lesson' : 'Upload Lesson'}</button>
         </form>
       )}
 
       {tab === 'lessons' && (
         <div className="lesson-list">
-          <h3>All Lessons</h3>
-          {lessons.length === 0 ? <p>No lessons found</p> : (
-            lessons.map((lesson) => (
-              <div key={lesson._id} className="lesson-item">
-                <h4>{lesson.title}</h4>
-                <p>{lesson.description}</p>
-                {lesson.audio && (
-                  <audio controls>
-                    <source src={`http://localhost:5000${lesson.audio}`} type="audio/mpeg" />
-                  </audio>
+          {lessons.map((lesson) => (
+            <div key={lesson._id} className="lesson-item">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {lesson.thumbnail && (
+                  <img src={`http://localhost:5000${lesson.thumbnail}`} alt="Thumbnail" style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #00ffcc', boxShadow: '0 0 8px rgba(0,255,204,0.3)' }} />
                 )}
-                <div className="actions">
-                  <button onClick={() => handleEditLesson(lesson)}>Edit</button>
-                  <button onClick={() => handleDeleteLesson(lesson._id)}>Delete</button>
-                </div>
+                <h4>{lesson.title}</h4>
               </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {tab === 'users' && (
-        <div className="user-list">
-          <h3>All Users</h3>
-          {users.length === 0 ? <p>No users found</p> : (
-            <table>
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Streak</th>
-                  <th>Completed</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user._id}>
-                    <td>{user.username}</td>
-                    <td>{user.streak}</td>
-                    <td>{user.completedLessons?.length || 0}</td>
-                    <td>
-                      <button onClick={() => setSelectedUser(user)}>View</button>
-                      <button onClick={() => handleDeleteUser(user._id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          {selectedUser && (
-            <div className="modal">
-              <div className="modal-content">
-                <h3>User: {selectedUser.username}</h3>
-                <p>Streak: {selectedUser.streak}</p>
-                <p>Completed Lessons: {selectedUser.completedLessons?.length || 0}</p>
-                <p>Last Accessed: {selectedUser.lastAccessed ? new Date(selectedUser.lastAccessed).toLocaleString() : 'N/A'}</p>
-                <button onClick={() => setSelectedUser(null)}>Close</button>
-              </div>
+              <p>{lesson.description}</p>
+              {lesson.audio && <audio controls><source src={`http://localhost:5000${lesson.audio}`} /></audio>}
+              <button onClick={() => handleEditLesson(lesson)}>Edit</button>
+              <button onClick={() => handleDeleteLesson(lesson._id)}>Delete</button>
             </div>
-          )}
+          ))}
         </div>
       )}
-
-      {tab === 'logs' && (
-        <div className="log-list">
-          <h3>Activity Logs</h3>
-          {logs.length === 0 ? <p>No logs yet</p> : (
-            <ul>
-              {logs.map(log => (
-                <li key={log._id}>
-                  <strong>{log.action}</strong>: {log.details} — <em>{log.performedBy}</em> at {new Date(log.createdAt).toLocaleString()}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      {tab === 'notifications' && (
-        <div className="notification-list">
-          <h3>Notifications</h3>
-          {notifications.length === 0 ? <p>No notifications yet</p> : (
-            <ul>
-              {notifications.map(note => (
-                <li key={note._id}>
-                  <strong>{note.title}</strong>: {note.message} — <em>{new Date(note.createdAt).toLocaleString()}</em>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      {tab === 'analytics' && (
-        <div className="analytics-tab">
-          <h3>📈 Analytics Overview</h3>
-
-          <div className="chart-grid">
-            <div className="chart-card">
-              <h4>👥 Users Joined Over Time</h4>
-              {stats.usersByDay.length === 0 ? (
-                <p>Loading chart...</p>
-              ) : (
-                <Line
-                  data={{
-                    labels: stats.usersByDay.map(u => u.date),
-                    datasets: [{
-                      label: 'New Users',
-                      data: stats.usersByDay.map(u => u.count),
-                      borderColor: '#4caf50',
-                      backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                      tension: 0.4,
-                      fill: true
-                    }]
-                  }}
-                  options={{
-                    responsive: true,
-                    plugins: { legend: { display: true } },
-                    animation: { duration: 1000 }
-                  }}
-                />
-              )}
-            </div>
-
-            <div className="chart-card">
-              <h4>📚 Lessons Uploaded Over Time</h4>
-              {stats.lessonsByDay.length === 0 ? (
-                <p>Loading chart...</p>
-              ) : (
-                <Bar
-                  data={{
-                    labels: stats.lessonsByDay.map(l => l.date),
-                    datasets: [{
-                      label: 'Lessons',
-                      data: stats.lessonsByDay.map(l => l.count),
-                      backgroundColor: '#42a5f5',
-                    }]
-                  }}
-                  options={{
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    animation: { duration: 1000 }
-                  }}
-                />
-              )}
-            </div>
-
-            <div className="chart-card">
-              <h4>🔥 Average Streak</h4>
-              {stats.averageStreak === 0 ? (
-                <p>Loading chart...</p>
-              ) : (
-                <Doughnut
-                  data={{
-                    labels: ['Avg Streak', 'To Max (7)'],
-                    datasets: [{
-                      data: [stats.averageStreak, 7 - stats.averageStreak],
-                      backgroundColor: ['#ff9800', '#e0e0e0'],
-                      hoverOffset: 4
-                    }]
-                  }}
-                  options={{
-                    responsive: true,
-                    plugins: { legend: { position: 'bottom' } },
-                    animation: { duration: 1000 }
-                  }}
-                />
-              )}
-      </div>
-    </div>
-  </div>
-)}
-
-
     </div>
   );
 };
-
-
 
 export default AdminDashboard;
