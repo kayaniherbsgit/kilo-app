@@ -1,5 +1,6 @@
 const Lesson = require('../models/Lesson');
 const Notification = require('../models/Notification-Log');
+const logActivity = require('../utils/logActivity');
 
 const getAllLessons = async (req, res) => {
   try {
@@ -28,10 +29,20 @@ const uploadLesson = async (req, res) => {
 
     await newLesson.save();
 
+    // ✅ Save notification
     await Notification.create({
       title: `📚 New lesson uploaded`,
       message: `${title} is now available (Day ${day})`,
       createdBy: req.user.username || 'admin',
+    });
+
+    // ✅ Log activity
+    await logActivity({
+      action: 'Upload Lesson',
+      performedBy: req.user.username || 'admin',
+      targetType: 'Lesson',
+      targetId: newLesson._id,
+      details: `Uploaded "${title}" (Day ${day})`,
     });
 
     res.status(201).json(newLesson);
@@ -53,6 +64,16 @@ const updateLesson = async (req, res) => {
     }
 
     const updated = await Lesson.findByIdAndUpdate(id, updates, { new: true });
+
+    // ✅ Log activity
+    await logActivity({
+      action: 'Edit Lesson',
+      performedBy: req.user.username || 'admin',
+      targetType: 'Lesson',
+      targetId: updated._id,
+      details: `Edited "${updated.title}"`,
+    });
+
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Update failed', details: err.message });
@@ -61,10 +82,43 @@ const updateLesson = async (req, res) => {
 
 const deleteLesson = async (req, res) => {
   try {
-    await Lesson.findByIdAndDelete(req.params.id);
+    const deleted = await Lesson.findByIdAndDelete(req.params.id);
+
+    // ✅ Log activity
+    if (deleted) {
+      await logActivity({
+        action: 'Delete Lesson',
+        performedBy: req.user.username || 'admin',
+        targetType: 'Lesson',
+        targetId: deleted._id,
+        details: `Deleted "${deleted.title}"`,
+      });
+    }
+
     res.json({ message: 'Lesson deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Deletion failed' });
+  }
+};
+
+const reorderLessons = async (req, res) => {
+  try {
+    const { order } = req.body; // array of lesson IDs
+    for (let i = 0; i < order.length; i++) {
+      await Lesson.findByIdAndUpdate(order[i], { order: i });
+    }
+
+    // ✅ Log activity
+    await logActivity({
+      action: 'Reorder Lessons',
+      performedBy: req.user.username || 'admin',
+      targetType: 'Lesson',
+      details: `Reordered ${order.length} lessons`
+    });
+
+    res.json({ message: 'Lessons reordered successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Reordering failed', details: err.message });
   }
 };
 
@@ -72,5 +126,6 @@ module.exports = {
   getAllLessons,
   uploadLesson,
   updateLesson,
-  deleteLesson
+  deleteLesson,
+  reorderLessons
 };

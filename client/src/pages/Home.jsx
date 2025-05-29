@@ -66,12 +66,9 @@ const Home = () => {
   }, [user]);
 
   const nextLesson = () => {
-    const currentLesson = lessons[currentIndex];
-    if (!completed.includes(currentLesson._id)) {
-      alert("Complete the current lesson first");
-      return;
+    if (currentIndex < lessons.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
     }
-    if (currentIndex < lessons.length - 1) setCurrentIndex(currentIndex + 1);
   };
 
   const prevLesson = () => {
@@ -110,7 +107,7 @@ const Home = () => {
   return (
     <div {...swipe} style={{ padding: '1.5rem', paddingBottom: '7rem', background: 'var(--bg)', color: 'var(--text)' }}>
       <audio ref={bellRef} src={notificationSound} />
-      
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
         <div>
           <h2 className="gradient-title">Hi, {user?.username || 'Guest'}</h2>
@@ -131,7 +128,7 @@ const Home = () => {
               })}
             >
               <img
-                src={`http://localhost:5000/uploads/${user?.avatar || 'default.png'}`}
+                src={`http://localhost:5000${user?.avatar || '/uploads/default.png'}`}
                 alt="avatar"
                 style={{ width: 30, height: 30, borderRadius: '50%' }}
               />

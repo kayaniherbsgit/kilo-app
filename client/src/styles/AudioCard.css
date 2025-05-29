@@ -1,0 +1,89 @@
+.audio-card-container {
+  padding: 1rem;
+  background-color: #1a1a1a;
+  border-radius: 1rem;
+  color: #fff;
+}
+
+.lesson-thumbnail {
+  width: 100%;
+  border-radius: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.lesson-description {
+  color: var(--subtext);
+  font-size: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+.ring-wrapper {
+  margin: 1.4rem auto;
+  width: 120px;
+}
+
+.glow-play-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.progress-container,
+.volume-control {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.neon-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #444 !important;
+}
+
+/* Resume Modal */
+.resume-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.resume-box {
+  background: #1b1b1b;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  max-width: 90%;
+}
+
+.resume-btn-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.countdown-box h1 {
+  transition: none !important;
+}

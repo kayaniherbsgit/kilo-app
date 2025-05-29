@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const { reorderLessons } = require('../controllers/lessonController');
 const auth = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 const {
@@ -35,5 +36,7 @@ router.get('/', getAllLessons);
 router.post('/', auth, isAdmin, uploadFields, uploadLesson);
 router.put('/:id', auth, isAdmin, uploadFields, updateLesson);
 router.delete('/:id', auth, isAdmin, deleteLesson);
+router.patch('/reorder', auth, isAdmin, reorderLessons); // ✅ new route
+
 
 module.exports = router;
