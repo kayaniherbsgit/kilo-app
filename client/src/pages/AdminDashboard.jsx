@@ -33,6 +33,8 @@ const AdminDashboard = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [selectedLessons, setSelectedLessons] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false); // ✅ THIS IS WHAT YOU FORGOT
+
 
   const [lessonData, setLessonData] = useState({
     title: '', description: '', day: '', duration: '', level: '', audio: null, thumbnail: null
@@ -114,6 +116,27 @@ const AdminDashboard = () => {
     });
     setStats(res.data);
   };
+
+  const groupedNotifications = () => {
+  const groups = {};
+
+  notifications.forEach(note => {
+    let type = 'Other';
+    const msg = note.message?.toLowerCase() || '';
+
+    if (msg.includes('registered')) type = '🧑 User Registered';
+    else if (msg.includes('completed')) type = '✅ Lesson Completed';
+    else if (msg.includes('uploaded')) type = '📝 Lesson Uploaded';
+    else if (msg.includes('deleted')) type = '🗑 Deleted';
+    else if (msg.includes('updated')) type = '✏️ Updated';
+
+    if (!groups[type]) groups[type] = [];
+    groups[type].push(note);
+  });
+
+  return Object.entries(groups);
+};
+
 
   const handleDrop = (field) => (file) => {
     setLessonData(prev => ({ ...prev, [field]: file }));
@@ -225,38 +248,80 @@ const AdminDashboard = () => {
     navigate('/login');
   };
 
-  const tabItems = [
-    { key: 'overview', label: '📊 Overview' },
-    { key: 'upload', label: editLesson ? '✏️ Edit Lesson' : '📤 Upload Lesson' },
-    { key: 'lessons', label: '🎧 All Lessons' },
-    { key: 'users', label: '👥 Users' },
-    { key: 'logs', label: '📋 Logs' },
-    { key: 'notifications', label: '🔔 Notifications' },
-  ];
+const tabItems = [
+  { key: 'overview', label: '📊 Overview' },
+  { key: 'upload', label: editLesson ? '✏️ Edit Lesson' : '📤 Upload Lesson' },
+  { key: 'lessons', label: '🎧 All Lessons' },
+  { key: 'users', label: '👥 Users' },
+  { key: 'logs', label: '📋 Logs' },
+];
 
   return (
-    <div className="admin-dashboard">
-<div className="admin-header">
-  <h2 className="gradient-title">
-    Hi, {user?.username || 'Admin'} 👋
-  </h2>
-  <img
-    src={`http://localhost:5000${user?.avatar || '/uploads/default.png'}`}
-    alt="admin avatar"
-    className="admin-avatar"
-  />
-</div>
+<div className="admin-dashboard">
+      <div className="admin-header">
+        <h2 className="gradient-title">Hi, {user?.username || 'Admin'} 👋</h2>
 
+        <div className="notification-bell-container">
+          <div className="notification-bell" onClick={() => setShowDropdown(!showDropdown)}>
+            🔔
+            {notifications.filter(n => !n.read).length > 0 && (
+              <span className="notification-count">
+                {notifications.filter(n => !n.read).length}
+              </span>
+            )}
+          </div>
 
-      <div className="admin-tab-cards">
+    {showDropdown && (
+            <div className="notification-dropdown">
+              <h4 className="dropdown-title">🔔 Notifications</h4>
+              {groupedNotifications().length === 0 ? (
+                <p className="no-notifications">No notifications yet.</p>
+              ) : (
+                groupedNotifications().map(([category, items], i) => (
+                  <div key={i} className="notification-group">
+                    <h5>{category}</h5>
+                    {items.map((note, idx) => (
+                      <div
+                        key={idx}
+                        className={`notification-item ${!note.read ? 'unread' : ''}`}
+                      >
+                        <div className="note-message">{note.message}</div>
+                        <div className="note-time">
+                          {new Date(note.createdAt).toLocaleString()}
+                   </div>
+                      </div>
+                    ))}
+                  </div>
+                ))
+              )}
+              <div
+                className="see-all-btn"
+                onClick={() => navigate('/admin/notifications')}
+              >
+                🔍 See All Notifications
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+<div className="admin-tab-cards">
         {tabItems.map(({ key, label }) => (
-          <div key={key} className={`tab-card ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>
+          <div
+            key={key}
+            className={`tab-card ${tab === key ? 'active' : ''}`}
+            onClick={() => setTab(key)}
+          >
             {label}
           </div>
         ))}
-        <div className="tab-card logout" onClick={handleLogout}>🚪 Logout</div>
+        <div className="tab-card logout" onClick={() => {
+          localStorage.clear();
+          navigate('/login');
+        }}>
+          🚪 Logout
+        </div>
       </div>
-
       {tab === 'logs' && (
   <ActivityLog logs={logs} />
 )}

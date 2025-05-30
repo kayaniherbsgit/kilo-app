@@ -12,6 +12,8 @@ import Notifications from './pages/Notifications';
 import Community from './pages/Community';
 import AdminDashboard from './pages/AdminDashboard';  // ✅ ADD THIS
 import UserProfile from './pages/UserProfile';
+import AdminNotifications from './pages/AdminNotifications';
+
 
 
 const App = () => {
@@ -30,6 +32,8 @@ const App = () => {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/community" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Community /></motion.div>} />
         <Route path="/profile/:username" element={<UserProfile />} />
+        <Route path="/admin/notifications" element={<AdminNotifications />} />
+
 
       </Routes>
     </AnimatePresence>

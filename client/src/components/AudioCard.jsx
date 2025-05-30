@@ -7,6 +7,7 @@ import Confetti from 'react-confetti';
 import { useWindowSize } from '@react-hook/window-size';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 import '../styles/AudioCard.css';
 
@@ -29,6 +30,7 @@ const AudioCard = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const [resumePrompt, setResumePrompt] = useState(false);
   const [resumeTime, setResumeTime] = useState(0);
+  const [lastToastLevel, setLastToastLevel] = useState(null);
   const [width, height] = useWindowSize();
 
   useEffect(() => {
@@ -51,6 +53,19 @@ const AudioCard = ({
     setAutoPlayTimer(10);
     setShowConfetti(false);
     setAutoPlayCancelled(false);
+    setLastToastLevel(null);
+
+    // ✅ Save current lesson index to backend DB
+    axios.post('http://localhost:5000/api/user/current-lesson', {
+      lessonId: lesson._id,
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }).catch((err) => {
+      console.error('Failed to save current lesson index:', err.message);
+    });
+
   }, [lesson]);
 
   useEffect(() => {
@@ -66,16 +81,15 @@ const AudioCard = ({
         const currentProgress = (audio.currentTime / audio.duration) * 100;
         if (currentProgress > 0) {
           localStorage.setItem(`lesson-progress-${lesson._id}`, audio.currentTime);
-          fetch('http://localhost:5000/api/user/progress', {
-            method: 'PATCH',
+          axios.patch('http://localhost:5000/api/user/progress', {
+            lessonId: lesson._id,
+            progress: currentProgress,
+          }, {
             headers: {
-              'Content-Type': 'application/json',
               Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
-            body: JSON.stringify({
-              lessonId: lesson._id,
-              progress: currentProgress,
-            }),
+          }).catch((err) => {
+            console.error('Error saving progress:', err.message);
           });
         }
       }
@@ -96,12 +110,26 @@ const AudioCard = ({
     const percent = (audio.currentTime / audio.duration) * 100;
     setProgress(percent);
 
-    if (percent >= 70 && !showConfetti) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 5000);
+    if (percent >= 99 && lastToastLevel !== 'done') {
       if (onMarkComplete && !completed.includes(lesson._id)) {
         onMarkComplete(lesson._id);
       }
+      toast.success("🏁 ✅ Completed! Ready to level up.");
+      setLastToastLevel('done');
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
+    } else if (percent >= 70 && percent < 99 && lastToastLevel !== 'almost') {
+      toast.info("🔥 You’re almost done. Focus!");
+      setLastToastLevel('almost');
+    } else if (percent >= 50 && percent < 70 && lastToastLevel !== 'half') {
+      toast.info("⚡ Halfway there — don’t stop now!");
+      setLastToastLevel('half');
+    } else if (percent >= 25 && percent < 50 && lastToastLevel !== 'quarter') {
+      toast.info("🎧 Nice flow... keep listening.");
+      setLastToastLevel('quarter');
+    } else if (percent > 0 && percent < 25 && lastToastLevel !== 'start') {
+      toast.info("🚀 Let’s go! Your journey begins.");
+      setLastToastLevel('start');
     }
   };
 
@@ -129,7 +157,7 @@ const AudioCard = ({
   };
 
   const handleNextClick = () => {
-    if (progress < 70) {
+    if (!completed.includes(lesson._id) && progress < 70) {
       toast.info('Please listen to at least 70% of the lesson to proceed.');
       return;
     }
@@ -142,8 +170,17 @@ const AudioCard = ({
     return `${min}:${sec}`;
   };
 
+  const progressMessage = () => {
+    if (progress >= 99) return "🏁 ✅ Completed! Ready to level up.";
+    if (progress >= 70) return "🔥 You’re almost done. Focus!";
+    if (progress >= 50) return "⚡ Halfway there — don’t stop now!";
+    if (progress >= 25) return "🎧 Nice flow... keep listening.";
+    if (progress > 0) return "🚀 Let’s go! Your journey begins.";
+    return null;
+  };
+
   return (
-    <div className="card audio-card-container">
+    <div className={`card audio-card-container ${completed.includes(lesson._id) ? 'lesson-completed' : ''}`}>
       <ToastContainer position="top-center" />
       {showConfetti && <Confetti width={width} height={height} />}
 
@@ -153,26 +190,16 @@ const AudioCard = ({
             <h4>⏪ Resume?</h4>
             <p>Do you want to continue from where you left off?</p>
             <div className="resume-btn-group">
-              <button
-                className="neon-btn"
-                onClick={() => {
-                  audioRef.current.currentTime = resumeTime;
-                  sessionStorage.setItem(`resumed-${lesson._id}`, 'true');
-                  setResumePrompt(false);
-                }}
-              >
-                Yes, resume
-              </button>
-              <button
-                className="neon-btn"
-                onClick={() => {
-                  audioRef.current.currentTime = 0;
-                  sessionStorage.setItem(`resumed-${lesson._id}`, 'true');
-                  setResumePrompt(false);
-                }}
-              >
-                No, start over
-              </button>
+              <button className="neon-btn" onClick={() => {
+                audioRef.current.currentTime = resumeTime;
+                sessionStorage.setItem(`resumed-${lesson._id}`, 'true');
+                setResumePrompt(false);
+              }}>Yes, resume</button>
+              <button className="neon-btn" onClick={() => {
+                audioRef.current.currentTime = 0;
+                sessionStorage.setItem(`resumed-${lesson._id}`, 'true');
+                setResumePrompt(false);
+              }}>No, start over</button>
             </div>
           </div>
         </div>
@@ -183,20 +210,15 @@ const AudioCard = ({
           <div className="countdown-box">
             <p>Auto-playing next lesson in</p>
             <h1>{autoPlayTimer}s</h1>
-
             <div className="resume-btn-group" style={{ marginTop: '1rem' }}>
               <button className="neon-btn" onClick={() => {
                 setShowAutoPlay(false);
                 onNext();
-              }}>
-                ⏭ Go to Next Now
-              </button>
+              }}>⏭ Go to Next Now</button>
               <button className="neon-btn" onClick={() => {
                 setAutoPlayCancelled(true);
                 setShowAutoPlay(false);
-              }}>
-                ✖ Stay Here
-              </button>
+              }}>✖ Stay Here</button>
             </div>
           </div>
         </div>
@@ -206,7 +228,12 @@ const AudioCard = ({
         <img src={`http://localhost:5000${lesson.thumbnail}`} alt="Lesson" className="lesson-thumbnail" />
       )}
 
-      <h3 style={{ marginBottom: '0.4rem' }}>{lesson.title}</h3>
+      <h3>{lesson.title}</h3>
+      {progressMessage() && <div className="progress-badge">{progressMessage()}</div>}
+      {completed.includes(lesson._id) && (
+        <p className="completed-tag">✅ Lesson Completed</p>
+      )}
+
       <p className="meta-text">
         📅 Day {lesson.day} | 🎧 {lesson.duration || 'Unknown'} | 🧠 {lesson.level}
       </p>
@@ -222,10 +249,10 @@ const AudioCard = ({
       <div className="ring-wrapper">
         <CircularProgressbarWithChildren
           value={progress}
-          strokeWidth={8}
+          strokeWidth={10}
           styles={buildStyles({
-            pathColor: 'var(--accent)',
-            trailColor: '#2b2b2b',
+            pathColor: '#b4ff39',
+            trailColor: '#333',
             strokeLinecap: 'round',
           })}
         >
@@ -269,9 +296,9 @@ const AudioCard = ({
         <button
           onClick={handleNextClick}
           disabled={currentIndex === totalLessons - 1}
-          className={`neon-btn ${progress < 70 ? 'disabled' : ''}`}
+          className={`neon-btn ${!completed.includes(lesson._id) && progress < 70 ? 'disabled' : ''}`}
         >
-          {progress >= 70 ? '➡️ Next Lesson' : '⏳ Listen 70% to continue'}
+          {completed.includes(lesson._id) || progress >= 70 ? '➡️ Next Lesson' : '⏳ Listen 70% to continue'}
         </button>
       </div>
     </div>

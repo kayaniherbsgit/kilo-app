@@ -49,3 +49,38 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Login failed', error: err.message });
   }
 };
+
+exports.saveAudioProgress = async (req, res) => {
+  const { username, lessonId, progress } = req.body;
+  try {
+    const user = await User.findOne({ username });
+    user.audioProgress.set(lessonId, progress);
+    await user.save();
+    res.json({ message: 'Progress saved' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error saving progress' });
+  }
+};
+
+exports.saveCurrentIndex = async (req, res) => {
+  const { username, index } = req.body;
+  try {
+    await User.findOneAndUpdate({ username }, { currentLessonIndex: index });
+    res.json({ message: 'Index saved' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error saving index' });
+  }
+};
+
+exports.getUserState = async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    res.json({
+      index: user.currentLessonIndex || 0,
+      audioProgress: user.audioProgress || {},
+      completedLessons: user.completedLessons || [],
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to get state' });
+  }
+};

@@ -16,6 +16,7 @@ const Home = () => {
   const [lessons, setLessons] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [completed, setCompleted] = useState([]);
+  const [audioProgress, setAudioProgress] = useState({});
   const [unreadCount, setUnreadCount] = useState(0);
   const [streak, setStreak] = useState(0);
   const [showStreak, setShowStreak] = useState(false);
@@ -31,13 +32,16 @@ const Home = () => {
   useEffect(() => {
     const fetchLessons = async () => {
       const res = await axios.get('http://localhost:5000/api/lessons');
-      setLessons(res.data.reverse());
+      const sorted = res.data.sort((a, b) => a.day - b.day);
+      setLessons(sorted);
     };
     fetchLessons();
 
     if (user?.username) {
-      axios.get(`http://localhost:5000/api/users/${user.username}`).then(res => {
+      axios.get(`http://localhost:5000/api/users/state/${user.username}`).then(res => {
         setCompleted(res.data.completedLessons || []);
+        setCurrentIndex(res.data.index || 0);
+        setAudioProgress(res.data.audioProgress || {});
       });
 
       axios.get(`http://localhost:5000/api/users/streak/${user.username}`).then(res => {
@@ -65,14 +69,26 @@ const Home = () => {
     }
   }, [user]);
 
+  const saveIndex = (newIndex) => {
+    setCurrentIndex(newIndex);
+    if (user?.username) {
+      axios.post('http://localhost:5000/api/users/save-current-index', {
+        username: user.username,
+        index: newIndex
+      });
+    }
+  };
+
   const nextLesson = () => {
     if (currentIndex < lessons.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
+      saveIndex(currentIndex + 1);
     }
   };
 
   const prevLesson = () => {
-    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
+    if (currentIndex > 0) {
+      saveIndex(currentIndex - 1);
+    }
   };
 
   const markCompleted = async (lessonId) => {
@@ -150,11 +166,14 @@ const Home = () => {
           currentIndex={currentIndex}
           totalLessons={lessons.length}
           completed={completed}
+          audioProgress={audioProgress}
+          username={user?.username}
           onNext={nextLesson}
           onPrev={prevLesson}
           onMarkComplete={markCompleted}
         />
       )}
+
       <div className="card" style={{ marginTop: '1.5rem', background: '#151515' }}>
         <h4>🌍 Community Activity</h4>
         <p style={{ fontSize: '0.9rem', color: 'var(--subtext)' }}>Check top streaks across the app 🚀</p>

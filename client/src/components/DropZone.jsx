@@ -1,39 +1,39 @@
-import React, { useRef } from 'react';
+// components/DropZone.jsx
+import React from 'react';
 
-const DropZone = ({ onFileSelect, label }) => {
-  const fileInputRef = useRef();
-
-  const handleDragOver = (e) => e.preventDefault();
+const DropZone = ({ label, accept, onFileDrop }) => {
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      onFileDrop(file);
+    }
+  };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file) onFileSelect(file);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      onFileDrop(file);
+    }
+  };
+
+  const preventDefaults = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
   };
 
   return (
     <div
-      onClick={() => fileInputRef.current.click()}
-      onDragOver={handleDragOver}
+      className="dropzone"
       onDrop={handleDrop}
-      style={{
-        border: '2px dashed #888',
-        padding: '25px',
-        borderRadius: '10px',
-        textAlign: 'center',
-        marginBottom: '10px',
-        color: '#ccc',
-        cursor: 'pointer',
-        background: '#1a1a1a'
-      }}
+      onDragOver={preventDefaults}
+      onDragEnter={preventDefaults}
+      onDragLeave={preventDefaults}
     >
-      {label || 'Click or Drag a file here to upload'}
-      <input
-        type="file"
-        ref={fileInputRef}
-        hidden
-        onChange={(e) => onFileSelect(e.target.files[0])}
-      />
+      <label className="dropzone-label">
+        {label}
+        <input type="file" accept={accept} onChange={handleFileChange} hidden />
+      </label>
     </div>
   );
 };

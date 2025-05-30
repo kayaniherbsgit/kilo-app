@@ -23,7 +23,18 @@ const getNotifications = async (req, res) => {
   }
 };
 
-// ✅ Get admin stats
+// ✅ Delete all notifications
+const deleteAllNotifications = async (req, res) => {
+  try {
+    await Notification.deleteMany({});
+    req.io.emit('notificationsUpdated'); // Trigger live refresh on frontend
+    res.status(200).json({ message: 'All notifications deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete notifications', error: err.message });
+  }
+};
+
+// ✅ Get admin dashboard stats
 const getStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
@@ -45,5 +56,6 @@ const getStats = async (req, res) => {
 module.exports = {
   getActivityLogs,
   getNotifications,
+  deleteAllNotifications,
   getStats
 };
