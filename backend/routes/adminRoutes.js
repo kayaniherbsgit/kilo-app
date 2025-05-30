@@ -2,63 +2,84 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
-const Notification = require('../models/Notification-Log');
-const Lesson = require('../models/Lesson');
+const Notification = require('../models/Notification-Log'); // 👈 Add if not already imported
 
 
 const {
   getActivityLogs,
   getNotifications,
-  getStats,
-  deleteAllNotifications,
+  getStats
 } = require('../controllers/adminController');
 
-// Logs & Stats
 router.get('/activity-logs', auth, isAdmin, getActivityLogs);
 router.get('/notifications', auth, isAdmin, getNotifications);
 router.get('/stats', auth, isAdmin, getStats);
 
-// 🔁 Realtime reorder
+const Lesson = require('../models/Lesson'); // Make sure this is at the top
+
+// Reorder lessons via drag-and-drop
 router.post('/reorder-lessons', auth, isAdmin, async (req, res) => {
   const { lessons } = req.body;
+
   try {
     for (const { id, order } of lessons) {
       await Lesson.findByIdAndUpdate(id, { order });
     }
     res.json({ success: true, message: 'Lesson order updated' });
   } catch (err) {
+    console.error('Lesson reorder error:', err);
     res.status(500).json({ error: 'Failed to reorder lessons' });
   }
 });
 
-// ✔️ Mark all as read
+// ✅ Mark all admin notifications as read
 router.put('/notifications/mark-all-read', auth, isAdmin, async (req, res) => {
   try {
+    // Update all notifications not yet marked as read by this admin
     await Notification.updateMany(
       { readBy: { $ne: req.user._id } },
       { $addToSet: { readBy: req.user._id } }
     );
-    req.io.emit('notificationsUpdated');
-    res.json({ message: 'Marked all as read' });
+
+    req.io?.emit('notificationsUpdated'); // (Optional real-time sync)
+    res.status(200).json({ message: 'All notifications marked as read.' });
+  } catch (err) {
+    res.status(500).json({
+      message: 'Failed to mark all as read',
+      error: err.message,
+    });
+  }
+});
+
+router.put('/notifications/:id/mark-read', auth, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+const notif = await Notification.findById(id);
+    if (!notif) return res.status(404).json({ message: 'Notification not found' });
+
+    if (!notif.readBy.map(id => id.toString()).includes(userId.toString())) {
+      notif.readBy.push(userId);
+      await notif.save();
+    }
+
+    res.json({ message: 'Notification marked as read' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to mark as read', error: err.message });
   }
 });
 
-// 🧹 Delete all
-router.delete('/notifications/delete-all', auth, isAdmin, deleteAllNotifications);
-
-// 🟢 Mark single as read
-router.put('/notifications/:id/mark-read', auth, isAdmin, async (req, res) => {
+router.get('/notifications/:id', async (req, res) => {
   try {
-    await Notification.findByIdAndUpdate(req.params.id, {
-      $addToSet: { readBy: req.user._id }
-    });
-    req.io.emit('notificationsUpdated');
-    res.json({ message: 'Marked one as read' });
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) return res.status(404).json({ error: 'Not found' });
+    res.json(notification);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update', error: err.message });
+    res.status(500).json({ error: 'Could Not Fetch Notification' });
   }
 });
+
+
 
 module.exports = router;

@@ -2,13 +2,11 @@ import React, { useRef, useEffect, useState } from 'react';
 import { FiPlay, FiPause, FiVolume2 } from 'react-icons/fi';
 import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-
 import Confetti from 'react-confetti';
 import { useWindowSize } from '@react-hook/window-size';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-
 import '../styles/AudioCard.css';
 
 const AudioCard = ({
@@ -66,6 +64,11 @@ const AudioCard = ({
       console.error('Failed to save current lesson index:', err.message);
     });
 
+    // ✅ Store last played lesson in localStorage
+    if (lesson && lesson._id) {
+      localStorage.setItem('lastPlayedLessonId', lesson._id);
+    }
+
   }, [lesson]);
 
   useEffect(() => {
@@ -114,6 +117,18 @@ const AudioCard = ({
       if (onMarkComplete && !completed.includes(lesson._id)) {
         onMarkComplete(lesson._id);
       }
+
+      // ✅ Save to backend as completed
+      axios.post('http://localhost:5000/api/user/mark-complete', {
+        lessonId: lesson._id,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }).catch((err) => {
+        console.error('Error saving completion:', err.message);
+      });
+
       toast.success("🏁 ✅ Completed! Ready to level up.");
       setLastToastLevel('done');
       setShowConfetti(true);

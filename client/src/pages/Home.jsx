@@ -34,13 +34,21 @@ const Home = () => {
       const res = await axios.get('http://localhost:5000/api/lessons');
       const sorted = res.data.sort((a, b) => a.day - b.day);
       setLessons(sorted);
+
+      // ✅ Remember last played lesson
+      const lastLessonId = localStorage.getItem('lastPlayedLessonId');
+      if (lastLessonId) {
+        const index = sorted.findIndex(l => l._id === lastLessonId);
+        if (index !== -1) {
+          setCurrentIndex(index);
+        }
+      }
     };
     fetchLessons();
 
     if (user?.username) {
       axios.get(`http://localhost:5000/api/users/state/${user.username}`).then(res => {
         setCompleted(res.data.completedLessons || []);
-        setCurrentIndex(res.data.index || 0);
         setAudioProgress(res.data.audioProgress || {});
       });
 
@@ -71,11 +79,9 @@ const Home = () => {
 
   const saveIndex = (newIndex) => {
     setCurrentIndex(newIndex);
-    if (user?.username) {
-      axios.post('http://localhost:5000/api/users/save-current-index', {
-        username: user.username,
-        index: newIndex
-      });
+    const lessonId = lessons[newIndex]?._id;
+    if (lessonId) {
+      localStorage.setItem('lastPlayedLessonId', lessonId);
     }
   };
 
@@ -97,7 +103,7 @@ const Home = () => {
       setCompleted(updated);
       await axios.post('http://localhost:5000/api/auth/progress', {
         username: user.username,
-        lessonId: lessonId,
+        lessonId,
       });
     }
   };

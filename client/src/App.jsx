@@ -13,12 +13,11 @@ import Community from './pages/Community';
 import AdminDashboard from './pages/AdminDashboard';  // ✅ ADD THIS
 import UserProfile from './pages/UserProfile';
 import AdminNotifications from './pages/AdminNotifications';
-
-
+import AdminNotificationDetail from './pages/AdminNotificationDetail';
 
 const App = () => {
-  const location = useLocation(); 
-
+  const location = useLocation();
+  
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -33,8 +32,7 @@ const App = () => {
         <Route path="/community" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Community /></motion.div>} />
         <Route path="/profile/:username" element={<UserProfile />} />
         <Route path="/admin/notifications" element={<AdminNotifications />} />
-
-
+        <Route path="/admin/notifications/:id" element={<AdminNotificationDetail />} />
       </Routes>
     </AnimatePresence>
   );
