@@ -38,5 +38,13 @@ router.put('/:id', auth, isAdmin, uploadFields, updateLesson);
 router.delete('/:id', auth, isAdmin, deleteLesson);
 router.patch('/reorder', auth, isAdmin, reorderLessons); // ✅ new route
 
+router.get('/:id', async (req, res) => {
+  try {
+    const lesson = await Lesson.findById(req.params.id);
+    res.json(lesson);
+  } catch (err) {
+    res.status(500).json({ message: 'Lesson not found' });
+  }
+});
 
 module.exports = router;

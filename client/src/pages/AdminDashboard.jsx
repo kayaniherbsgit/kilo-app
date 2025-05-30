@@ -443,7 +443,7 @@ const tabItems = [
                                   />
                                 )}
                                 <div>
-                                  <h4 style={{ margin: 0, color: '#b4ff39' }}>{lesson.title}</h4>
+                                  <h4 style={{ margin: 0, color: '#07bc0c' }}>{lesson.title}</h4>
                                   <p style={{ fontSize: '0.85rem', color: '#aaa', margin: '4px 0' }}>
                                     📅 Day {lesson.day} | ⏱ {lesson.duration || 'Unknown'} | 📘 {lesson.level}
                                   </p>

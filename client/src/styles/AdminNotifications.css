@@ -13,7 +13,7 @@
 }
 
 .admin-title {
-  color: #b4ff39;
+  color: #07bc0c;
   font-size: 1.8rem;
   font-weight: bold;
   margin-bottom: 1rem;
@@ -37,7 +37,7 @@
 }
 
 .notif-input:focus {
-  box-shadow: 0 0 0 2px #b4ff39;
+  box-shadow: 0 0 0 2px #07bc0c;
 }
 
 .notif-btn {
@@ -56,7 +56,7 @@
 
 .notif-btn.green {
   background-color: #1d401d;
-  color: #b4ff39;
+  color: #07bc0c;
 }
 
 .notif-btn.red {
@@ -75,7 +75,7 @@
 }
 
 .notif-count {
-  background: #b4ff39;
+  background: #07bc0c;
   color: #000;
   font-size: 12px;
   padding: 2px 8px;
@@ -94,7 +94,7 @@
 }
 
 .notification-card.unread {
-  border-left: 4px solid #b4ff39;
+  border-left: 4px solid #07bc0c;
 }
 
 .notification-card:hover {
@@ -124,7 +124,7 @@
 .read-btn {
   background: none;
   border: none;
-  color: #b4ff39;
+  color: #07bc0c;
   cursor: pointer;
   font-weight: bold;
 }

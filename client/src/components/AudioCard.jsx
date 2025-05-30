@@ -31,6 +31,8 @@ const AudioCard = ({
   const [lastToastLevel, setLastToastLevel] = useState(null);
   const [width, height] = useWindowSize();
 
+  const isCompleted = completed.includes(lesson._id);
+
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -53,8 +55,7 @@ const AudioCard = ({
     setAutoPlayCancelled(false);
     setLastToastLevel(null);
 
-    // ✅ Save current lesson index to backend DB
-    axios.post('http://localhost:5000/api/user/current-lesson', {
+    axios.post('http://localhost:5000/api/users/current-lesson', {
       lessonId: lesson._id,
     }, {
       headers: {
@@ -64,7 +65,6 @@ const AudioCard = ({
       console.error('Failed to save current lesson index:', err.message);
     });
 
-    // ✅ Store last played lesson in localStorage
     if (lesson && lesson._id) {
       localStorage.setItem('lastPlayedLessonId', lesson._id);
     }
@@ -84,7 +84,7 @@ const AudioCard = ({
         const currentProgress = (audio.currentTime / audio.duration) * 100;
         if (currentProgress > 0) {
           localStorage.setItem(`lesson-progress-${lesson._id}`, audio.currentTime);
-          axios.patch('http://localhost:5000/api/user/progress', {
+          axios.patch('http://localhost:5000/api/users/progress', {
             lessonId: lesson._id,
             progress: currentProgress,
           }, {
@@ -118,7 +118,6 @@ const AudioCard = ({
         onMarkComplete(lesson._id);
       }
 
-      // ✅ Save to backend as completed
       axios.post('http://localhost:5000/api/user/mark-complete', {
         lessonId: lesson._id,
       }, {
@@ -171,10 +170,16 @@ const AudioCard = ({
     }, 1000);
   };
 
-  const handleNextClick = () => {
-    if (!completed.includes(lesson._id) && progress < 70) {
-      toast.info('Please listen to at least 70% of the lesson to proceed.');
-      return;
+  const handleNextClick = async () => {
+    if (!completed.includes(lesson._id)) {
+      await axios.post('http://localhost:5000/api/users/mark-complete', {
+        lessonId: lesson._id,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      onMarkComplete(lesson._id);
     }
     onNext();
   };
@@ -195,7 +200,7 @@ const AudioCard = ({
   };
 
   return (
-    <div className={`card audio-card-container ${completed.includes(lesson._id) ? 'lesson-completed' : ''}`}>
+    <div className={`card audio-card-container ${isCompleted ? 'lesson-completed' : 'pending'}`}>
       <ToastContainer position="top-center" />
       {showConfetti && <Confetti width={width} height={height} />}
 
@@ -245,7 +250,7 @@ const AudioCard = ({
 
       <h3>{lesson.title}</h3>
       {progressMessage() && <div className="progress-badge">{progressMessage()}</div>}
-      {completed.includes(lesson._id) && (
+      {isCompleted && (
         <p className="completed-tag">✅ Lesson Completed</p>
       )}
 
@@ -266,7 +271,7 @@ const AudioCard = ({
           value={progress}
           strokeWidth={10}
           styles={buildStyles({
-            pathColor: '#b4ff39',
+            pathColor: '#07bc0c',
             trailColor: '#333',
             strokeLinecap: 'round',
           })}
@@ -311,9 +316,9 @@ const AudioCard = ({
         <button
           onClick={handleNextClick}
           disabled={currentIndex === totalLessons - 1}
-          className={`neon-btn ${!completed.includes(lesson._id) && progress < 70 ? 'disabled' : ''}`}
+          className={`neon-btn ${!isCompleted && progress < 70 ? 'disabled' : ''}`}
         >
-          {completed.includes(lesson._id) || progress >= 70 ? '➡️ Next Lesson' : '⏳ Listen 70% to continue'}
+          {isCompleted || progress >= 70 ? '➡️ Next Lesson' : '⏳ Listen 70% to continue'}
         </button>
       </div>
     </div>

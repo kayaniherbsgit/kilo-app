@@ -47,4 +47,16 @@ router.post('/mark-complete', auth, async (req, res) => {
   }
 });
 
+router.get('/state/:username', async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    res.json({
+      completedLessons: user.completedLessons,
+      audioProgress: user.audioProgress || {},
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

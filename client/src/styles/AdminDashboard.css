@@ -11,7 +11,7 @@
 .admin-dashboard h2 {
   font-size: 28px;
   margin-bottom: 16px;
-  color: #b4ff39;
+  color: #07bc0c;
 }
 
 .admin-tabs {
@@ -33,7 +33,7 @@
 }
 
 .admin-tabs button.active {
-  background-color: #b4ff39;
+  background-color: #07bc0c;
   color: #000;
 }
 
@@ -59,7 +59,7 @@
   text-align: center;
   font-size: 18px;
   font-weight: 600;
-  color: #b4ff39;
+  color: #07bc0c;
   border: 1px solid #2f2f2f;
 }
 
@@ -85,7 +85,7 @@
 
 .upload-form button {
   padding: 10px;
-  background-color: #b4ff39;
+  background-color: #07bc0c;
   color: #000;
   font-weight: 600;
   border: none;
@@ -132,7 +132,7 @@ table td {
 
 table th {
   background: #1c1c1c;
-  color: #b4ff39;
+  color: #07bc0c;
 }
 
 .modal {
@@ -176,7 +176,7 @@ table th {
 }
 
 .chart-section h4 {
-  color: #b4ff39;
+  color: #07bc0c;
   margin-bottom: 12px;
   font-size: 18px;
 }
@@ -210,7 +210,7 @@ table th {
 }
 
 .tab-card.active {
-  background-color: #b4ff39;
+  background-color: #07bc0c;
   color: #000;
 }
 
@@ -242,7 +242,7 @@ table th {
 }
 
 .tab-card.active {
-  background-color: #b4ff39;
+  background-color: #07bc0c;
   color: #000;
 }
 
@@ -372,7 +372,7 @@ table th {
 .admin-tabs button {
   margin-right: 10px;
   background: #333;
-  color: #b4ff39;
+  color: #07bc0c;
   padding: 8px 12px;
   border: none;
   border-radius: 6px;
@@ -397,7 +397,7 @@ table th {
   border-radius: 50%;
   object-fit: cover;
   margin: 10px 0;
-  box-shadow: 0 0 10px #b4ff39;
+  box-shadow: 0 0 10px #07bc0c;
 }
 
 .progress-bar {
@@ -410,7 +410,7 @@ table th {
 
 .progress-bar div {
   height: 100%;
-  background: #b4ff39;
+  background: #07bc0c;
   text-align: center;
   line-height: 20px;
   color: #111;
@@ -437,7 +437,7 @@ table th {
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #b4ff39;
+  border: 2px solid #07bc0c;
 }
 
 .lessons-grid {
@@ -465,11 +465,11 @@ table th {
   height: 64px;
   border-radius: 8px;
   object-fit: cover;
-  border: 2px solid #b4ff39;
+  border: 2px solid #07bc0c;
 }
 
 .neon-btn {
-  background: #b4ff39;
+  background: #07bc0c;
   border: none;
   color: #000;
   padding: 6px 14px;
@@ -539,7 +539,7 @@ table th {
 
 .lesson-card:hover {
   transform: scale(1.01);
-  border-color: #b4ff39;
+  border-color: #07bc0c;
 }
 
 .lesson-thumb {
@@ -573,7 +573,7 @@ table th {
 }
 
 .pagination-btn.active {
-  background-color: #b4ff39;
+  background-color: #07bc0c;
   color: #000;
   font-weight: bold;
 }
@@ -584,7 +584,7 @@ table th {
 
 .dropdown-items-per-page {
   background: #111;
-  color: #b4ff39;
+  color: #07bc0c;
   border: 1px solid #555;
   padding: 6px 10px;
   border-radius: 6px;
@@ -684,7 +684,7 @@ table th {
 
 .section-title {
   font-size: 1.2rem;
-  color: #b4ff39;
+  color: #07bc0c;
   margin-bottom: 1rem;
 }
 
@@ -697,7 +697,7 @@ table th {
   background: #222;
   padding: 0.8rem;
   margin-bottom: 0.5rem;
-  border-left: 4px solid #b4ff39;
+  border-left: 4px solid #07bc0c;
   border-radius: 4px;
   color: #eee;
 }
@@ -718,7 +718,7 @@ table th {
 
 .section-title {
   font-size: 1.3rem;
-  color: #b4ff39;
+  color: #07bc0c;
   margin-bottom: 1rem;
 }
 
@@ -741,7 +741,7 @@ table th {
   background: #222;
   padding: 1rem;
   margin-bottom: 0.7rem;
-  border-left: 4px solid #b4ff39;
+  border-left: 4px solid #07bc0c;
   border-radius: 5px;
   color: #ddd;
 }
@@ -780,7 +780,7 @@ table th {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #b4ff39;
+  color: #07bc0c;
 }
 
 .log-search-input {
@@ -797,7 +797,7 @@ table th {
 
 .log-search-input:focus {
   outline: none;
-  border-color: #b4ff39;
+  border-color: #07bc0c;
   box-shadow: 0 0 8px rgba(180, 255, 57, 0.3);
 }
 
@@ -810,7 +810,7 @@ table th {
 
 .log-entry {
   background: #181818;
-  border-left: 4px solid #b4ff39;
+  border-left: 4px solid #07bc0c;
   padding: 0.9rem 1rem;
   border-radius: 8px;
   color: #ddd;
@@ -829,7 +829,7 @@ table th {
 }
 
 .log-entry span {
-  color: #b4ff39;
+  color: #07bc0c;
   font-weight: 600;
 }
 
@@ -917,7 +917,7 @@ table th {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid #b4ff39;
+  border: 2px solid #07bc0c;
   object-fit: cover;
 }
 
@@ -930,7 +930,7 @@ table th {
 }
 
 .notification-heading {
-  color: #b4ff39;
+  color: #07bc0c;
   font-size: 1.4rem;
   margin-bottom: 1rem;
 }
@@ -939,7 +939,7 @@ table th {
   background: #181818;
   padding: 1rem;
   margin-bottom: 1rem;
-  border-left: 4px solid #b4ff39;
+  border-left: 4px solid #07bc0c;
   border-radius: 8px;
   animation: fadeInSlide 0.3s ease-in-out;
   box-shadow: 0 0 10px rgba(180, 255, 57, 0.05);
@@ -1024,7 +1024,7 @@ table th {
 
 .notification-group h5 {
   margin: 0.5rem 0 0.3rem;
-  color: #b4ff39;
+  color: #07bc0c;
   font-size: 0.9rem;
 }
 
@@ -1069,7 +1069,7 @@ scrollbar-color: #555 #111;
 }
 
 .notification-dropdown h4 {
-  color: #b4ff39;
+  color: #07bc0c;
   font-size: 1rem;
   margin-bottom: 0.75rem;
   font-weight: bold;
@@ -1088,7 +1088,7 @@ scrollbar-color: #555 #111;
   background: #181818;
   padding: 10px;
   margin-bottom: 0.5rem;
-  border-left: 4px solid #b4ff39;
+  border-left: 4px solid #07bc0c;
   border-radius: 8px;
   font-size: 0.88rem;
   color: #eee;
@@ -1140,7 +1140,7 @@ scrollbar-color: #555 #111;
   background: #1a1a1a;
   padding: 10px 12px;
   margin-bottom: 0.5rem;
-  border-left: 4px solid #b4ff39;
+  border-left: 4px solid #07bc0c;
   border-radius: 8px;
   font-size: 0.88rem;
   color: #eee;
@@ -1234,7 +1234,7 @@ scrollbar-color: #555 #111;
 }
 
 .top-bar h2 {
-  color: #b4ff39;
+  color: #07bc0c;
 }
 
 .back-btn {
@@ -1265,7 +1265,7 @@ scrollbar-color: #555 #111;
 }
 
 .notification-card.unread {
-  border-left-color: #b4ff39;
+  border-left-color: #07bc0c;
   background-color: #1d1d1d;
 }
 

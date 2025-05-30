@@ -1,9 +1,16 @@
 .audio-card-container {
-  padding: 1rem;
-  background-color: #1a1a1a;
-  border-radius: 1rem;
-  color: #fff;
+  background: #000;
+  border: 2px solid #00ff66;
+  padding: 1.2rem;
+  border-radius: 16px;
+  box-shadow: 0 0 12px #00ff6644;
+  transition: all 0.3s ease-in-out;
 }
+
+.audio-card-container:hover {
+  box-shadow: 0 0 20px #00ff66aa;
+}
+
 
 .lesson-thumbnail {
   width: 100%;
@@ -85,13 +92,13 @@ input[type="range"] {
 
 .lesson-completed {
   background-color: #1c1c1c;
-  border: 1px solid #b4ff39;
-  box-shadow: 0 0 8px #b4ff39aa;
+  border: 1px solid #07bc0c;
+  box-shadow: 0 0 8px #07bc0caa;
 }
 
 .completed-tag {
   font-size: 0.8rem;
-  color: #b4ff39;
+  color: #07bc0c;
   background: #222;
   padding: 2px 8px;
   border-radius: 20px;
@@ -115,7 +122,7 @@ input[type="range"] {
   left: 50%;
   transform: translate(-50%, -55%);
   text-align: center;
-  color: #b4ff39;
+  color: #07bc0c;
   font-weight: bold;
   pointer-events: none;
   display: flex;
@@ -139,18 +146,18 @@ input[type="range"] {
 
 .ring-label .emoji {
   font-size: 1.4rem;
-  filter: drop-shadow(0 0 4px #b4ff39);
+  filter: drop-shadow(0 0 4px #07bc0c);
 }
 
 .progress-badge {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #b4ff39;
+  color: #07bc0c;
   background: #222;
   padding: 6px 12px;
   border-radius: 20px;
   display: inline-block;
   margin: 0.5rem 0 1.2rem;
   text-align: center;
-  box-shadow: 0 0 6px #b4ff3922;
+  box-shadow: 0 0 6px #07bc0c22;
 }

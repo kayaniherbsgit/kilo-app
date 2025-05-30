@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import AdminUpload from './pages/AdminDashboard';
 import Activity from './pages/Activity';
 import Profile from './pages/Profile';
+import Lesson from './pages/Lesson';
 import Notifications from './pages/Notifications';
 import Community from './pages/Community';
 import AdminDashboard from './pages/AdminDashboard';  // ✅ ADD THIS
@@ -33,6 +34,7 @@ const App = () => {
         <Route path="/profile/:username" element={<UserProfile />} />
         <Route path="/admin/notifications" element={<AdminNotifications />} />
         <Route path="/admin/notifications/:id" element={<AdminNotificationDetail />} />
+        <Route path="/lesson/:id" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Lesson /></motion.div>} />
       </Routes>
     </AnimatePresence>
   );

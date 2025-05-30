@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useSwipeable } from 'react-swipeable';
 import BottomNav from '../components/BottomNav';
+import { toast } from 'react-toastify';
 import confetti from 'canvas-confetti';
 import { useNavigate } from 'react-router-dom';
 import { FiBell } from 'react-icons/fi';
@@ -37,12 +38,15 @@ const Home = () => {
 
       // ✅ Remember last played lesson
       const lastLessonId = localStorage.getItem('lastPlayedLessonId');
-      if (lastLessonId) {
-        const index = sorted.findIndex(l => l._id === lastLessonId);
-        if (index !== -1) {
-          setCurrentIndex(index);
-        }
-      }
+if (lastLessonId) {
+  const index = sorted.findIndex(l => l._id === lastLessonId);
+  if (index !== -1) {
+    setCurrentIndex(index);
+    toast.info(`📍 Jumped to Day ${sorted[index].day}: ${sorted[index].title}`);
+  }
+  localStorage.removeItem('lastPlayedLessonId');
+}
+
     };
     fetchLessons();
 
@@ -77,13 +81,19 @@ const Home = () => {
     }
   }, [user]);
 
-  const saveIndex = (newIndex) => {
-    setCurrentIndex(newIndex);
-    const lessonId = lessons[newIndex]?._id;
-    if (lessonId) {
-      localStorage.setItem('lastPlayedLessonId', lessonId);
-    }
-  };
+const saveIndex = async (newIndex) => {
+  setCurrentIndex(newIndex);
+  const lessonId = lessons[newIndex]?._id;
+  if (lessonId) {
+    localStorage.setItem('lastPlayedLessonId', lessonId);
+    await axios.post('http://localhost:5000/api/users/current-lesson', {
+      lessonId,
+    }, {
+      headers: { Authorization: `Bearer ${user?.token}` }
+    });
+  }
+};
+
 
   const nextLesson = () => {
     if (currentIndex < lessons.length - 1) {
@@ -97,16 +107,18 @@ const Home = () => {
     }
   };
 
-  const markCompleted = async (lessonId) => {
-    if (!completed.includes(lessonId)) {
-      const updated = [...completed, lessonId];
-      setCompleted(updated);
-      await axios.post('http://localhost:5000/api/auth/progress', {
-        username: user.username,
-        lessonId,
-      });
-    }
-  };
+ const markCompleted = async (lessonId) => {
+  if (!completed.includes(lessonId)) {
+    const updated = [...completed, lessonId];
+    setCompleted(updated);
+    await axios.post('http://localhost:5000/api/users/mark-complete', {
+      lessonId,
+    }, {
+      headers: { Authorization: `Bearer ${user?.token}` }
+    });
+  }
+};
+
 
   const swipe = useSwipeable({
     onSwipedLeft: nextLesson,

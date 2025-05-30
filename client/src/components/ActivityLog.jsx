@@ -59,7 +59,7 @@ const ActivityLog = ({ logs }) => {
         {Object.keys(groupedLogs).length > 0 ? (
           Object.keys(groupedLogs).map((date) => (
             <div key={date}>
-              <h4 style={{ color: '#b4ff39', marginTop: '1rem' }}>{date}</h4>
+              <h4 style={{ color: '#07bc0c', marginTop: '1rem' }}>{date}</h4>
               {groupedLogs[date].map((log, i) => (
                 <div key={i} className="log-entry">
                   <strong>{log.action}</strong> by <span>{log.performedBy}</span>
