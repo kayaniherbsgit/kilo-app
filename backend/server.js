@@ -42,7 +42,6 @@ const userRoutes = require('./routes/userRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-
 app.use('/api/auth', authRoutes);
 app.use('/api/lessons', require('./routes/lessonRoutes'));
 app.use('/api/notifications', notificationRoutes);

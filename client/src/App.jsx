@@ -15,6 +15,8 @@ import AdminDashboard from './pages/AdminDashboard';  // ✅ ADD THIS
 import UserProfile from './pages/UserProfile';
 import AdminNotifications from './pages/AdminNotifications';
 import AdminNotificationDetail from './pages/AdminNotificationDetail';
+import ProfileSettings from './pages/ProfileSettings';
+
 
 const App = () => {
   const location = useLocation();
@@ -29,6 +31,7 @@ const App = () => {
         <Route path="/admin" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><AdminDashboard /></motion.div>} />
         <Route path="/activity" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Activity /></motion.div>} />
         <Route path="/profile" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Profile /></motion.div>} />
+        <Route path="/profile-settings" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><ProfileSettings /></motion.div>} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/community" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Community /></motion.div>} />
         <Route path="/profile/:username" element={<UserProfile />} />

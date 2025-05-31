@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const { reorderLessons } = require('../controllers/lessonController');
 const auth = require('../middleware/auth');
+const Lesson = require('../models/Lesson');
 const isAdmin = require('../middleware/isAdmin');
 const {
   getAllLessons,
@@ -38,6 +39,18 @@ router.put('/:id', auth, isAdmin, uploadFields, updateLesson);
 router.delete('/:id', auth, isAdmin, deleteLesson);
 router.patch('/reorder', auth, isAdmin, reorderLessons); // ✅ new route
 
+// GET total number of lessons
+router.get('/count', async (req, res) => {
+  try {
+    const Lesson = require('../models/Lesson');
+    const count = await Lesson.countDocuments();
+    res.json({ total: count });
+  } catch (err) {
+    console.error('Error in /lessons/count:', err);
+    res.status(500).json({ message: 'Error fetching lesson count' });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const lesson = await Lesson.findById(req.params.id);
@@ -46,5 +59,8 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: 'Lesson not found' });
   }
 });
+
+
+
 
 module.exports = router;
