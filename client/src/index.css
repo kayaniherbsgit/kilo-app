@@ -124,3 +124,7 @@ body {
 }
 
 
+.circular-crop .reactEasyCrop_CropArea {
+  border-radius: 50% !important;
+  overflow: hidden;
+}

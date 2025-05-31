@@ -112,5 +112,17 @@ router.patch('/:id', auth, upload.single('avatar'), async (req, res) => {
   }
 });
 
+router.get('/activity/:username', async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const timeline = user.activityLog.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    res.json(timeline);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching timeline' });
+  }
+});
+
 
 module.exports = router;

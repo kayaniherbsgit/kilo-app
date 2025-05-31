@@ -29,8 +29,15 @@ const updateProgress = async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (!user.completedLessons.includes(lessonId)) {
-      user.completedLessons.push(lessonId);
-      await user.save();
+  user.completedLessons.push(lessonId);
+
+  const lesson = await Lesson.findById(lessonId);
+  user.activityLog.push({
+    action: 'Completed Lesson',
+    message: `✅ Finished: ${lesson.title}`,
+  });
+
+  await user.save();
 
       await NotificationLog.create({
         message: `🎉 ${user.username} completed lesson ID: ${lessonId}`,

@@ -103,3 +103,33 @@
   border-bottom: 1px dashed #333;
   padding-bottom: 6px;
 }
+
+.scrollable-timeline {
+  max-height: 250px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.scrollable-timeline::-webkit-scrollbar {
+  display: none;
+}
+
+.fade-in {
+  animation: fadeIn 0.7s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scrollable-timeline ul {
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
