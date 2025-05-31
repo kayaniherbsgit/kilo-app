@@ -93,7 +93,7 @@ const percent = totalCount === 0 ? 0 : Math.min(Math.round((completedCount / tot
         <h4>📦 Summary</h4>
         <p>Completed: <strong>{completedCount}</strong></p>
         <p>Total Lessons: <strong>{totalCount}</strong></p>
-<p>Remaining: <strong>{Math.max(totalCount - completedCount, 0)}</strong></p>
+        <p>Remaining: <strong>{totalCount - completedCount}</strong></p>
         <p>📅 Today: <strong>{getTodayCompletions()}</strong> lessons</p>
         <p>🏅 Rank: <strong>{getRank()}</strong></p>
         {topListened && (
