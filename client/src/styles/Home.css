@@ -1,0 +1,279 @@
+:root {
+  --bg: #0e0e0e;
+  --text: #ffffff;
+  --card-bg: #1a1a1a;
+  --accent: #f7b733;
+  --subtext: #aaa;
+  --radius: 14px;
+}
+
+/* Container Card */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Gradient Title */
+.gradient-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  background: linear-gradient(to right, #00FFA3, #DC1FFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Notification Bell Dot */
+.pulse-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background: red;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Streak Card */
+.streak-card {
+  border: 1px dashed var(--accent);
+  text-align: center;
+}
+
+/* Neon Button */
+.neon-btn {
+  background-color: #00ff66;
+  color: black;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 0 10px #00ff6677;
+}
+
+.neon-btn:hover {
+  box-shadow: 0 0 18px #00ff66aa;
+  transform: scale(1.02);
+}
+
+
+/* Audio Player Card */
+.audio-card {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 1.2rem;
+  box-shadow: 0 0 10px rgba(247, 183, 51, 0.15);
+  text-align: center;
+}
+
+.audio-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.audio-play-btn {
+  font-size: 1.4rem;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #000;
+  font-weight: bold;
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.audio-icon {
+  font-size: 1.2rem;
+  background: #2b2b2b;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+}
+
+.audio-visual-icon {
+  font-size: 1.3rem;
+  color: var(--accent);
+  margin-left: 0.5rem;
+}
+
+/* Audio Progress */
+.audio-progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+}
+
+
+
+.audio-progress-bar input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  height: 6px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--accent) 0%, #333 100%);
+}
+.audio-progress-bar input::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: none;
+}
+
+/* Speed Dropdown */
+.audio-speed {
+  margin-top: 1rem;
+  color: var(--subtext);
+}
+.audio-speed select {
+  margin-left: 0.4rem;
+  background: #2b2b2b;
+  border: 1px solid var(--accent);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.audio-card-container {
+  position: relative;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: 0 0 20px rgba(52, 168, 83, 0.2);
+  margin-top: 1rem;
+}
+
+.ring-wrapper {
+  width: 120px;
+  height: 120px;
+  margin: 1.5rem auto 0.5rem;
+}
+
+.glow-play-btn {
+  background: var(--accent);
+  color: #000;
+  font-size: 1.8rem;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 0 20px var(--accent), 0 0 10px var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.meta-text {
+  font-size: 0.85rem;
+  color: var(--subtext);
+  margin-bottom: 0.3rem;
+}
+
+.auto-play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-box {
+  color: var(--accent);
+  text-align: center;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.lesson-thumbnail {
+  width: 100%;
+  border-radius: 14px;
+  margin-bottom: 1rem;
+  object-fit: cover;
+  max-height: 180px;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 1rem 0;
+  color: var(--subtext);
+}
+
+.volume-control input[type="range"] {
+  width: 120px;
+  accent-color: var(--accent);
+}
+
+
+/* Scrollable Day Tabs */
+.day-tabs-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.5rem 0.3rem 1rem;
+  margin-bottom: 1rem;
+  scrollbar-width: none;
+}
+.day-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.day-tab {
+  background: #1f1f1f;
+  color: #888;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: not-allowed;
+  opacity: 0.6;
+  font-size: 0.9rem;
+}
+
+.day-tab.active-day {
+  background: #00ff66;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  opacity: 1;
+  box-shadow: 0 0 10px #00ff66aa;
+}
+
+.day-tab:disabled {
+  cursor: not-allowed;
+}

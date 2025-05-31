@@ -1,0 +1,105 @@
+.activity-page {
+  padding: 1.5rem;
+  padding-bottom: 6rem;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.activity-heading {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.progress-ring-container {
+  max-width: 180px;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+.progress-ring-container p {
+  margin-top: 0.5rem;
+  color: var(--subtext);
+  font-size: 0.9rem;
+}
+
+.activity-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+}
+
+.activity-card h4 {
+  margin-bottom: 0.8rem;
+}
+
+.activity-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.activity-item {
+  margin: 10px 0;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #333;
+  padding-bottom: 6px;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.3rem 0.6rem;
+  border-radius: 10px;
+  color: #000;
+}
+
+.badge.completed {
+  background: var(--badge-complete);
+}
+
+.badge.progress {
+  background: var(--badge-progress);
+}
+
+.activity-page {
+  padding: 1.5rem;
+  padding-bottom: 6rem;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.activity-heading {
+  margin-bottom: 1.5rem;
+}
+
+.progress-ring-wrapper {
+  max-width: 180px;
+  margin: 0 auto 2rem;
+}
+
+.progress-label {
+  text-align: center;
+  color: var(--subtext);
+  margin-top: 0.5rem;
+}
+
+.lesson-list {
+  padding-left: 1rem;
+  list-style: none;
+  margin: 0;
+}
+
+.lesson-item {
+  margin: 10px 0;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #333;
+  padding-bottom: 6px;
+}
