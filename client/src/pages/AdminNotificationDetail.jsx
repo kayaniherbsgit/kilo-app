@@ -13,7 +13,7 @@ const AdminNotificationDetail = () => {
   useEffect(() => {
     const fetchNotification = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/notifications/${id}`);
+        const res = await axios.get(`http://localhost:5000/api/admin/notifications/${id}`);
         setNotification(res.data); // ✅ fixed: backend returns a single object
       } catch (error) {
         console.error("Failed to fetch notification:", error);

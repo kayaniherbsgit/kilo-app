@@ -24,7 +24,7 @@ const UserManager = ({ users, searchQuery, setSearchQuery, sortByStreak, setSort
         {filteredUsers.map((user, i) => (
           <li key={i} onClick={() => setSelectedUser(user)}>
             <img
-              src={`${import.meta.env.VITE_API_URL}${user.avatar && user.avatar !== '' ? user.avatar : '/uploads/default.png'}`}
+              src={`http://localhost:5000${user.avatar && user.avatar !== '' ? user.avatar : '/uploads/default.png'}`}
               alt="avatar"
               className="avatar-img"
             />

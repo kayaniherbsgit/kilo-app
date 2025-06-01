@@ -38,7 +38,7 @@ const LessonManager = ({
           reordered.splice(result.destination.index, 0, removed);
           setLessons(reordered);
 
-          fetch('${import.meta.env.VITE_API_URL}/api/admin/reorder-lessons', {
+          fetch('http://localhost:5000/api/admin/reorder-lessons', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -77,7 +77,7 @@ const LessonManager = ({
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             {lesson.thumbnail && (
                               <img
-                                src={`${import.meta.env.VITE_API_URL}${lesson.thumbnail}`}
+                                src={`http://localhost:5000${lesson.thumbnail}`}
                                 alt="thumbnail"
                                 className="lesson-thumb"
                               />
@@ -94,7 +94,7 @@ const LessonManager = ({
                           </p>
                           {lesson.audio && (
                             <audio controls style={{ width: '100%', marginTop: '10px' }}>
-                              <source src={`${import.meta.env.VITE_API_URL}${lesson.audio}`} />
+                              <source src={`http://localhost:5000${lesson.audio}`} />
                             </audio>
                           )}
                           <div style={{ marginTop: '10px', display: 'flex', gap: '1rem' }}>

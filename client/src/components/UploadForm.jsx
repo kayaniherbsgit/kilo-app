@@ -47,8 +47,8 @@ const UploadForm = ({
 
     try {
       const endpoint = editLesson
-        ? `${import.meta.env.VITE_API_URL}/api/lessons/${lessonData._id}`
-        : '${import.meta.env.VITE_API_URL}/api/lessons';
+        ? `http://localhost:5000/api/lessons/${lessonData._id}`
+        : 'http://localhost:5000/api/lessons';
 
       const method = editLesson ? 'PUT' : 'POST';
 
