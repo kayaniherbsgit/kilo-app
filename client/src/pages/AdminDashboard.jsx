@@ -57,7 +57,7 @@ const AdminDashboard = () => {
       return;
     }
 
-    const newSocket = io('http://${import.meta.env.VITE_API_URL}');
+    const newSocket = io('${import.meta.env.VITE_API_URL}');
     setSocket(newSocket);
     fetchAllData();
 
@@ -85,33 +85,33 @@ const AdminDashboard = () => {
   };
 
   const fetchLessons = async () => {
-    const res = await axios.get('http://${import.meta.env.VITE_API_URL}/api/lessons');
+    const res = await axios.get('${import.meta.env.VITE_API_URL}/api/lessons');
     setLessons(res.data);
   };
 
   const fetchUsers = async () => {
-    const res = await axios.get('http://${import.meta.env.VITE_API_URL}/api/users/all', {
+    const res = await axios.get('${import.meta.env.VITE_API_URL}/api/users/all', {
       headers: { Authorization: `Bearer ${token}` },
     });
     setUsers(res.data);
   };
 
   const fetchLogs = async () => {
-    const res = await axios.get('http://${import.meta.env.VITE_API_URL}/api/admin/activity-logs', {
+    const res = await axios.get('${import.meta.env.VITE_API_URL}/api/admin/activity-logs', {
       headers: { Authorization: `Bearer ${token}` },
     });
     setLogs(res.data);
   };
 
   const fetchNotifications = async () => {
-    const res = await axios.get('http://${import.meta.env.VITE_API_URL}/api/admin/notifications', {
+    const res = await axios.get('${import.meta.env.VITE_API_URL}/api/admin/notifications', {
       headers: { Authorization: `Bearer ${token}` },
     });
     setNotifications(res.data);
   };
 
   const fetchStats = async () => {
-    const res = await axios.get('http://${import.meta.env.VITE_API_URL}/api/admin/stats', {
+    const res = await axios.get('${import.meta.env.VITE_API_URL}/api/admin/stats', {
       headers: { Authorization: `Bearer ${token}` },
     });
     setStats(res.data);
@@ -154,7 +154,7 @@ const AdminDashboard = () => {
       audio: null, 
       thumbnail: null
     });
-    setPreview(lesson.thumbnail ? `http://${import.meta.env.VITE_API_URL}${lesson.thumbnail}` : null);
+    setPreview(lesson.thumbnail ? `${import.meta.env.VITE_API_URL}${lesson.thumbnail}` : null);
     setTab('upload');
     setModalOpen(true);
   };
@@ -166,7 +166,7 @@ const AdminDashboard = () => {
       if (val) formData.append(key, val);
     });
 
-    await axios.post('http://${import.meta.env.VITE_API_URL}/api/lessons', formData, {
+    await axios.post('${import.meta.env.VITE_API_URL}/api/lessons', formData, {
       headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
     });
 
@@ -182,7 +182,7 @@ const AdminDashboard = () => {
       if (val) formData.append(key, val);
     });
 
-    await axios.put(`http://${import.meta.env.VITE_API_URL}/api/lessons/${editLesson._id}`, formData, {
+    await axios.put(`${import.meta.env.VITE_API_URL}/api/lessons/${editLesson._id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
     });
 
@@ -196,7 +196,7 @@ const AdminDashboard = () => {
 
   const handleDeleteLesson = async (id) => {
     if (window.confirm('Delete this lesson?')) {
-      await axios.delete(`http://${import.meta.env.VITE_API_URL}/api/lessons/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/lessons/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchLessons();
@@ -207,7 +207,7 @@ const AdminDashboard = () => {
     if (window.confirm(`Delete ${selectedLessons.length} selected lessons?`)) {
       await Promise.all(
         selectedLessons.map(id => 
-          axios.delete(`http://${import.meta.env.VITE_API_URL}/api/lessons/${id}`, {
+          axios.delete(`${import.meta.env.VITE_API_URL}/api/lessons/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
           })
         )
@@ -402,7 +402,7 @@ const tabItems = [
               reordered.splice(result.destination.index, 0, removed);
               setLessons(reordered);
 
-              axios.post('http://${import.meta.env.VITE_API_URL}/api/admin/reorder-lessons', {
+              axios.post('${import.meta.env.VITE_API_URL}/api/admin/reorder-lessons', {
                 lessons: reordered.map((lesson, index) => ({
                   id: lesson._id,
                   order: index,
@@ -437,7 +437,7 @@ const tabItems = [
                               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 {lesson.thumbnail && (
                                   <img
-                                    src={`http://${import.meta.env.VITE_API_URL}${lesson.thumbnail}`}
+                                    src={`${import.meta.env.VITE_API_URL}${lesson.thumbnail}`}
                                     alt="thumbnail"
                                     className="lesson-thumb"
                                   />
@@ -454,7 +454,7 @@ const tabItems = [
                               </p>
                               {lesson.audio && (
                                 <audio controls style={{ width: '100%', marginTop: '10px' }}>
-                                  <source src={`http://${import.meta.env.VITE_API_URL}${lesson.audio}`} />
+                                  <source src={`${import.meta.env.VITE_API_URL}${lesson.audio}`} />
                                 </audio>
                               )}
                               <div style={{ marginTop: '10px', display: 'flex', gap: '1rem' }}>
@@ -517,7 +517,7 @@ const tabItems = [
             {filteredUsers.map((user, i) => (
               <li key={i} onClick={() => setSelectedUser(user)}>
                 <img
-                  src={`http://${import.meta.env.VITE_API_URL}${user.avatar && user.avatar !== '' ? user.avatar : '/uploads/default.png'}`}
+                  src={`${import.meta.env.VITE_API_URL}${user.avatar && user.avatar !== '' ? user.avatar : '/uploads/default.png'}`}
                   alt="avatar"
                   className="avatar-img"
                 />

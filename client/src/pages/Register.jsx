@@ -19,7 +19,7 @@ const Register = () => {
     data.append('avatar', formData.avatar);
 
     try {
-      await axios.post('http://${import.meta.env.VITE_API_URL}/api/auth/register', data);
+      await axios.post('${import.meta.env.VITE_API_URL}/api/auth/register', data);
       alert('Registration successful!');
       navigate('/login');
     } catch (error) {

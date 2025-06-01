@@ -9,7 +9,7 @@ const Notifications = () => {
 
   useEffect(() => {
     if (user?.username) {
-      axios.get(`http://${import.meta.env.VITE_API_URL}/api/notifications/${user.username}`)
+      axios.get(`${import.meta.env.VITE_API_URL}/api/notifications/${user.username}`)
         .then(res => setNotifications(res.data));
     }
   }, [user]);

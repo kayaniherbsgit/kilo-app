@@ -24,21 +24,21 @@ const [totalLessons, setTotalLessons] = useState(10); // Optional: You can fetch
 useEffect(() => {
   const fetchProgress = async () => {
     try {
-      const res = await axios.get(`http://${import.meta.env.VITE_API_URL}/api/users/state/${user.username}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/state/${user.username}`);
       setCompletedCount(res.data.completedLessons.length);
     } catch (err) {
       console.error('Failed to fetch completed lessons');
     }
 
     try {
-      const res = await axios.get(`http://${import.meta.env.VITE_API_URL}/api/users/streak/${user.username}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/streak/${user.username}`);
       setStreak(res.data.streak || 0);
     } catch (err) {
       console.error('Failed to fetch streak');
     }
 
     try {
-      const res = await axios.get(`http://${import.meta.env.VITE_API_URL}/api/lessons/count`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/lessons/count`);
       setTotalLessons(res.data.total);
     } catch (err) {
       console.error('Failed to fetch total lessons');
@@ -57,7 +57,7 @@ useEffect(() => {
 
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <img
-          src={`http://${import.meta.env.VITE_API_URL}${user.avatar || '/uploads/default.png'}`}
+          src={`${import.meta.env.VITE_API_URL}${user.avatar || '/uploads/default.png'}`}
           alt="avatar"
           style={{ width: 80, height: 80, borderRadius: '50%' }}
         />

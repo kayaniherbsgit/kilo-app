@@ -59,7 +59,7 @@ const AudioCard = ({
     setAutoPlayCancelled(false);
     setLastToastLevel(null);
 
-    axios.post('http://${import.meta.env.VITE_API_URL}/api/users/current-lesson', {
+    axios.post('${import.meta.env.VITE_API_URL}/api/users/current-lesson', {
       lessonId: lesson._id,
     }, {
       headers: {
@@ -88,7 +88,7 @@ const AudioCard = ({
         const currentProgress = (audio.currentTime / audio.duration) * 100;
         if (currentProgress > 0) {
           localStorage.setItem(`lesson-progress-${lesson._id}`, audio.currentTime);
-          axios.patch('http://${import.meta.env.VITE_API_URL}/api/users/progress', {
+          axios.patch('${import.meta.env.VITE_API_URL}/api/users/progress', {
             lessonId: lesson._id,
             progress: currentProgress,
           }, {
@@ -132,7 +132,7 @@ const togglePlay = () => {
         onMarkComplete(lesson._id);
       }
 
-      axios.post('http://${import.meta.env.VITE_API_URL}/api/user/mark-complete', {
+      axios.post('${import.meta.env.VITE_API_URL}/api/user/mark-complete', {
         lessonId: lesson._id,
       }, {
         headers: {
@@ -187,7 +187,7 @@ const togglePlay = () => {
 
   const handleNextClick = async () => {
     if (!completed.includes(lesson._id)) {
-      await axios.post('http://${import.meta.env.VITE_API_URL}/api/users/mark-complete', {
+      await axios.post('${import.meta.env.VITE_API_URL}/api/users/mark-complete', {
         lessonId: lesson._id,
       }, {
         headers: {
@@ -260,7 +260,7 @@ const togglePlay = () => {
       )}
 
       {lesson.thumbnail && (
-        <img src={`http://${import.meta.env.VITE_API_URL}${lesson.thumbnail}`} alt="Lesson" className="lesson-thumbnail" />
+        <img src={`${import.meta.env.VITE_API_URL}${lesson.thumbnail}`} alt="Lesson" className="lesson-thumbnail" />
       )}
 
       <h3>{lesson.title}</h3>
@@ -292,7 +292,7 @@ const togglePlay = () => {
       ref={audioRef}
       onTimeUpdate={onProgress}
       onEnded={handleEnded}
-      src={`http://${import.meta.env.VITE_API_URL}${lesson.audio}`}
+      src={`${import.meta.env.VITE_API_URL}${lesson.audio}`}
     />
 
     <div className="ring-wrapper">

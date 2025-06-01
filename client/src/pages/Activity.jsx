@@ -22,12 +22,12 @@ const Activity = () => {
 
     const fetchData = async () => {
       try {
-        const lessonsRes = await axios.get('http://${import.meta.env.VITE_API_URL}/api/lessons');
+        const lessonsRes = await axios.get('${import.meta.env.VITE_API_URL}/api/lessons');
         const sortedLessons = lessonsRes.data.sort((a, b) => a.day - b.day);
         setLessons(sortedLessons);
 
         if (storedUser?.username) {
-          const progressRes = await axios.get(`http://${import.meta.env.VITE_API_URL}/api/users/state/${storedUser.username}`);
+          const progressRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/state/${storedUser.username}`);
           setCompleted(progressRes.data.completedLessons || []);
         }
       } catch (err) {
@@ -61,7 +61,7 @@ const Activity = () => {
 
     const fetchTimeline = async () => {
       try {
-        const res = await axios.get(`http://${import.meta.env.VITE_API_URL}/api/users/activity/${storedUser.username}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/activity/${storedUser.username}`);
         const grouped = groupTimeline(res.data || []);
         setTimeline(grouped);
       } catch (err) {
