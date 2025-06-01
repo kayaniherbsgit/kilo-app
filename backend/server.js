@@ -42,6 +42,9 @@ const userRoutes = require('./routes/userRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
+app.get('/', (req, res) => {
+  res.send('🚀 Kilo App Backend is running!');
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/lessons', require('./routes/lessonRoutes'));
 app.use('/api/notifications', notificationRoutes);
