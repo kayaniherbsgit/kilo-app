@@ -4,7 +4,7 @@ import '../styles/AdminNotifications.css';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io('http://${import.meta.env.VITE_API_URL}');
 
 const AdminNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -18,7 +18,7 @@ const AdminNotifications = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/notifications', {
+      const res = await axios.get('http://${import.meta.env.VITE_API_URL}/api/admin/notifications', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotifications(res.data);
@@ -39,7 +39,7 @@ const AdminNotifications = () => {
 
   const handleMarkAsRead = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/admin/notifications/${id}/mark-read`, {}, {
+      await axios.put(`http://${import.meta.env.VITE_API_URL}/api/admin/notifications/${id}/mark-read`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchNotifications();
@@ -50,7 +50,7 @@ const AdminNotifications = () => {
 
   const handleMarkAllAsRead = async () => {
     try {
-      await axios.put('http://localhost:5000/api/admin/notifications/mark-all-read', {}, {
+      await axios.put('http://${import.meta.env.VITE_API_URL}/api/admin/notifications/mark-all-read', {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchNotifications();
@@ -62,7 +62,7 @@ const AdminNotifications = () => {
   const handleDeleteAll = async () => {
     if (!window.confirm('Are you sure you want to delete all notifications?')) return;
     try {
-      await axios.delete('http://localhost:5000/api/admin/notifications/delete-all', {
+      await axios.delete('http://${import.meta.env.VITE_API_URL}/api/admin/notifications/delete-all', {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchNotifications();

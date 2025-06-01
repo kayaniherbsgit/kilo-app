@@ -12,7 +12,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/users/profile/${username}`, {
+        const res = await axios.get(`http://${import.meta.env.VITE_API_URL}/api/users/profile/${username}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(res.data);

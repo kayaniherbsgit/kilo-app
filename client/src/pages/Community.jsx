@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import postSound from '../assets/post.mp3';
 import EmojiPicker from 'emoji-picker-react';
 
-const socket = io('http://localhost:5000');
+const socket = io('http://${import.meta.env.VITE_API_URL}');
 
 const Community = () => {
   const [posts, setPosts] = useState([]);
@@ -40,12 +40,12 @@ const Community = () => {
   }, []);
 
   const fetchPosts = async () => {
-    const res = await axios.get('http://localhost:5000/api/community');
+    const res = await axios.get('http://${import.meta.env.VITE_API_URL}/api/community');
     setPosts(res.data);
   };
 
   const fetchLeaders = async () => {
-    const res = await axios.get('http://localhost:5000/api/users/leaderboard');
+    const res = await axios.get('http://${import.meta.env.VITE_API_URL}/api/users/leaderboard');
     setLeaders(res.data);
   };
 
@@ -57,7 +57,7 @@ const Community = () => {
     formData.append('content', text);
     if (media) formData.append('media', media);
 
-    await axios.post('http://localhost:5000/api/community', formData, {
+    await axios.post('http://${import.meta.env.VITE_API_URL}/api/community', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 
@@ -67,12 +67,12 @@ const Community = () => {
   };
 
   const react = async (id, emoji) => {
-    await axios.post(`http://localhost:5000/api/community/${id}/reaction`, { emoji });
+    await axios.post(`http://${import.meta.env.VITE_API_URL}/api/community/${id}/reaction`, { emoji });
   };
 
   const comment = async (id, commentText) => {
     if (!commentText) return;
-    await axios.post(`http://localhost:5000/api/community/${id}/comment`, {
+    await axios.post(`http://${import.meta.env.VITE_API_URL}/api/community/${id}/comment`, {
       username: user.username,
       avatar: user.avatar || '',
       text: commentText,
@@ -203,7 +203,7 @@ const Community = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
               <img
-                src={`http://localhost:5000/uploads/${post.avatar || 'default.png'}`}
+                src={`http://${import.meta.env.VITE_API_URL}/uploads/${post.avatar || 'default.png'}`}
                 alt="avatar"
                 style={{ width: 40, height: 40, borderRadius: '50%' }}
               />
@@ -217,19 +217,19 @@ const Community = () => {
 
             {post.media && post.mediaType === 'image' && (
               <img
-                src={`http://localhost:5000/uploads/${post.media}`}
+                src={`http://${import.meta.env.VITE_API_URL}/uploads/${post.media}`}
                 alt="media"
                 style={{ width: '100%', borderRadius: '10px', marginTop: '1rem' }}
               />
             )}
             {post.media && post.mediaType === 'video' && (
               <video controls style={{ width: '100%', borderRadius: '10px', marginTop: '1rem' }}>
-                <source src={`http://localhost:5000/uploads/${post.media}`} />
+                <source src={`http://${import.meta.env.VITE_API_URL}/uploads/${post.media}`} />
               </video>
             )}
             {post.media && post.mediaType === 'audio' && (
               <audio controls style={{ width: '100%', marginTop: '1rem' }}>
-                <source src={`http://localhost:5000/uploads/${post.media}`} />
+                <source src={`http://${import.meta.env.VITE_API_URL}/uploads/${post.media}`} />
               </audio>
             )}
 
@@ -261,7 +261,7 @@ const Community = () => {
                 <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.4rem' }}>
                     <img
-                      src={`http://localhost:5000/uploads/${c.avatar || 'default.png'}`}
+                      src={`http://${import.meta.env.VITE_API_URL}/uploads/${c.avatar || 'default.png'}`}
                       alt="avatar"
                       style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }}
                     />
