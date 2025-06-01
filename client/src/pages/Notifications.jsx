@@ -9,7 +9,7 @@ const Notifications = () => {
 
   useEffect(() => {
     if (user?.username) {
-      axios.get(`http://localhost:5000/api/notifications/${user.username}`)
+      axios.get(`https://kilo-app-backend.onrender.com/api/notifications/${user.username}`)
         .then(res => setNotifications(res.data));
     }
   }, [user]);

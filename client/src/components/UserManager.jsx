@@ -24,7 +24,7 @@ const UserManager = ({ users, searchQuery, setSearchQuery, sortByStreak, setSort
         {filteredUsers.map((user, i) => (
           <li key={i} onClick={() => setSelectedUser(user)}>
             <img
-              src={`http://localhost:5000${user.avatar && user.avatar !== '' ? user.avatar : '/uploads/default.png'}`}
+              src={`https://kilo-app-backend.onrender.com${user.avatar && user.avatar !== '' ? user.avatar : '/uploads/default.png'}`}
               alt="avatar"
               className="avatar-img"
             />

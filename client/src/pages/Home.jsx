@@ -32,7 +32,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchLessons = async () => {
-      const res = await axios.get('http://localhost:5000/api/lessons');
+      const res = await axios.get('https://kilo-app-backend.onrender.com/api/lessons');
       const sorted = res.data.sort((a, b) => a.day - b.day);
       setLessons(sorted);
 
@@ -51,23 +51,23 @@ if (lastLessonId) {
     fetchLessons();
 
     if (user?.username) {
-      axios.get(`http://localhost:5000/api/users/state/${user.username}`).then(res => {
+      axios.get(`https://kilo-app-backend.onrender.com/api/users/state/${user.username}`).then(res => {
         setCompleted(res.data.completedLessons || []);
         setAudioProgress(res.data.audioProgress || {});
       });
 
-      axios.get(`http://localhost:5000/api/users/streak/${user.username}`).then(res => {
+      axios.get(`https://kilo-app-backend.onrender.com/api/users/streak/${user.username}`).then(res => {
         setStreak(res.data.streak || 0);
         if (res.data.streak === 7) {
           confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
         }
       });
 
-      axios.get(`http://localhost:5000/api/notifications/unread/${user.username}`).then(res => {
+      axios.get(`https://kilo-app-backend.onrender.com/api/notifications/unread/${user.username}`).then(res => {
         setUnreadCount(res.data.unreadCount || 0);
       });
 
-      axios.get(`http://localhost:5000/api/community/leaderboard`).then(res => {
+      axios.get(`https://kilo-app-backend.onrender.com/api/community/leaderboard`).then(res => {
         setTopUsers(res.data || []);
       });
     }
@@ -86,7 +86,7 @@ const saveIndex = async (newIndex) => {
   const lessonId = lessons[newIndex]?._id;
   if (lessonId) {
     localStorage.setItem('lastPlayedLessonId', lessonId);
-    await axios.post('http://localhost:5000/api/users/current-lesson', {
+    await axios.post('https://kilo-app-backend.onrender.com/api/users/current-lesson', {
       lessonId,
     }, {
       headers: { Authorization: `Bearer ${user?.token}` }
@@ -111,7 +111,7 @@ const saveIndex = async (newIndex) => {
   if (!completed.includes(lessonId)) {
     const updated = [...completed, lessonId];
     setCompleted(updated);
-    await axios.post('http://localhost:5000/api/users/mark-complete', {
+    await axios.post('https://kilo-app-backend.onrender.com/api/users/mark-complete', {
       lessonId,
     }, {
       headers: { Authorization: `Bearer ${user?.token}` }
@@ -162,7 +162,7 @@ const saveIndex = async (newIndex) => {
               })}
             >
               <img
-                src={`http://localhost:5000${user?.avatar || '/uploads/default.png'}`}
+                src={`https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`}
                 alt="avatar"
                 style={{ width: 30, height: 30, borderRadius: '50%' }}
               />

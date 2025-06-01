@@ -24,21 +24,21 @@ const [totalLessons, setTotalLessons] = useState(10); // Optional: You can fetch
 useEffect(() => {
   const fetchProgress = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/users/state/${user.username}`);
+      const res = await axios.get(`https://kilo-app-backend.onrender.com/api/users/state/${user.username}`);
       setCompletedCount(res.data.completedLessons.length);
     } catch (err) {
       console.error('Failed to fetch completed lessons');
     }
 
     try {
-      const res = await axios.get(`http://localhost:5000/api/users/streak/${user.username}`);
+      const res = await axios.get(`https://kilo-app-backend.onrender.com/api/users/streak/${user.username}`);
       setStreak(res.data.streak || 0);
     } catch (err) {
       console.error('Failed to fetch streak');
     }
 
     try {
-      const res = await axios.get(`http://localhost:5000/api/lessons/count`);
+      const res = await axios.get(`https://kilo-app-backend.onrender.com/api/lessons/count`);
       setTotalLessons(res.data.total);
     } catch (err) {
       console.error('Failed to fetch total lessons');
@@ -57,7 +57,7 @@ useEffect(() => {
 
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <img
-          src={`http://localhost:5000${user.avatar || '/uploads/default.png'}`}
+          src={`https://kilo-app-backend.onrender.com${user.avatar || '/uploads/default.png'}`}
           alt="avatar"
           style={{ width: 80, height: 80, borderRadius: '50%' }}
         />

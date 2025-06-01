@@ -7,7 +7,7 @@ const Lesson = () => {
   const [lesson, setLesson] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/lessons/${id}`)
+    axios.get(`https://kilo-app-backend.onrender.com/api/lessons/${id}`)
       .then((res) => setLesson(res.data))
       .catch((err) => console.error(err));
   }, [id]);
@@ -18,7 +18,7 @@ const Lesson = () => {
     <div style={{ padding: '2rem', background: '#111', color: '#fff' }}>
       <h2>{lesson.title}</h2>
       <p>{lesson.description}</p>
-      <audio controls src={`http://localhost:5000${lesson.audio}`} style={{ marginTop: '1rem' }} />
+      <audio controls src={`https://kilo-app-backend.onrender.com${lesson.audio}`} style={{ marginTop: '1rem' }} />
     </div>
   );
 };

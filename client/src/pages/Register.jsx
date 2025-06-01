@@ -19,7 +19,7 @@ const Register = () => {
     data.append('avatar', formData.avatar);
 
     try {
-      await axios.post('http://localhost:5000/api/auth/register', data);
+      await axios.post('https://kilo-app-backend.onrender.com/api/auth/register', data);
       alert('Registration successful!');
       navigate('/login');
     } catch (error) {
