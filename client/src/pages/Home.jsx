@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useSwipeable } from 'react-swipeable';
 import BottomNav from '../components/BottomNav';
-import { toast } from 'react-toastify';
 import confetti from 'canvas-confetti';
 import { useNavigate } from 'react-router-dom';
 import { FiBell } from 'react-icons/fi';
@@ -22,6 +21,7 @@ const Home = () => {
   const [streak, setStreak] = useState(0);
   const [showStreak, setShowStreak] = useState(false);
   const [topUsers, setTopUsers] = useState([]);
+  const [globalSetting, setGlobalSetting] = useState({});
   const bellRef = useRef();
   const navigate = useNavigate();
 
@@ -31,55 +31,55 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const fetchLessons = async () => {
-      const res = await axios.get('https://kilo-app-backend.onrender.com/api/lessons');
-      const sorted = res.data.sort((a, b) => a.day - b.day);
-      setLessons(sorted);
+  const fetchLessons = async () => {
+    const res = await axios.get('https://kilo-app-backend.onrender.com/api/lessons');
+    const sorted = res.data.sort((a, b) => a.day - b.day);
+    setLessons(sorted);
 
-      // ✅ Remember last played lesson
-      const lastLessonId = localStorage.getItem('lastPlayedLessonId');
-if (lastLessonId) {
-  const index = sorted.findIndex(l => l._id === lastLessonId);
-  if (index !== -1) {
-    setCurrentIndex(index);
-    toast.info(`📍 Jumped to Day ${sorted[index].day}: ${sorted[index].title}`);
+    const lastLessonId = localStorage.getItem('lastPlayedLessonId');
+    if (lastLessonId) {
+      const index = sorted.findIndex(l => l._id === lastLessonId);
+      if (index !== -1) {
+        setCurrentIndex(index);
+        toast.info(`📍 Jumped to Day ${sorted[index].day}: ${sorted[index].title}`);
+      }
+      localStorage.removeItem('lastPlayedLessonId');
+    }
+  };
+
+  fetchLessons();
+
+  if (user?.username) {
+    axios.get(`https://kilo-app-backend.onrender.com/api/users/state/${user.username}`).then(res => {
+      setCompleted(res.data.completedLessons || []);
+      setAudioProgress(res.data.audioProgress || {});
+    });
+
+    axios.get(`https://kilo-app-backend.onrender.com/api/users/streak/${user.username}`).then(res => {
+      setStreak(res.data.streak || 0);
+      if (res.data.streak === 7) {
+        confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+      }
+    });
+
+    axios.get(`https://kilo-app-backend.onrender.com/api/notifications/unread/${user.username}`).then(res => {
+      setUnreadCount(res.data.unreadCount || 0);
+    });
+
+    axios.get(`https://kilo-app-backend.onrender.com/api/community/leaderboard`).then(res => {
+      setTopUsers(res.data || []);
+    });
   }
-  localStorage.removeItem('lastPlayedLessonId');
-}
 
-    };
-    fetchLessons();
+  const once = localStorage.getItem('showStreakOnce');
+  if (!once) {
+    setShowStreak(true);
+    localStorage.setItem('showStreakOnce', 'true');
+  } else if (Math.random() < 0.3) {
+    setShowStreak(true);
+  }
+}, [user]);
 
-    if (user?.username) {
-      axios.get(`https://kilo-app-backend.onrender.com/api/users/state/${user.username}`).then(res => {
-        setCompleted(res.data.completedLessons || []);
-        setAudioProgress(res.data.audioProgress || {});
-      });
-
-      axios.get(`https://kilo-app-backend.onrender.com/api/users/streak/${user.username}`).then(res => {
-        setStreak(res.data.streak || 0);
-        if (res.data.streak === 7) {
-          confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
-        }
-      });
-
-      axios.get(`https://kilo-app-backend.onrender.com/api/notifications/unread/${user.username}`).then(res => {
-        setUnreadCount(res.data.unreadCount || 0);
-      });
-
-      axios.get(`https://kilo-app-backend.onrender.com/api/community/leaderboard`).then(res => {
-        setTopUsers(res.data || []);
-      });
-    }
-
-    const once = localStorage.getItem('showStreakOnce');
-    if (!once) {
-      setShowStreak(true);
-      localStorage.setItem('showStreakOnce', 'true');
-    } else if (Math.random() < 0.3) {
-      setShowStreak(true);
-    }
-  }, [user]);
 
 const saveIndex = async (newIndex) => {
   setCurrentIndex(newIndex);

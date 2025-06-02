@@ -325,19 +325,7 @@ const togglePlay = () => {
       />
       <span>{formatTime(audioRef.current?.duration || 0)}</span>
     </div>
-
-    <div className="volume-control">
-      <FiVolume2 />
-      <input
-        type="range"
-        min={0}
-        max={1}
-        step={0.01}
-        value={volume}
-        onChange={(e) => setVolume(parseFloat(e.target.value))}
-      />
-    </div>
-
+    
     <div className="nav-buttons">
       <button onClick={onPrev} disabled={currentIndex === 0} className="neon-btn">
         ⬅️ Previous Lesson

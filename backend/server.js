@@ -41,6 +41,8 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const userRoutes = require('./routes/userRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const globalUserSettingRoutes = require('./routes/globalUserSettingRoutes');
+
 
 app.get('/', (req, res) => {
   res.send('🚀 Kilo App Backend is running!');
@@ -51,6 +53,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/global-user-setting', globalUserSettingRoutes);
 
 
 // ✅ Auto-create admin

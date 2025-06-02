@@ -9,7 +9,7 @@ import DropZone from '../components/DropZone';
 import UserModal from '../components/UserModal';
 import ActivityLog from '../components/ActivityLog';
 import NotificationManager from '../components/NotificationManager';
-
+import { toast } from 'react-toastify';
 import {
   DragDropContext,
   Droppable,
@@ -33,17 +33,14 @@ const AdminDashboard = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [selectedLessons, setSelectedLessons] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false); // ✅ THIS IS WHAT YOU FORGOT
-
-
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [globalSettings, setGlobalSettings] = useState({ showWelcomeToast: true });
   const [lessonData, setLessonData] = useState({
     title: '', description: '', day: '', duration: '', level: '', audio: null, thumbnail: null
   });
-
   const [stats, setStats] = useState({
     totalUsers: 0, totalLessons: 0, averageStreak: 0, usersByDay: [], lessonsByDay: []
   });
-
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
   const token = localStorage.getItem('token');
@@ -60,6 +57,7 @@ const AdminDashboard = () => {
     const newSocket = io('https://kilo-app-backend.onrender.com');
     setSocket(newSocket);
     fetchAllData();
+    fetchGlobalSetting();
 
     newSocket.on('statsUpdated', fetchStats);
     newSocket.on('notificationsUpdated', fetchNotifications);
@@ -117,26 +115,47 @@ const AdminDashboard = () => {
     setStats(res.data);
   };
 
+  const fetchGlobalSetting = async () => {
+    try {
+      const res = await axios.get('https://kilo-app-backend.onrender.com/api/global-user-setting');
+      setGlobalSettings(res.data || { showWelcomeToast: true });
+    } catch (err) {
+      console.error('Failed to fetch global setting', err);
+    }
+  };
+
+  const updateGlobalSetting = async () => {
+    try {
+      await axios.post('https://kilo-app-backend.onrender.com/api/global-user-setting', {
+        showWelcomeToast: globalSettings.showWelcomeToast
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('✅ Global setting updated!');
+    } catch (err) {
+      toast.error('❌ Failed to update setting');
+    }
+  };
+
   const groupedNotifications = () => {
-  const groups = {};
+    const groups = {};
 
-  notifications.forEach(note => {
-    let type = 'Other';
-    const msg = note.message?.toLowerCase() || '';
+    notifications.forEach(note => {
+      let type = 'Other';
+      const msg = note.message?.toLowerCase() || '';
 
-    if (msg.includes('registered')) type = '🧑 User Registered';
-    else if (msg.includes('completed')) type = '✅ Lesson Completed';
-    else if (msg.includes('uploaded')) type = '📝 Lesson Uploaded';
-    else if (msg.includes('deleted')) type = '🗑 Deleted';
-    else if (msg.includes('updated')) type = '✏️ Updated';
+      if (msg.includes('registered')) type = '🧑 User Registered';
+      else if (msg.includes('completed')) type = '✅ Lesson Completed';
+      else if (msg.includes('uploaded')) type = '📝 Lesson Uploaded';
+      else if (msg.includes('deleted')) type = '🗑 Deleted';
+      else if (msg.includes('updated')) type = '✏️ Updated';
 
-    if (!groups[type]) groups[type] = [];
-    groups[type].push(note);
-  });
+      if (!groups[type]) groups[type] = [];
+      groups[type].push(note);
+    });
 
-  return Object.entries(groups);
-};
-
+    return Object.entries(groups);
+  };
 
   const handleDrop = (field) => (file) => {
     setLessonData(prev => ({ ...prev, [field]: file }));
@@ -248,16 +267,16 @@ const AdminDashboard = () => {
     navigate('/login');
   };
 
-const tabItems = [
-  { key: 'overview', label: '📊 Overview' },
-  { key: 'upload', label: editLesson ? '✏️ Edit Lesson' : '📤 Upload Lesson' },
-  { key: 'lessons', label: '🎧 All Lessons' },
-  { key: 'users', label: '👥 Users' },
-  { key: 'logs', label: '📋 Logs' },
-];
+  const tabItems = [
+    { key: 'overview', label: '📊 Overview' },
+    { key: 'upload', label: editLesson ? '✏️ Edit Lesson' : '📤 Upload Lesson' },
+    { key: 'lessons', label: '🎧 All Lessons' },
+    { key: 'users', label: '👥 Users' },
+    { key: 'logs', label: '📋 Logs' },
+  ];
 
   return (
-<div className="admin-dashboard">
+    <div className="admin-dashboard">
       <div className="admin-header">
         <h2 className="gradient-title">Hi, {user?.username || 'Admin'} 👋</h2>
 
@@ -271,7 +290,7 @@ const tabItems = [
             )}
           </div>
 
-    {showDropdown && (
+          {showDropdown && (
             <div className="notification-dropdown">
               <h4 className="dropdown-title">🔔 Notifications</h4>
               {groupedNotifications().length === 0 ? (
@@ -288,7 +307,7 @@ const tabItems = [
                         <div className="note-message">{note.message}</div>
                         <div className="note-time">
                           {new Date(note.createdAt).toLocaleString()}
-                   </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -305,7 +324,7 @@ const tabItems = [
         </div>
       </div>
 
-<div className="admin-tab-cards">
+      <div className="admin-tab-cards">
         {tabItems.map(({ key, label }) => (
           <div
             key={key}
@@ -315,17 +334,39 @@ const tabItems = [
             {label}
           </div>
         ))}
-        <div className="tab-card logout" onClick={() => {
-          localStorage.clear();
-          navigate('/login');
-        }}>
+        <div className="tab-card logout" onClick={handleLogout}>
           🚪 Logout
         </div>
       </div>
-      {tab === 'logs' && (
-  <ActivityLog logs={logs} />
-)}
 
+      {/* Global Settings Panel */}
+      {tab === 'overview' && (
+        <div className="card" style={{ marginTop: '1rem', padding: '1rem', background: '#202020' }}>
+          <h3>🌐 Global User Settings</h3>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <input
+              type="checkbox"
+              checked={globalSettings.showWelcomeToast}
+              onChange={(e) => setGlobalSettings({
+                ...globalSettings,
+                showWelcomeToast: e.target.checked
+              })}
+            />
+            Show Welcome Toast on Home
+          </label>
+          <button 
+            onClick={updateGlobalSetting} 
+            className="neon-btn" 
+            style={{ marginTop: '1rem' }}
+          >
+            Save Global Settings
+          </button>
+        </div>
+      )}
+
+      {tab === 'logs' && (
+        <ActivityLog logs={logs} />
+      )}
 
       {tab === 'upload' && (
         <form className="upload-form" onSubmit={handleSubmit}>

@@ -249,3 +249,20 @@ input[type="range"] {
   justify-content: center;
 }
 
+.new-glow {
+  box-shadow: 0 0 10px #07bc0c;
+  border: 1px solid #07bc0c;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 5px #07bc0c; }
+  50% { box-shadow: 0 0 15px #07bc0c; }
+  100% { box-shadow: 0 0 5px #07bc0c; }
+}
+
+.faded {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
