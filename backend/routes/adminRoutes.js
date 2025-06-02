@@ -2,19 +2,20 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
+const { sendNotification } = require('../controllers/adminController'); // 👈 add this if not imported
 const Notification = require('../models/Notification-Log'); // 👈 Add if not already imported
-
-
+const User = require('../models/User');
 const {
   getActivityLogs,
   getNotifications,
-  getStats
+  getStats,
+  sendNotification 
 } = require('../controllers/adminController');
 
 router.get('/activity-logs', auth, isAdmin, getActivityLogs);
 router.get('/notifications', auth, isAdmin, getNotifications);
 router.get('/stats', auth, isAdmin, getStats);
-
+router.post('/notifications', auth, isAdmin, sendNotification); // ✅ add this route
 const Lesson = require('../models/Lesson'); // Make sure this is at the top
 
 // Reorder lessons via drag-and-drop
@@ -80,6 +81,18 @@ router.get('/notifications/:id', async (req, res) => {
   }
 });
 
+router.get('/stats', auth, isAdmin, async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalLessons = await Lesson.countDocuments();
+    const users = await User.find();
+    const averageStreak =
+      users.reduce((sum, u) => sum + (u.streak || 0), 0) / (users.length || 1);
 
+    res.json({ totalUsers, totalLessons, averageStreak: Math.round(averageStreak) });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch stats', error: err.message });
+  }
+});
 
 module.exports = router;

@@ -41,7 +41,6 @@ const Home = () => {
       const index = sorted.findIndex(l => l._id === lastLessonId);
       if (index !== -1) {
         setCurrentIndex(index);
-        toast.info(`📍 Jumped to Day ${sorted[index].day}: ${sorted[index].title}`);
       }
       localStorage.removeItem('lastPlayedLessonId');
     }
@@ -161,11 +160,16 @@ const saveIndex = async (newIndex) => {
                 strokeLinecap: 'round',
               })}
             >
-              <img
-                src={`https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`}
-                alt="avatar"
-                style={{ width: 30, height: 30, borderRadius: '50%' }}
-              />
+<img
+  src={
+    user?.avatar?.startsWith('http')
+      ? user.avatar
+      : `https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`
+  }
+  alt="avatar"
+  style={{ width: 30, height: 30, borderRadius: '50%' }}
+/>
+
             </CircularProgressbarWithChildren>
           </div>
         </div>

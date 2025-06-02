@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/AdminDashboard.css';
+import "../styles/admin/AdminDashboard.css";
 
 const highlightKeywords = (text = '') => {
   const highlightMap = {

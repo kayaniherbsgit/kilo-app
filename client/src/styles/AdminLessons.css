@@ -1,0 +1,36 @@
+.lessons-container {
+  padding: 30px;
+  color: #fff;
+}
+
+.lessons-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #181818;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.lessons-table th,
+.lessons-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+.lessons-table th {
+  background-color: #222;
+}
+
+.lessons-table tr:hover {
+  background-color: #2a2a2a;
+}
+
+.delete-btn {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}

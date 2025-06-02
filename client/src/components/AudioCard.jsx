@@ -4,8 +4,6 @@ import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-pro
 import 'react-circular-progressbar/dist/styles.css';
 import Confetti from 'react-confetti';
 import { useWindowSize } from '@react-hook/window-size';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import '../styles/AudioCard.css';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
@@ -216,7 +214,6 @@ const togglePlay = () => {
 
   return (
     <div className={`card audio-card-container ${isCompleted ? 'lesson-completed' : 'pending'}`}>
-      <ToastContainer position="top-center" />
       {showConfetti && <Confetti width={width} height={height} />}
 
       {resumePrompt && (

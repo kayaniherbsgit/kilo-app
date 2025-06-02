@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../styles/AdminDashboard.css"; // ensure styling is in this file
+import "../styles/admin/AdminDashboard.css";
 
 const NotificationManager = () => {
   const [notifications, setNotifications] = useState([]);

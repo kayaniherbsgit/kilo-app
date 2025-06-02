@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { FiArrowLeft } from "react-icons/fi";
 import { FaBell } from "react-icons/fa";
-import "../styles/AdminNotificationDetail.css";
+import "../../styles/admin/AdminNotificationDetail.css";
 
 const AdminNotificationDetail = () => {
   const navigate = useNavigate();

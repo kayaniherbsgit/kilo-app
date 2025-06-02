@@ -1,0 +1,38 @@
+.upload-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+  background: #121212;
+  border-radius: 16px;
+  color: #fff;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.upload-form input,
+.upload-form textarea {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #1e1e1e;
+  color: white;
+}
+
+.upload-form label {
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.upload-form button {
+  padding: 10px;
+  background-color: #00cc66;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}

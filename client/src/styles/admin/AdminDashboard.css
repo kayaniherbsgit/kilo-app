@@ -1,4 +1,4 @@
-/* AdminDashboard.css */
+/* import "../../styles/admin/AdminDashboard.css";s */
 
 .admin-dashboard {
   padding: 20px;
@@ -637,7 +637,7 @@ table th {
   justify-content: flex-end;
 }
 
-/* Add this to AdminDashboard.css */
+/* Add this to import "../../styles/admin/AdminDashboard.css";s */
 .overview-section {
   padding: 1rem;
   background: #1a1a1a;
@@ -1279,4 +1279,59 @@ scrollbar-color: #555 #111;
   font-size: 0.8rem;
   color: #999;
   margin-top: 0.4rem;
+}
+
+
+
+/* Card-based dashboard styles */
+.admin-dashboard-cards {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.admin-card {
+  background: #1c1c1c;
+  padding: 2rem;
+  border-radius: 16px;
+  color: #b4ff39;
+  font-size: 1.2rem;
+  cursor: pointer;
+  text-align: center;
+  border: 1px solid #333;
+  transition: all 0.25s ease;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-card:hover {
+  background: #292929;
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px #b4ff39aa;
+}
+
+/* Back button styles */
+.neon-btn {
+  background: #b4ff39;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #000;
+  transition: 0.3s ease;
+}
+
+.neon-btn:hover {
+  background: #d4ff6f;
+  box-shadow: 0 0 8px #b4ff39;
 }

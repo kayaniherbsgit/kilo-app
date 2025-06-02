@@ -1,0 +1,19 @@
+.back-to-dashboard {
+  margin-bottom: 1rem;
+}
+
+.back-link {
+  color: #b4ff39;
+  background: #111;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  border: 1px solid #b4ff39;
+  transition: all 0.2s ease-in-out;
+}
+
+.back-link:hover {
+  background: #b4ff39;
+  color: #111;
+}

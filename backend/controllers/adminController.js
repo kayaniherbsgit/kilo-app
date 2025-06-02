@@ -42,8 +42,28 @@ const getStats = async (req, res) => {
   }
 };
 
+const sendNotification = async (req, res) => {
+  try {
+    const { title, message, target } = req.body;
+
+    const notification = await Notification.create({
+      title,
+      message,
+      target,
+      readBy: [],
+      createdAt: new Date(),
+    });
+
+    req.io?.emit('newNotification', notification); // optional real-time
+    res.status(201).json({ success: true, notification });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to send notification', error: err.message });
+  }
+};
+
 module.exports = {
   getActivityLogs,
   getNotifications,
-  getStats
+  getStats,
+  sendNotification 
 };
