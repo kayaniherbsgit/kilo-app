@@ -124,5 +124,36 @@ router.get('/activity/:username', async (req, res) => {
   }
 });
 
+router.put('/:id/approve', auth, isAdmin, async (req, res) => {
+  console.log('🚦 [userRoutes] PUT /:id/approve hit for user ID:', req.params.id);
+  
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Prevent approving admins
+    if (user.isAdmin) {
+      return res.status(400).json({ message: 'Cannot approve admin accounts' });
+    }
+
+    // Only update if not already approved
+    if (!user.isApproved) {
+      user.isApproved = true;
+      await user.save();
+      
+      console.log('✅ Approved user:', user.username);
+      return res.status(200).json(user);
+    }
+
+    res.status(200).json({ message: 'User was already approved', user });
+  } catch (err) {
+    console.error('❌ Approval error:', err);
+    res.status(500).json({ message: 'Approval failed' });
+  }
+});
+
+
 
 module.exports = router;

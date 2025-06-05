@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
-const { sendNotification } = require('../controllers/adminController'); // 👈 add this if not imported
 const Notification = require('../models/Notification-Log'); // 👈 Add if not already imported
 const User = require('../models/User');
 const {

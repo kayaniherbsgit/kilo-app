@@ -30,6 +30,33 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* COMMUNITY COMING SOON PAGE */
+
+.coming-soon {
+  min-height: 100vh;
+  padding-bottom: 6rem;
+  background: #0e0e0e;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.coming-soon h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.coming-soon p {
+  font-size: 1.1rem;
+  color: #aaa;
+  margin-bottom: 0.4rem;
+}
+
 .badge {
   font-size: 0.75rem;
   font-weight: 500;

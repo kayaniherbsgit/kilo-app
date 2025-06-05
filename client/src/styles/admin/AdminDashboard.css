@@ -1290,33 +1290,32 @@ scrollbar-color: #555 #111;
   margin: 0 auto;
 }
 
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
-}
-
 .admin-card {
-  background: #1c1c1c;
-  padding: 2rem;
-  border-radius: 16px;
+  background: #1a1a1a;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
   color: #b4ff39;
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  text-align: center;
-  border: 1px solid #333;
-  transition: all 0.25s ease;
-  min-height: 120px;
+  border: 1px solid #2d2d2d;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.6rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
 }
 
 .admin-card:hover {
-  background: #292929;
-  transform: translateY(-2px);
+  background: #232323;
+  transform: scale(1.01);
   box-shadow: 0 0 10px #b4ff39aa;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 /* Back button styles */

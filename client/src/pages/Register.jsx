@@ -2,8 +2,25 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const tanzaniaRegions = [
+  "Arusha", "Dar es Salaam", "Dodoma", "Geita", "Iringa", "Kagera", "Katavi",
+  "Kigoma", "Kilimanjaro", "Lindi", "Manyara", "Mara", "Mbeya", "Morogoro",
+  "Mtwara", "Mwanza", "Njombe", "Pwani", "Rukwa", "Ruvuma", "Shinyanga",
+  "Simiyu", "Singida", "Tabora", "Tanga"
+];
+
 const Register = () => {
-  const [formData, setFormData] = useState({ username: '', password: '', avatar: null });
+  const [formData, setFormData] = useState({
+    fullName: '',
+    username: '',
+    email: '',
+    phoneNumber: '',
+    whatsappNumber: '',
+    region: '',
+    password: '',
+    avatar: null,
+  });
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -11,28 +28,44 @@ const Register = () => {
     setFormData({ ...formData, [name]: files ? files[0] : value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const data = new FormData();
-    data.append('username', formData.username);
-    data.append('password', formData.password);
-    data.append('avatar', formData.avatar);
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      await axios.post('https://kilo-app-backend.onrender.com/api/auth/register', data);
-      alert('Registration successful!');
-      navigate('/login');
-    } catch (error) {
-      alert(error.response?.data?.message || 'Registration failed');
-    }
-  };
+  const isAdmin = formData.username.trim().toLowerCase() === 'kayaniadmin';
+  const data = new FormData();
+
+  // Only append avatar and region if NOT admin
+  Object.entries(formData).forEach(([key, value]) => {
+    if (isAdmin && ['region', 'phoneNumber', 'whatsappNumber', 'avatar'].includes(key)) return;
+    data.append(key, value);
+  });
+
+  try {
+    await axios.post('https://kilo-app-backend.onrender.com/api/auth/register', data);
+    alert(isAdmin ? 'Admin registered! You can now login.' : 'Registration successful! Wait for admin approval.');
+    navigate('/login');
+  } catch (error) {
+    alert(error.response?.data?.message || 'Registration failed');
+  }
+};
+
 
   return (
     <div style={containerStyle}>
       <div style={boxStyle}>
         <h2 style={titleStyle}>Register</h2>
         <form onSubmit={handleSubmit} encType="multipart/form-data">
+          <input type="text" name="fullName" placeholder="Full Name" onChange={handleChange} required style={inputStyle} />
           <input type="text" name="username" placeholder="Username" onChange={handleChange} required style={inputStyle} />
+          <input type="email" name="email" placeholder="Email" onChange={handleChange} required style={inputStyle} />
+          <input type="text" name="phoneNumber" placeholder="Phone Number" onChange={handleChange} required style={inputStyle} />
+          <input type="text" name="whatsappNumber" placeholder="WhatsApp Number" onChange={handleChange} required style={inputStyle} />
+          <select name="region" onChange={handleChange} required style={inputStyle}>
+            <option value="">Select Region</option>
+            {tanzaniaRegions.map((region) => (
+              <option key={region} value={region}>{region}</option>
+            ))}
+          </select>
           <input type="password" name="password" placeholder="Password" onChange={handleChange} required style={inputStyle} />
           <input type="file" name="avatar" accept="image/*" onChange={handleChange} required style={inputStyle} />
           <button type="submit" style={buttonStyle}>Register</button>
@@ -45,7 +78,7 @@ const Register = () => {
   );
 };
 
-// Reuse same styles from Login
+// Reuse same styles
 const containerStyle = {
   background: 'var(--bg)',
   minHeight: '100vh',
@@ -60,7 +93,7 @@ const boxStyle = {
   borderRadius: 'var(--radius)',
   boxShadow: 'var(--shadow)',
   width: '90%',
-  maxWidth: '400px',
+  maxWidth: '500px',
 };
 
 const titleStyle = {

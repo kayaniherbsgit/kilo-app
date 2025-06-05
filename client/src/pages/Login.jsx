@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  // Only username + password now
   const [formData, setFormData] = useState({ username: '', password: '' });
   const navigate = useNavigate();
 
@@ -11,12 +12,20 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('🚀 Submitting login with:', formData);
+
     try {
-const res = await axios.post(`https://kilo-app-backend.onrender.com/api/auth/login`, formData);
+      // Send just { username, password }
+      const res = await axios.post(
+        'https://kilo-app-backend.onrender.com/api/auth/login',
+        formData,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       alert('Login successful!');
-      if (res.data.user.username === 'kayaniadmin') {
+
+      if (res.data.user.isAdmin) {
         navigate('/admin');
       } else {
         navigate('/home');
@@ -31,19 +40,39 @@ const res = await axios.post(`https://kilo-app-backend.onrender.com/api/auth/log
       <div style={boxStyle}>
         <h2 style={titleStyle}>Login</h2>
         <form onSubmit={handleSubmit}>
-          <input type="text" name="username" placeholder="Username" onChange={handleChange} required style={inputStyle} />
-          <input type="password" name="password" placeholder="Password" onChange={handleChange} required style={inputStyle} />
-          <button type="submit" style={buttonStyle}>Login</button>
+          {/* Change name from usernameOrEmail → username */}
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          />
+          <button type="submit" style={buttonStyle}>
+            Login
+          </button>
         </form>
         <div style={switchStyle}>
-          Don’t have an account? <a href="/register" style={linkStyle}>Register here</a>
+          Don’t have an account?{' '}
+          <a href="/register" style={linkStyle}>
+            Register here
+          </a>
         </div>
       </div>
     </div>
   );
 };
 
-// Reusable styles
+// (Styled objects unchanged)
 const containerStyle = {
   background: 'var(--bg)',
   minHeight: '100vh',
@@ -51,7 +80,6 @@ const containerStyle = {
   justifyContent: 'center',
   alignItems: 'center',
 };
-
 const boxStyle = {
   background: 'var(--card)',
   padding: '2rem',
@@ -60,13 +88,11 @@ const boxStyle = {
   width: '90%',
   maxWidth: '400px',
 };
-
 const titleStyle = {
   textAlign: 'center',
   marginBottom: '1.5rem',
   color: 'var(--accent)',
 };
-
 const inputStyle = {
   width: '100%',
   padding: '0.75rem',
@@ -76,7 +102,6 @@ const inputStyle = {
   background: '#1f1f1f',
   color: '#fff',
 };
-
 const buttonStyle = {
   width: '100%',
   background: 'var(--accent)',
@@ -87,13 +112,11 @@ const buttonStyle = {
   cursor: 'pointer',
   fontWeight: 600,
 };
-
 const switchStyle = {
   textAlign: 'center',
   fontSize: '0.9rem',
   marginTop: '1rem',
 };
-
 const linkStyle = {
   color: 'var(--accent)',
   textDecoration: 'none',

@@ -7,29 +7,24 @@ const path = require('path');
 const auth = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 
-router.get('/admin/secret', auth, isAdmin, (req, res) => {
-  res.json({ message: 'This is a protected admin-only route.' });
-});
-
-
-// Multer config
+// Multer setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     const name = Date.now() + '-' + Math.round(Math.random() * 1e9) + ext;
     cb(null, name);
-  }
+  },
 });
 const upload = multer({ storage });
 
-// GET all posts
+// Get all posts
 router.get('/', async (req, res) => {
   const posts = await CommunityPost.find().sort({ timestamp: -1 });
   res.json(posts);
 });
 
-// POST new post
+// Create new post
 router.post('/', upload.single('media'), async (req, res) => {
   const { username, content } = req.body;
   const user = await User.findOne({ username });
@@ -50,12 +45,46 @@ router.post('/', upload.single('media'), async (req, res) => {
     avatar: user.avatar,
     content,
     media,
-    mediaType
+    mediaType,
   });
 
   await post.save();
   req.io?.emit('newPost', post);
   res.status(201).json(post);
+});
+
+// Delete post (User or Admin only)
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const post = await CommunityPost.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    const isOwner = post.username === req.user.username;
+    const isAdminUser = req.user.isAdmin;
+
+    if (!isOwner && !isAdminUser)
+      return res.status(403).json({ message: 'Not authorized to delete this post' });
+
+    await post.remove();
+    req.io?.emit('deletePost', req.params.id);
+    res.json({ message: 'Post deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Deletion failed', error: err.message });
+  }
+});
+
+// Patch/edit post
+router.patch('/:id', auth, async (req, res) => {
+  const post = await CommunityPost.findById(req.params.id);
+  if (!post) return res.status(404).json({ message: 'Post not found' });
+
+  if (post.username !== req.user.username && !req.user.isAdmin)
+    return res.status(403).json({ message: 'Not authorized' });
+
+  post.content = req.body.content || post.content;
+  await post.save();
+  req.io?.emit('updatePost', post);
+  res.json(post);
 });
 
 // React to post
@@ -85,10 +114,11 @@ router.post('/:id/comment', async (req, res) => {
   res.json(post);
 });
 
+// Leaderboard
 router.get('/leaderboard', async (req, res) => {
   try {
     const topUsers = await User.find().sort({ streak: -1 }).limit(10);
-    const leaderboard = topUsers.map((user) => ({
+    const leaderboard = topUsers.map(user => ({
       username: user.username,
       streak: user.streak || 0,
       avatar: user.avatar || '',

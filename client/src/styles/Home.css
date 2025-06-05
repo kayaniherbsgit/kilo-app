@@ -274,6 +274,53 @@
   box-shadow: 0 0 10px #00ff66aa;
 }
 
+.day-tab.completed-day {
+  background: #1c1c1c;
+  color: #00ff66;
+  box-shadow: 0 0 12px #00ff6688;
+  font-weight: 500;
+  border: 1px solid #00ff66;
+}
+
+
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+.day-tab.shake {
+  animation: shake 0.4s ease-in-out;
+}
 .day-tab:disabled {
   cursor: not-allowed;
+}
+
+/* Next Step Banner Style (auto-unlocked lesson) */
+.card h4 {
+  font-size: 1rem;
+  color: #00ff66;
+  margin-bottom: 0.4rem;
+}
+
+.card p {
+  font-size: 0.85rem;
+  color: var(--subtext);
+}
+
+.day-tab.locked-day {
+  filter: blur(2px);
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: auto;
+  transition: 0.3s ease;
+}
+
+.day-tab.locked-day:hover {
+  filter: blur(3px);
+  opacity: 0.6;
 }

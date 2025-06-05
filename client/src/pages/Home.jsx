@@ -10,6 +10,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import notificationSound from '../assets/notification.mp3';
 import '../styles/Home.css';
 import AudioCard from '../components/AudioCard';
+import { toast } from 'react-toastify';
 
 const Home = () => {
   const [user, setUser] = useState(null);
@@ -21,99 +22,116 @@ const Home = () => {
   const [streak, setStreak] = useState(0);
   const [showStreak, setShowStreak] = useState(false);
   const [topUsers, setTopUsers] = useState([]);
-  const [globalSetting, setGlobalSetting] = useState({});
   const bellRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     setUser(storedUser);
+
+      localStorage.removeItem('lastPlayedLessonId');
+
   }, []);
 
   useEffect(() => {
-  const fetchLessons = async () => {
-    const res = await axios.get('https://kilo-app-backend.onrender.com/api/lessons');
-    const sorted = res.data.sort((a, b) => a.day - b.day);
-    setLessons(sorted);
+    const fetchLessons = async () => {
+      const res = await axios.get('https://kilo-app-backend.onrender.com/api/lessons');
+      const sorted = res.data.sort((a, b) => a.day - b.day);
+      setLessons(sorted);
 
-    const lastLessonId = localStorage.getItem('lastPlayedLessonId');
-    if (lastLessonId) {
-      const index = sorted.findIndex(l => l._id === lastLessonId);
-      if (index !== -1) {
-        setCurrentIndex(index);
+      const lastLessonId = localStorage.getItem('lastPlayedLessonId');
+      if (lastLessonId) {
+        const index = sorted.findIndex(l => l._id === lastLessonId);
+        if (index !== -1) setCurrentIndex(index);
+        localStorage.removeItem('lastPlayedLessonId');
       }
-      localStorage.removeItem('lastPlayedLessonId');
+
+      // Auto-unlock toast
+      const nextLesson = sorted.find(
+        (lesson, index) =>
+          !completed.includes(lesson._id) &&
+          index === 0 || completed.includes(sorted[index - 1]?._id)
+      );
+      if (nextLesson) {
+        toast.success(`🎉 Day ${nextLesson.day} is unlocked!`);
+      }
+    };
+
+    fetchLessons();
+
+    if (user?.username) {
+      axios.get(`https://kilo-app-backend.onrender.com/api/users/state/${user.username}`).then(res => {
+        setCompleted(res.data.completedLessons || []);
+        setAudioProgress(res.data.audioProgress || {});
+      });
+
+      axios.get(`https://kilo-app-backend.onrender.com/api/users/streak/${user.username}`).then(res => {
+        setStreak(res.data.streak || 0);
+        if (res.data.streak === 7) confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+      });
+
+      axios.get(`https://kilo-app-backend.onrender.com/api/notifications/unread/${user.username}`).then(res => {
+        setUnreadCount(res.data.unreadCount || 0);
+      });
+
+      axios.get(`https://kilo-app-backend.onrender.com/api/community/leaderboard`).then(res => {
+        setTopUsers(res.data || []);
+      });
+    }
+
+    const once = localStorage.getItem('showStreakOnce');
+    if (!once) {
+      setShowStreak(true);
+      localStorage.setItem('showStreakOnce', 'true');
+    } else if (Math.random() < 0.3) {
+      setShowStreak(true);
+    }
+  }, [user]);
+
+  const saveIndex = async (newIndex) => {
+    setCurrentIndex(newIndex);
+    const lessonId = lessons[newIndex]?._id;
+    if (lessonId) {
+      localStorage.setItem('lastPlayedLessonId', lessonId);
+      await axios.post('https://kilo-app-backend.onrender.com/api/users/current-lesson', {
+        lessonId,
+      }, {
+        headers: { Authorization: `Bearer ${user?.token}` }
+      });
     }
   };
 
-  fetchLessons();
-
-  if (user?.username) {
-    axios.get(`https://kilo-app-backend.onrender.com/api/users/state/${user.username}`).then(res => {
-      setCompleted(res.data.completedLessons || []);
-      setAudioProgress(res.data.audioProgress || {});
-    });
-
-    axios.get(`https://kilo-app-backend.onrender.com/api/users/streak/${user.username}`).then(res => {
-      setStreak(res.data.streak || 0);
-      if (res.data.streak === 7) {
-        confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
-      }
-    });
-
-    axios.get(`https://kilo-app-backend.onrender.com/api/notifications/unread/${user.username}`).then(res => {
-      setUnreadCount(res.data.unreadCount || 0);
-    });
-
-    axios.get(`https://kilo-app-backend.onrender.com/api/community/leaderboard`).then(res => {
-      setTopUsers(res.data || []);
-    });
-  }
-
-  const once = localStorage.getItem('showStreakOnce');
-  if (!once) {
-    setShowStreak(true);
-    localStorage.setItem('showStreakOnce', 'true');
-  } else if (Math.random() < 0.3) {
-    setShowStreak(true);
-  }
-}, [user]);
-
-
-const saveIndex = async (newIndex) => {
-  setCurrentIndex(newIndex);
-  const lessonId = lessons[newIndex]?._id;
-  if (lessonId) {
-    localStorage.setItem('lastPlayedLessonId', lessonId);
-    await axios.post('https://kilo-app-backend.onrender.com/api/users/current-lesson', {
-      lessonId,
-    }, {
-      headers: { Authorization: `Bearer ${user?.token}` }
-    });
-  }
-};
-
-
   const nextLesson = () => {
-    if (currentIndex < lessons.length - 1) {
-      saveIndex(currentIndex + 1);
-    }
+    if (currentIndex < lessons.length - 1) saveIndex(currentIndex + 1);
   };
 
   const prevLesson = () => {
-    if (currentIndex > 0) {
-      saveIndex(currentIndex - 1);
-    }
+    if (currentIndex > 0) saveIndex(currentIndex - 1);
   };
 
- const markCompleted = async (lessonId) => {
+const markCompleted = async (lessonId) => {
   if (!completed.includes(lessonId)) {
     const updated = [...completed, lessonId];
     setCompleted(updated);
+
     await axios.post('https://kilo-app-backend.onrender.com/api/users/mark-complete', {
       lessonId,
     }, {
       headers: { Authorization: `Bearer ${user?.token}` }
+    });
+
+    // 🎉 Visual feedback
+    confetti({
+      particleCount: 100,
+      spread: 80,
+      origin: { y: 0.6 },
+    });
+
+    toast.success('✅ Lesson Completed!', {
+      position: 'bottom-center',
+      autoClose: 1800,
+      hideProgressBar: false,
+      theme: 'dark',
     });
   }
 };
@@ -136,6 +154,9 @@ const saveIndex = async (newIndex) => {
     : 0;
 
   const currentLesson = lessons[currentIndex];
+  const nextLessonObj = lessons[currentIndex + 1];
+  const nextLessonUnlocked =
+    nextLessonObj && completed.includes(currentLesson?._id);
 
   return (
     <div {...swipe} style={{ padding: '1.5rem', paddingBottom: '7rem', background: 'var(--bg)', color: 'var(--text)' }}>
@@ -160,16 +181,15 @@ const saveIndex = async (newIndex) => {
                 strokeLinecap: 'round',
               })}
             >
-<img
-  src={
-    user?.avatar?.startsWith('http')
-      ? user.avatar
-      : `https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`
-  }
-  alt="avatar"
-  style={{ width: 30, height: 30, borderRadius: '50%' }}
-/>
-
+              <img
+                src={
+                  user?.avatar?.startsWith('http')
+                    ? user.avatar
+                    : `https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`
+                }
+                alt="avatar"
+                style={{ width: 30, height: 30, borderRadius: '50%' }}
+              />
             </CircularProgressbarWithChildren>
           </div>
         </div>
@@ -181,28 +201,62 @@ const saveIndex = async (newIndex) => {
           <p>You're on a {streak}-day streak. Stay consistent!</p>
         </div>
       )}
-   <div className="day-tabs-scroll">
-  {lessons.map((lesson, index) => {
-    const isUnlocked = index === 0 || completed.includes(lessons[index - 1]._id);
-    const isActive = index === currentIndex;
 
-    return (
-      <button
-        key={lesson._id}
-        className={`day-tab ${isActive ? 'active-day' : ''}`}
-        disabled={!isUnlocked}
-        onClick={() => {
-          if (isUnlocked) {
-            saveIndex(index);
-          }
-        }}
-      >
-        Day {lesson.day}
-      </button>
-    );
-  })}
-</div>
+      <div className="day-tabs-scroll">
+        {lessons.map((lesson, index) => {
+          const isUnlocked = index === 0 || completed.includes(lessons[index - 1]?._id);
+          const isActive = index === currentIndex;
+const triggerShake = (index) => {
+  const tab = document.getElementById(`day-tab-${index}`);
+  if (tab) {
+    tab.classList.add('shake');
+    setTimeout(() => tab.classList.remove('shake'), 500);
+  }
 
+  const lockedDay = lessons[index];
+  const requiredDay = lessons[index - 1];
+
+  if (lockedDay && requiredDay) {
+    toast.info(`⛔ You must complete Day ${requiredDay.day} first!`, {
+      position: 'bottom-center',
+      autoClose: 2000,
+      theme: 'dark',
+    });
+  } else {
+    toast.info(`⛔ This lesson is locked.`, {
+      position: 'bottom-center',
+      autoClose: 2000,
+      theme: 'dark',
+    });
+  }
+};
+
+
+          return (
+<button
+  id={`day-tab-${index}`}
+  key={lesson._id}
+  className={`day-tab 
+    ${isActive ? 'active-day' : ''} 
+    ${completed.includes(lesson._id) ? 'completed-day' : ''} 
+    ${!isUnlocked ? 'locked-day' : ''}`}
+  onClick={() => {
+    if (isUnlocked) {
+      saveIndex(index);
+    } else {
+      triggerShake(index);
+    }
+  }}
+>
+  Day {lesson.day}
+</button>
+
+
+
+
+          );
+        })}
+      </div>
 
       {currentLesson && (
         <AudioCard
@@ -218,12 +272,13 @@ const saveIndex = async (newIndex) => {
         />
       )}
 
-      <div className="card" style={{ marginTop: '1.5rem', background: '#151515' }}>
+      {/* Community Leaderboard */}
+      <div className="card" style={{ marginTop: '2rem' }}>
         <h4>🌍 Community Activity</h4>
         <p style={{ fontSize: '0.9rem', color: 'var(--subtext)' }}>Check top streaks across the app 🚀</p>
         <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem' }}>
-          {topUsers.slice(0, 3).map((_, i) => (
-            <li key={i}>🏅 User #{i + 1}</li>
+          {topUsers.slice(0, 3).map((u, i) => (
+            <li key={i}>🏅 {u.username} — 🔥 {u.streak} days</li>
           ))}
         </ul>
         <button onClick={() => navigate('/community')} className="neon-btn" style={{ marginTop: '1rem' }}>
