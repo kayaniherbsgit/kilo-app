@@ -52,14 +52,14 @@ exports.login = async (req, res) => {
     const { username, password } = req.body;
     console.log('🚀 Received login request for username:', username);
 
-    // Case-insensitive exact match for username
+    // Case-insensitive exact match for username, explicitly include password field
     const user = await User.findOne({
       username: { $regex: new RegExp(`^${username}$`, 'i') }
-    }).select('+password'); // Explicitly include password field
+    }).select('+password');
 
     if (!user) {
       console.log('❌ No user found for username:', username);
-      return res.status(400).json({ message: 'Invalid credentials' }); // Generic message for security
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -68,25 +68,25 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Enforce approval check for non-admin users
+    // Block unapproved (non-admin) accounts
     if (!user.isApproved && !user.isAdmin) {
       console.log('⏳ Login attempt before approval:', username);
-      return res.status(403).json({ 
-        message: 'Your account is pending approval by admin.' 
+      return res.status(403).json({
+        message: 'Your account is pending approval by admin.'
       });
     }
 
     const token = generateToken(user);
     console.log('✅ Login success for username:', username);
-    
-    // Return minimal user data without sensitive info
+
+    // Return minimal user info (no password)
     const userData = {
       _id: user._id,
       username: user.username,
       isAdmin: user.isAdmin,
       avatar: user.avatar
     };
-    
+
     res.status(200).json({ user: userData, token });
   } catch (err) {
     console.log('💥 Error during login:', err.message);

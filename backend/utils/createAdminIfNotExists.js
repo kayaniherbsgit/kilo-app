@@ -10,6 +10,7 @@ const createAdminIfNotExists = async () => {
     return;
   }
 
+  // Hash the string "#Kayani2025" and store it
   const hashedPassword = await bcrypt.hash('#Kayani2025', 10);
 
   await User.create({
@@ -25,7 +26,7 @@ const createAdminIfNotExists = async () => {
     isApproved: true
   });
 
-console.log('🎉 Default admin created: kayaniadmin / #Kayani2025');
+  console.log('🎉 Default admin created: kayaniadmin / #Kayani2025');
 };
 
 module.exports = createAdminIfNotExists;
