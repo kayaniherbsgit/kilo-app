@@ -181,3 +181,63 @@
   gap: 1.5rem;  /* was 1rem; now extra spacing between Prev/Next */
   padding: 0 0.8rem 1rem;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Resume Modal Cleanup (so “Yes, resume” / “No, start over” are well spaced)
+───────────────────────────────────────────────────────────────────────────── */
+.resume-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.88);  /* semi‐transparent black */
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resume-box {
+  background-color: #1f1f1f;
+  border-radius: 8px;
+  padding: 1rem 1.4rem;            /* comfortable internal padding */
+  text-align: center;
+  max-width: 260px;                /* give it a bit more room horizontally */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+}
+
+.resume-box h4 {
+  margin-bottom: 0.4rem;           /* slightly less than before */
+  color: #b4ff39;                  /* neon green text */
+  font-size: 1.05rem;              /* keep the heading prominent */
+}
+
+.resume-box p {
+  margin-bottom: 1.2rem;           /* extra space before the buttons */
+  color: #ddd;
+  font-size: 0.9rem;
+}
+
+.resume-btn-group {
+  display: flex;
+  gap: 1rem;                       /* full 1rem between the two buttons */
+  justify-content: center;
+}
+
+/* Override the default button size when inside .resume-btn-group */
+.resume-btn-group .neon-btn.small {
+  flex: 1;                         /* each takes up equal half of the container */
+  padding: 0.5rem 0.8rem;          /* narrow the padding so the two can sit side by side */
+  font-size: 0.95rem;              /* slightly smaller text for fitting nicely */
+  box-shadow: 0 0 6px rgba(7, 188, 12, 0.7); /* softer neon glow */
+}
+
+/* Optional: if you want the “Yes, resume” button to be a bit greener than the “No, start over” */
+.resume-btn-group .neon-btn.small:not(.disabled):first-child {
+  background-color: #07bc0c;
+}
+.resume-btn-group .neon-btn.small:not(.disabled):last-child {
+  background-color: #444;          /* e.g. dull gray, to indicate “start over” is the “danger” or “side” option */
+  color: #aaa;
+}
