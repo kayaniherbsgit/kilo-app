@@ -1,7 +1,5 @@
-// src/components/AudioCard.jsx
-import React, { useEffect, useState } from 'react';
-import { FiPlay, FiPause, FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-progressbar';
+import React, { useEffect, useState, useRef } from 'react';
+import { FiPlay, FiPause } from 'react-icons/fi';
 import 'react-circular-progressbar/dist/styles.css';
 import Confetti from 'react-confetti';
 import { useWindowSize } from '@react-hook/window-size';
@@ -22,12 +20,11 @@ const AudioCard = ({
   // Consume global audio context
   const { src, isPlaying, currentTime, duration, playSource, togglePlay, seekTo } = useAudio();
 
-  const [progress, setProgress] = useState(0);            // percent 0–100
+  const [progress, setProgress] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [resumePrompt, setResumePrompt] = useState(false);
   const [resumeTime, setResumeTime] = useState(0);
   const [lastToastLevel, setLastToastLevel] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [autoPlayTimer, setAutoPlayTimer] = useState(10);
   const [showAutoPlay, setShowAutoPlay] = useState(false);
   const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
@@ -35,12 +32,24 @@ const AudioCard = ({
   const [width, height] = useWindowSize();
   const isCompleted = completed.includes(lesson._id);
 
-  // 1) Whenever `lesson` changes:
+  // Track whether we’ve already triggered the “ended” sequence
+  const hasEndedRef = useRef(false);
+  const countdownRef = useRef(null);
+
+  // 1) Whenever `lesson` changes: load but do NOT auto-play
   useEffect(() => {
-    // Start playback of the new lesson via global AudioContext
+    hasEndedRef.current = false;
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    setShowAutoPlay(false);
+    setAutoPlayCancelled(false);
+
+    // Load the new lesson into the global AudioContext (paused)
     playSource(`https://kilo-app-backend.onrender.com${lesson.audio}`);
 
-    // Check if we should prompt “Resume from savedTime?”
+    // If we have saved progress >5s, show resume prompt
     const savedTime = localStorage.getItem(`lesson-progress-${lesson._id}`);
     const resumedKey = sessionStorage.getItem(`resumed-${lesson._id}`);
     if (savedTime && !resumedKey && parseFloat(savedTime) > 5) {
@@ -48,15 +57,10 @@ const AudioCard = ({
       setResumePrompt(true);
     }
 
-    // Reset UI flags whenever the lesson changes
     setProgress(0);
-    setShowAutoPlay(false);
-    setAutoPlayTimer(10);
-    setShowConfetti(false);
-    setAutoPlayCancelled(false);
     setLastToastLevel(null);
 
-    // Inform backend of “current lesson”
+    // Inform backend of current lesson
     axios
       .post(
         'https://kilo-app-backend.onrender.com/api/users/current-lesson',
@@ -80,7 +84,6 @@ const AudioCard = ({
     const pct = (currentTime / duration) * 100;
     setProgress(pct);
 
-    // Milestone toasts/Confetti exactly once per threshold
     if (pct >= 99 && lastToastLevel !== 'done') {
       if (!completed.includes(lesson._id)) {
         onMarkComplete(lesson._id);
@@ -111,42 +114,49 @@ const AudioCard = ({
       toast.info('🚀 Let’s go! Your journey begins.');
       setLastToastLevel('start');
     }
-  }, [
-    currentTime,
-    duration,
-    lastToastLevel,
-    lesson._id,
-    onMarkComplete,
-    completed,
-  ]);
+  }, [currentTime, duration, lastToastLevel, lesson._id, onMarkComplete, completed]);
 
-  // 3) When the track ends, show auto‐play overlay
+  // 3) Watch for “audio ended” and initiate 10s countdown once
   useEffect(() => {
-    if (duration && currentTime >= duration) {
+    if (!duration) return;
+
+    // If we haven’t already triggered “ended” and currentTime ≥ duration - 0.1
+    if (!hasEndedRef.current && currentTime >= duration - 0.1) {
+      hasEndedRef.current = true;
       setShowAutoPlay(true);
-      setAutoPlayCancelled(false);
-      setIsExpanded(false);
+      setAutoPlayTimer(10);
 
       let timer = 10;
-      setAutoPlayTimer(10);
-      const countdown = setInterval(() => {
+      countdownRef.current = setInterval(() => {
         if (autoPlayCancelled) {
-          clearInterval(countdown);
+          clearInterval(countdownRef.current);
+          countdownRef.current = null;
           setShowAutoPlay(false);
           return;
         }
         timer -= 1;
         setAutoPlayTimer(timer);
         if (timer <= 0) {
-          clearInterval(countdown);
+          clearInterval(countdownRef.current);
+          countdownRef.current = null;
           setShowAutoPlay(false);
           onNext();
         }
       }, 1000);
-      return () => clearInterval(countdown);
+    }
+
+    // If user seeks back before end, reset the flag/timer
+    if (hasEndedRef.current && currentTime < duration - 0.1) {
+      hasEndedRef.current = false;
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+        setShowAutoPlay(false);
+      }
     }
   }, [currentTime, duration, autoPlayCancelled, onNext]);
 
+  // Format seconds → M:SS
   const formatTime = (sec) => {
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60).toString().padStart(2, '0');
@@ -194,156 +204,94 @@ const AudioCard = ({
   };
 
   return (
-    <div className={`card audio-card-container ${isCompleted ? 'lesson-completed' : 'pending'}`}>
-      {showConfetti && <Confetti width={width} height={height} />}
+<div className={`card audio-card-container ${isCompleted ? 'lesson-completed' : ''}`}>
+  {showConfetti && <Confetti width={width} height={height} />}
 
-      {resumePrompt && (
-        <div className="resume-modal">
-          <div className="resume-box">
-            <h4>⏪ Resume?</h4>
-            <p>Do you want to continue from {formatTime(resumeTime)}?</p>
-            <div className="resume-btn-group">
-              <button
-                className="neon-btn"
-                onClick={() => {
-                  seekTo(resumeTime);
-                  sessionStorage.setItem(`resumed-${lesson._id}`, 'true');
-                  setResumePrompt(false);
-                }}
-              >
-                Yes, resume
-              </button>
-              <button
-                className="neon-btn"
-                onClick={() => {
-                  seekTo(0);
-                  sessionStorage.setItem(`resumed-${lesson._id}`, 'true');
-                  setResumePrompt(false);
-                }}
-              >
-                No, start over
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showAutoPlay && (
-        <div className="auto-play-overlay">
-          <div className="countdown-box">
-            <p>Auto-playing next lesson in</p>
-            <h1>{autoPlayTimer}s</h1>
-            <div className="resume-btn-group" style={{ marginTop: '1rem' }}>
-              <button
-                className="neon-btn"
-                onClick={() => {
-                  setShowAutoPlay(false);
-                  onNext();
-                }}
-              >
-                ⏭ Go to Next Now
-              </button>
-              <button
-                className="neon-btn"
-                onClick={() => {
-                  setAutoPlayCancelled(true);
-                  setShowAutoPlay(false);
-                }}
-              >
-                ✖ Stay Here
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {lesson.thumbnail && (
-        <img
-          src={`https://kilo-app-backend.onrender.com${lesson.thumbnail}`}
-          alt="Lesson"
-          className="lesson-thumbnail"
-        />
-      )}
-
-      <h3>{lesson.title}</h3>
-      <div style={{ margin: '1rem 0' }} />
-
-      {progressMessage() && <div className="progress-badge">{progressMessage()}</div>}
-      {isCompleted && <p className="completed-tag">✅ Lesson Completed</p>}
-
-      <div className="lesson-meta-bar">
-        <div className="meta-item">
-          📅 <span>Day {lesson.day}</span>
-        </div>
-        <div className="meta-item">
-          🎧 <span>{lesson.duration || 'Unknown'}</span>
-        </div>
-        <div className="meta-item">
-          🧠 <span>{lesson.level}</span>
+  {resumePrompt && (
+    <div className="resume-modal">
+      <div className="resume-box">
+        <h4>⏪ Resume?</h4>
+        <p>Continue from {formatTime(resumeTime)}?</p>
+        <div className="resume-btn-group">
+          <button className="neon-btn small" /* ... */>Yes, resume</button>
+          <button className="neon-btn small" /* ... */>No, start over</button>
         </div>
       </div>
-
-      <div style={{ textAlign: 'center', marginTop: '0.6rem' }}>
-        <button className="toggle-btn" onClick={() => setIsExpanded((prev) => !prev)}>
-          {isExpanded ? <FiChevronUp /> : <FiChevronDown />} {isExpanded ? 'Hide Details' : 'Show Details'}
-        </button>
-      </div>
-
-      {isExpanded && (
-        <div className="expand-wrapper">
-          <div className={`expandable-section ${isExpanded ? 'expanded' : ''}`}>
-            <p className="lesson-description">{lesson.description || 'No description provided.'}</p>
-
-            <div className="ring-wrapper">
-              <CircularProgressbarWithChildren
-                value={progress}
-                strokeWidth={10}
-                styles={buildStyles({
-                  pathColor: '#07bc0c',
-                  trailColor: '#333',
-                  strokeLinecap: 'round',
-                })}
-              >
-                <button onClick={togglePlay} className="glow-play-btn" aria-label="Play or Pause">
-                  {isPlaying ? <FiPause /> : <FiPlay />}
-                </button>
-              </CircularProgressbarWithChildren>
-            </div>
-
-            <div className="progress-container">
-              <span>{formatTime(currentTime || 0)}</span>
-              <input
-                type="range"
-                value={currentTime || 0}
-                min="0"
-                max={duration || 1}
-                step="0.1"
-                onChange={handleRangeChange}
-                className="progress-range"
-              />
-              <span>{formatTime(duration || 0)}</span>
-            </div>
-
-            <div className="progress-bar" onClick={handleSeekClick}>
-              <div className="progress-filled" style={{ width: `${progress}%` }} />
-            </div>
-
-            <div className="nav-buttons">
-              <button onClick={onPrev} disabled={currentIndex === 0} className="neon-btn">
-                ⬅️ Previous Lesson
-              </button>
-              <button
-                onClick={handleNextClick}
-                disabled={currentIndex === totalLessons - 1 || (!isCompleted && progress < 70)}
-                className={`neon-btn ${!isCompleted && progress < 70 ? 'disabled' : ''}`}
-              >
-                {isCompleted || progress >= 70 ? '➡️ Next Lesson' : '⏳ Listen 70% to continue'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
+  )}
+
+  {showAutoPlay && (
+    <div className="auto-play-overlay">
+      <div className="countdown-box">
+        <p>Auto‐playing next lesson in</p>
+        <h1>{autoPlayTimer}s</h1>
+        <div className="resume-btn-group">
+          <button className="neon-btn small">⏭ Next Now</button>
+          <button className="neon-btn small">✖ Stay Here</button>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <img
+    src={`https://kilo-app-backend.onrender.com${lesson.thumbnail}`}
+    alt="Lesson Thumbnail"
+    className="lesson-thumbnail"
+  />
+
+  <div className="audio-card-content">
+    <h3 className="lesson-title">{lesson.title}</h3>
+    <p className="lesson-description">
+      {lesson.description || 'No description provided.'}
+    </p>
+
+    <div className="tagline-badge">🚀 Let’s go! Your journey begins.</div>
+
+    <div className="lesson-meta-bar">
+      <div className="meta-item">📅 Day {lesson.day}</div>
+      <div className="meta-item">⏱ {lesson.duration || 'Unknown'}</div>
+      <div className="meta-item">🎧 {lesson.level}</div>
+    </div>
+
+    <div className="audio-controls-inline">
+      <button className="play-inline-btn" onClick={togglePlay}>
+        {isPlaying ? <FiPause /> : <FiPlay />}
+      </button>
+
+      <div className="progress-wrapper" onClick={handleSeekClick}>
+        <div className="progress-bar-linear">
+          <div
+            className="progress-filled-linear"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="time-stamps">
+        <span>{formatTime(currentTime || 0)}</span>
+        <span>/ {formatTime(duration || 0)}</span>
+      </div>
+    </div>
+
+    <div className="nav-buttons">
+      <button
+        onClick={onPrev}
+        disabled={currentIndex === 0}
+        className="neon-btn small"
+      >
+        ⬅️ Previous
+      </button>
+      <button
+        onClick={handleNextClick}
+        disabled={currentIndex === totalLessons - 1 || (!isCompleted && progress < 70)}
+        className={`neon-btn small ${(!isCompleted && progress < 70) ? 'disabled' : ''}`}
+      >
+        {isCompleted || progress >= 70 ? '➡️ Next' : '⏳ 70% to continue'}
+      </button>
+    </div>
+  </div>
+</div>
+
   );
 };
 

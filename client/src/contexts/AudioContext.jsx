@@ -25,34 +25,26 @@ export const AudioProvider = ({ children }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Whenever `src` changes, pause old, load new, then attempt to play
+  // Whenever `src` changes, pause old, load new, but DO NOT auto-play
   useEffect(() => {
     const audio = audioRef.current;
     if (!src) return;
 
-    // 1) Stop any previous playback
+    // 1) Pause any in‐flight playback
     audio.pause();
+    // 2) Reset currentTime to 0 (so new track always starts at 0)
     audio.currentTime = 0;
 
-    // 2) Set new source and load
+    // 3) Update the source and load
     audio.src = src;
     audio.load();
 
-    // 3) Play (catch AbortError if user hasn’t interacted)
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch((err) => {
-          console.warn('Audio play error:', err.message);
-          setIsPlaying(false);
-        });
-    }
+    // We intentionally do NOT call `audio.play()` here.
+    // Playback will begin only when the user taps Play via togglePlay().
+    setIsPlaying(false);
   }, [src]);
 
-  // timeupdate / loadedmetadata / ended listeners
+  // Add timeupdate / loadedmetadata / ended listeners
   useEffect(() => {
     const audio = audioRef.current;
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
@@ -72,10 +64,16 @@ export const AudioProvider = ({ children }) => {
 
   // Exposed methods:
 
-  const playSource = useCallback((newSrc) => {
-    setSrc(newSrc);
-  }, []);
+  // playSource: load a brand‐new `src` (but do NOT start playback)
+  const playSource = useCallback(
+    (newSrc) => {
+      setSrc(newSrc);
+      // Playback stays paused until togglePlay() is called
+    },
+    []
+  );
 
+  // togglePlay: if paused, attempt to play; otherwise, pause
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
     if (audio.paused) {
@@ -89,6 +87,7 @@ export const AudioProvider = ({ children }) => {
     }
   }, []);
 
+  // seekTo: jump to a specific time
   const seekTo = useCallback((time) => {
     const audio = audioRef.current;
     audio.currentTime = time;
