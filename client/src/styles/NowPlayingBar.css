@@ -1,0 +1,83 @@
+/* src/styles/NowPlayingBar.css */
+
+.now-playing-bar {
+  position: fixed;          /* float relative to viewport */
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  overflow: hidden;
+  user-select: none;        /* prevent text selection during drag */
+  display: flex;
+  flex-direction: column;
+  cursor: move;             /* show "move" cursor when hovering bar */
+}
+
+/* CONTENT: track info + play button */
+.now-playing-bar .content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  flex: 1;
+}
+
+/* TRACK INFO (left side) */
+.now-playing-bar .track-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  pointer-events: none;     /* so clicking text doesn't interfere with dragging */
+}
+
+.now-playing-bar .track-name {
+  color: #b4ff39;
+  font-weight: bold;
+  max-width: 180px;         /* adjust if you want more room for the name */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9rem;
+}
+
+.now-playing-bar .time-display {
+  color: #aaa;
+  font-size: 0.75rem;
+}
+
+/* PLAY / PAUSE BUTTON (right side) */
+.now-playing-bar .play-toggle-btn {
+  background: none;
+  border: none;
+  color: #b4ff39;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  pointer-events: auto;      /* clicks on this button should register */
+}
+
+.now-playing-bar .play-toggle-btn:hover {
+  transform: scale(1.1);
+}
+
+/* RESIZE HANDLE: bottom-right corner (bigger area to grab) */
+.now-playing-bar .resize-handle {
+  position: absolute;
+  width: 20px;              /* easier to grab */
+  height: 20px;
+  right: 2px;
+  bottom: 2px;
+  cursor: nwse-resize;
+  background: #444;
+  border-radius: 3px;
+  z-index: 1001;             /* above content */
+  pointer-events: auto;      /* must catch mousedown for resizing */
+}
+
+.now-playing-bar .resize-handle:hover {
+  background: #666;
+}

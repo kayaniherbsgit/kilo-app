@@ -1,7 +1,9 @@
+// src/App.jsx
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
+
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Home from './pages/Home';
@@ -24,36 +26,99 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminOverview from './pages/admin/AdminOverview';
 import AdminUploadLesson from './pages/admin/AdminUploadLesson';
 
+import { AudioProvider } from './contexts/AudioContext';
+import NowPlayingBar from './components/NowPlayingBar';
+
 const App = () => {
   const location = useLocation();
-  
+
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Home /></motion.div>} />
-        <Route path="/admin" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><AdminDashboard /></motion.div>} />
-        <Route path="/activity" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Activity /></motion.div>} />
-        <Route path="/profile" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Profile /></motion.div>} />
-        <Route path="/profile-settings" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><ProfileSettings /></motion.div>} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/community" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Community /></motion.div>} />
-        <Route path="/profile/:username" element={<UserProfile />} />
-        <Route path="/admin/notifications" element={<AdminNotifications />} />
-        <Route path="/admin/send-notification" element={<SendNotification />} />
-        <Route path="/admin/notifications/:id" element={<AdminNotificationDetail />} />
-        <Route path="/lesson/:id" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Lesson /></motion.div>} />
-        <Route path="/admin/edit-lesson/:id" element={<EditLesson />} />
-        <Route path="/admin/lessons" element={<AdminLessons />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/overview" element={<AdminOverview />} />
-         <Route path="/admin/users" element={<AdminUsers />} />
-         <Route path="/admin/logs" element={<AdminLogs />} />
-         <Route path="/admin/upload" element={<AdminUploadLesson/>} />
-      </Routes>
-    </AnimatePresence>
+    <AudioProvider>
+      {/* AnimatePresence should wrap ONLY the route changes */}
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/home"
+            element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Home />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <AdminDashboard />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/activity"
+            element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Activity />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Profile />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/profile-settings"
+            element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <ProfileSettings />
+              </motion.div>
+            }
+          />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route
+            path="/community"
+            element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Community />
+              </motion.div>
+            }
+          />
+          <Route path="/profile/:username" element={<UserProfile />} />
+          <Route path="/admin/notifications" element={<AdminNotifications />} />
+          <Route
+            path="/admin/send-notification"
+            element={<SendNotification />}
+          />
+          <Route
+            path="/admin/notifications/:id"
+            element={<AdminNotificationDetail />}
+          />
+          <Route
+            path="/lesson/:id"
+            element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Lesson />
+              </motion.div>
+            }
+          />
+          <Route path="/admin/edit-lesson/:id" element={<EditLesson />} />
+          <Route path="/admin/lessons" element={<AdminLessons />} />
+          <Route path="/admin/overview" element={<AdminOverview />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/logs" element={<AdminLogs />} />
+          <Route path="/admin/upload" element={<AdminUploadLesson />} />
+        </Routes>
+      </AnimatePresence>
+
+      {/* NowPlayingBar sits here—outside AnimatePresence—so it floats above the bottom nav */}
+      <NowPlayingBar />
+    </AudioProvider>
   );
 };
 
