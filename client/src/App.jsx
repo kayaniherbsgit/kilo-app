@@ -116,8 +116,6 @@ const App = () => {
         </Routes>
       </AnimatePresence>
 
-      {/* NowPlayingBar sits here—outside AnimatePresence—so it floats above the bottom nav */}
-      <NowPlayingBar />
     </AudioProvider>
   );
 };

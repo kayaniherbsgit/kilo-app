@@ -361,7 +361,6 @@ const Home = () => {
           Open Community
         </button>
       </div>
-      {/* ———————————————————————————————— */}
 
       <BottomNav />
     </div>
