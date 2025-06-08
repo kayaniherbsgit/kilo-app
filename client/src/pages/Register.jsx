@@ -32,19 +32,23 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   const isAdmin = formData.username.trim().toLowerCase() === 'kayaniadmin';
-  const data = new FormData();
 
-  // Only append avatar and region if NOT admin
-  Object.entries(formData).forEach(([key, value]) => {
-    if (isAdmin && ['region', 'phoneNumber', 'whatsappNumber', 'avatar'].includes(key)) return;
-    data.append(key, value);
-  });
+  const data = {
+    fullName: formData.fullName,
+    username: formData.username,
+    email: formData.email,
+    phoneNumber: formData.phoneNumber,
+    whatsappNumber: formData.whatsappNumber,
+    region: formData.region,
+    password: formData.password,
+  };
 
   try {
     await axios.post('https://kilo-app-backend.onrender.com/api/auth/register', data);
     alert(isAdmin ? 'Admin registered! You can now login.' : 'Registration successful! Wait for admin approval.');
     navigate('/login');
   } catch (error) {
+    console.log('❌ Register error full:', error.response?.data);
     alert(error.response?.data?.message || 'Registration failed');
   }
 };

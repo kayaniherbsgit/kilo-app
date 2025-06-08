@@ -86,7 +86,7 @@ setUserData(updated);
 
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <img
-          src={`https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`}
+  src={`https://kilo-app-backend.onrender.com${userData?.avatar || '/uploads/default.png'}`}
           onError={(e) => {
             e.target.src = 'https://kilo-app-backend.onrender.com/uploads/default.png';
           }}

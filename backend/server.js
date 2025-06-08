@@ -25,9 +25,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Middleware
+// middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
+
+// serve avatar uploads statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ✅ Main Routes
@@ -44,6 +47,17 @@ app.use('/api/global-user-setting', require('./routes/globalUserSettingRoutes'))
 
 // ✅ Auto-create admin user
 const createAdminIfNotExists = require('./utils/createAdminIfNotExists');
+
+// 🔥 Global error handler (last middleware)
+app.use((err, req, res, next) => {
+  console.error('🔥 Uncaught error:', err);
+  res.status(500).json({
+    message: 'Something went wrong at the server level',
+    error: err.message,
+    full: err
+  });
+});
+
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,

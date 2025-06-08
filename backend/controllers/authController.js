@@ -17,11 +17,16 @@ exports.register = async (req, res) => {
       whatsappNumber, region, password
     } = req.body;
 
-    const userExists = await User.findOne({ $or: [{ username }, { email }] });
-    if (userExists) return res.status(400).json({ message: 'Username or email already exists' });
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'Username, email, and password are required.' });
+    }
 
-    const hashed = await bcrypt.hash(password, 10);
-    const avatarUrl = req.file ? req.file.path : '';
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
+    if (userExists) {
+      return res.status(400).json({ message: 'Username or email already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const isAdmin = username === 'kayaniadmin';
 
@@ -32,17 +37,20 @@ exports.register = async (req, res) => {
       phoneNumber,
       whatsappNumber,
       region,
-      password: hashed,
-      avatar: avatarUrl,
+      password: hashedPassword,
+      avatar: '', // 🔥 No avatar
       isAdmin,
-      isApproved: isAdmin // ✅ Only admin auto-approved
+      isApproved: isAdmin
     });
 
     const msg = isAdmin
       ? 'Admin registered successfully.'
       : 'Registration successful. Wait for admin approval.';
+
     res.status(201).json({ message: msg });
+
   } catch (err) {
+    console.error('💥 Registration error:', err);
     res.status(500).json({ message: 'Registration failed', error: err.message });
   }
 };
@@ -50,36 +58,28 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log('🚀 Received login request for username:', username);
 
-    // Case-insensitive exact match for username, explicitly include password field
     const user = await User.findOne({
       username: { $regex: new RegExp(`^${username}$`, 'i') }
     }).select('+password');
 
     if (!user) {
-      console.log('❌ No user found for username:', username);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log('❌ Wrong password for username:', username);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Block unapproved (non-admin) accounts
     if (!user.isApproved && !user.isAdmin) {
-      console.log('⏳ Login attempt before approval:', username);
       return res.status(403).json({
         message: 'Your account is pending approval by admin.'
       });
     }
 
     const token = generateToken(user);
-    console.log('✅ Login success for username:', username);
 
-    // Return minimal user info (no password)
     const userData = {
       _id: user._id,
       username: user.username,
@@ -89,7 +89,7 @@ exports.login = async (req, res) => {
 
     res.status(200).json({ user: userData, token });
   } catch (err) {
-    console.log('💥 Error during login:', err.message);
+    console.error('💥 Login error:', err);
     res.status(500).json({ message: 'Login failed', error: err.message });
   }
 };
