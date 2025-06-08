@@ -1,10 +1,10 @@
 .audio-card-container {
   position: relative;
   background-color: #121212;
-  border: 1px solid #07bc0c;      
+  border: 1px solid #07bc0c;
   border-radius: 12px;
-  box-shadow: 0 0 6px rgba(7,188,12,0.5);
-  margin: 0 0 2rem 0;
+  box-shadow: 0 0 6px rgba(7, 188, 12, 0.5);
+  margin-bottom: 2rem;
   padding: 1rem;
   color: #e0e0e0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,28 +12,20 @@
 
 .lesson-thumbnail {
   width: 100%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-radius: 10px;
   margin-bottom: 0.5rem;
-}
-
-.audio-card-header {
-  padding: 0 1rem 0.5rem;
-  text-align: center;
 }
 
 .lesson-title {
   font-size: 1.4rem;
-  margin: 0 0 0.5rem 0;
+  margin-bottom: 0.5rem;
 }
-
-
 
 .lesson-description {
   font-size: 0.95rem;
-  margin: 0 0 1rem 0;
+  margin-bottom: 1rem;
   line-height: 1.4;
   opacity: 0.88;
   text-align: center;
@@ -42,14 +34,12 @@
 .tagline-badge {
   background-color: #07bc0c;
   color: #121212;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
+  display: inline-block;
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 500;
-  box-shadow: 0 0 8px rgba(7,188,12,0.8);
+  box-shadow: 0 0 8px rgba(7, 188, 12, 0.8);
   margin-bottom: 1rem;
 }
 
@@ -60,82 +50,23 @@
   gap: 1.2rem;
   font-size: 0.9rem;
   color: #aaaaaa;
-  padding: 0.4rem 1rem 0.8rem 1rem;
+  padding: 0.4rem 1rem 0.8rem;
   border: 1px solid #07bc0c;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
 
-.lesson-meta-bar .meta-item {
+.meta-item {
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
 
-.audio-controls-inline {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.play-inline-btn {
-  background-color: #07bc0c;
-  border: none;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 0 8px rgba(7,188,12,0.7);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  color: #121212;
-  font-size: 1.2rem;
-}
-.play-inline-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(7,188,12,1);
-}
-
-.progress-wrapper {
-  flex: 1;
-  max-width: 260px;
-  cursor: pointer;
-}
-
-.progress-bar-linear {
-  width: 100%;
-  height: 7px;
-  background-color: #2a2a2a;
-  border-radius: 3.5px;
-  overflow: hidden;
-  margin: 0 auto;
-}
-
-.progress-filled-linear {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #07bc0c, #a4ff57);
-  transition: width 0.1s linear;
-}
-
-.time-stamps {
-  display: flex;
-  gap: 0.4rem;
-  font-size: 0.9rem;
-  color: #bbbbbb;
-  padding-left: 0.4rem;
-}
-
 .nav-buttons-wrapper {
   display: flex;
   justify-content: center;
-  /* Increase this gap until it looks spacious—but not too far apart. */
-  gap: 1.5rem;  /* was 1rem; now there’s more room between the two buttons */
-  margin-bottom: 1rem;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .neon-btn.small {
@@ -147,13 +78,15 @@
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(7,188,12,0.8);
+  box-shadow: 0 0 8px rgba(7, 188, 12, 0.8);
   transition: background-color 0.15s, box-shadow 0.15s;
 }
+
 .neon-btn.small:hover {
   background-color: #a4ff57;
-  box-shadow: 0 0 12px rgba(164,255,87,1);
+  box-shadow: 0 0 12px rgba(164, 255, 87, 1);
 }
+
 .neon-btn.small.disabled {
   background-color: #444;
   color: #666;
@@ -161,37 +94,13 @@
   box-shadow: none;
 }
 
-/* Optional—if you still have a completed tag: */
-.completed-tag {
-  font-size: 0.95rem;
-  color: #07bc0c;
-  font-weight: 500;
-  text-align: center;
-  margin: 0 0.8rem 1rem 0.8rem;
-  background-color: #222;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(7,188,12,0.6);
-}
-
-.nav-buttons {
-  display: flex;
-  justify-content: center;
-  /* Make this gap bigger: */
-  gap: 1.5rem;  /* was 1rem; now extra spacing between Prev/Next */
-  padding: 0 0.8rem 1rem;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Resume Modal Cleanup (so “Yes, resume” / “No, start over” are well spaced)
-───────────────────────────────────────────────────────────────────────────── */
 .resume-modal {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.88);  /* semi‐transparent black */
+  background: rgba(0, 0, 0, 0.88);
   z-index: 20;
   display: flex;
   align-items: center;
@@ -201,43 +110,125 @@
 .resume-box {
   background-color: #1f1f1f;
   border-radius: 8px;
-  padding: 1rem 1.4rem;            /* comfortable internal padding */
+  padding: 1rem 1.4rem;
   text-align: center;
-  max-width: 260px;                /* give it a bit more room horizontally */
+  max-width: 260px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
 }
 
 .resume-box h4 {
-  margin-bottom: 0.4rem;           /* slightly less than before */
-  color: #b4ff39;                  /* neon green text */
-  font-size: 1.05rem;              /* keep the heading prominent */
+  margin-bottom: 0.4rem;
+  color: #b4ff39;
+  font-size: 1.05rem;
 }
 
 .resume-box p {
-  margin-bottom: 1.2rem;           /* extra space before the buttons */
+  margin-bottom: 1.2rem;
   color: #ddd;
   font-size: 0.9rem;
 }
 
 .resume-btn-group {
   display: flex;
-  gap: 1rem;                       /* full 1rem between the two buttons */
+  gap: 1rem;
   justify-content: center;
 }
 
-/* Override the default button size when inside .resume-btn-group */
 .resume-btn-group .neon-btn.small {
-  flex: 1;                         /* each takes up equal half of the container */
-  padding: 0.5rem 0.8rem;          /* narrow the padding so the two can sit side by side */
-  font-size: 0.95rem;              /* slightly smaller text for fitting nicely */
-  box-shadow: 0 0 6px rgba(7, 188, 12, 0.7); /* softer neon glow */
+  flex: 1;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.95rem;
+  box-shadow: 0 0 6px rgba(7, 188, 12, 0.7);
 }
 
-/* Optional: if you want the “Yes, resume” button to be a bit greener than the “No, start over” */
 .resume-btn-group .neon-btn.small:not(.disabled):first-child {
   background-color: #07bc0c;
 }
+
 .resume-btn-group .neon-btn.small:not(.disabled):last-child {
-  background-color: #444;          /* e.g. dull gray, to indicate “start over” is the “danger” or “side” option */
+  background-color: #444;
   color: #aaa;
 }
+
+.auto-play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 10, 10, 0.9);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-box {
+  text-align: center;
+  background-color: #1c1c1c;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(7, 188, 12, 0.5);
+}
+
+.countdown-box p {
+  color: #ccc;
+  margin-bottom: 0.5rem;
+}
+
+.countdown-box h1 {
+  color: #b4ff39;
+  font-size: 2rem;
+}
+
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #07bc0c;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.start-overlay,
+.locked-overlay {
+  background: rgba(0, 0, 0, 0.85);
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+}
+
+.badge-popup {
+  background: #b4ff39;
+  color: black;
+  padding: 0.6rem 1rem;
+  margin: 1rem 0;
+  border-radius: 10px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.player-bar {
+  margin-top: 1rem;
+  background: #222;
+  padding: 0.8rem;
+  border-radius: 10px;
+  box-shadow: 0 0 8px #0f0;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+

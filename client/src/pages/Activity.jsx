@@ -16,9 +16,14 @@ const Activity = () => {
   const [timeline, setTimeline] = useState({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    setUser(storedUser);
+useEffect(() => {
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+  if (!storedUser || !storedUser.username) {
+    localStorage.clear();
+    return navigate('/login');
+  }
+  setUser(storedUser);
+
 
     const fetchData = async () => {
       try {

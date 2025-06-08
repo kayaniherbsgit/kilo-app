@@ -12,6 +12,8 @@ const UserSchema = new mongoose.Schema({
   isApproved: { type: Boolean, default: false },
   avatar: { type: String, default: '' },
   streak: { type: Number, default: 0 },
+  xp: { type: Number, default: 0 },
+  badges: [{ type: String }],
   completedLessons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Lesson' }],
   lastPlayedLesson: { type: mongoose.Schema.Types.ObjectId, ref: 'Lesson', default: null },
   activityLog: [

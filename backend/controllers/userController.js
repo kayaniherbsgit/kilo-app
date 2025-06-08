@@ -28,8 +28,23 @@ const updateProgress = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
 
-    if (!user.completedLessons.includes(lessonId)) {
+if (!user.completedLessons.includes(lessonId)) {
   user.completedLessons.push(lessonId);
+  user.xp += 10; // 🎯 Award XP
+
+  // 🎖️ Add badge logic
+  const completed = user.completedLessons.length;
+  const total = 28; // update if dynamic later
+
+  if (completed === 1 && !user.badges.includes('🏁 First Lesson')) {
+    user.badges.push('🏁 First Lesson');
+  }
+  if (completed >= total / 2 && !user.badges.includes('🎯 Halfway There')) {
+    user.badges.push('🎯 Halfway There');
+  }
+  if (completed === total && !user.badges.includes('🏆 All Done!')) {
+    user.badges.push('🏆 All Done!');
+  }
 
   const lesson = await Lesson.findById(lessonId);
   user.activityLog.push({
@@ -39,12 +54,13 @@ const updateProgress = async (req, res) => {
 
   await user.save();
 
-      await NotificationLog.create({
-        message: `🎉 ${user.username} completed lesson ID: ${lessonId}`,
-        userId: user._id,
-        type: 'success',
-      });
-    }
+  await NotificationLog.create({
+    message: `🎉 ${user.username} completed lesson ID: ${lessonId}`,
+    userId: user._id,
+    type: 'success',
+  });
+}
+
 
     res.status(200).json({ message: 'Progress updated' });
   } catch (err) {
@@ -52,8 +68,26 @@ const updateProgress = async (req, res) => {
   }
 };
 
+const updateLastPlayedLesson = async (req, res) => {
+  try {
+    const { lessonId } = req.body;
+
+    const user = await User.findById(req.user.id);
+    user.lastPlayedLesson = lessonId;
+
+    await user.save();
+
+    res.status(200).json({ message: 'Last played lesson updated' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update last played lesson', details: err.message });
+  }
+};
+
+
 module.exports = {
   getAllUsers,
   deleteUser,
-  updateProgress
+  updateProgress,
+  updateLastPlayedLesson
+
 };

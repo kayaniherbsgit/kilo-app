@@ -12,10 +12,13 @@ const {
   updateProgress
 } = require('../controllers/userController');
 
+const { updateLastPlayedLesson } = require('../controllers/userController');
+
 // Existing admin routes
 router.get('/all', auth, isAdmin, getAllUsers);
 router.delete('/:id', auth, isAdmin, deleteUser);
 router.patch('/progress', auth, updateProgress);
+router.post('/last-played', auth, updateLastPlayedLesson);
 
 // ✅ Save current lesson
 router.post('/current-lesson', auth, async (req, res) => {
@@ -151,6 +154,34 @@ router.put('/:id/approve', auth, isAdmin, async (req, res) => {
   } catch (err) {
     console.error('❌ Approval error:', err);
     res.status(500).json({ message: 'Approval failed' });
+  }
+});
+
+router.post('/complete-lesson', auth, async (req, res) => {
+  const { lessonId } = req.body;
+  if (!lessonId) return res.status(400).json({ message: 'Lesson ID is required' });
+
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Avoid duplicate entry
+    if (!user.completedLessons.includes(lessonId)) {
+      user.completedLessons.push(lessonId);
+
+      // Optional activity log
+      user.activityLog.push({
+        action: 'Completed Lesson',
+        message: `🎓 Finished lesson ID: ${lessonId}`,
+      });
+
+      await user.save();
+    }
+
+    res.status(200).json({ message: 'Lesson marked complete', completedLessons: user.completedLessons });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
