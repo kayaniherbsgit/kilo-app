@@ -21,7 +21,7 @@ exports.register = async (req, res) => {
     if (userExists) return res.status(400).json({ message: 'Username or email already exists' });
 
     const hashed = await bcrypt.hash(password, 10);
-    const avatarUrl = req.file ? `/uploads/${req.file.filename}` : '';
+    const avatarUrl = req.file ? req.file.path : '';
 
     const isAdmin = username === 'kayaniadmin';
 

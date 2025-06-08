@@ -86,11 +86,12 @@ setUserData(updated);
 
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <img
-          src={`https://kilo-app-backend.onrender.com${
-            userData.avatar || '/uploads/default.png'
-          }`}
+          src={`https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`}
+          onError={(e) => {
+            e.target.src = 'https://kilo-app-backend.onrender.com/uploads/default.png';
+          }}
           alt="avatar"
-          style={{ width: 80, height: 80, borderRadius: '50%' }}
+          style={{ width: 30, height: 30, borderRadius: '50%' }}
         />
         <h3 style={{ margin: '0.5rem 0 0' }}>{userData.username}</h3>
         <p

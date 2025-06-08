@@ -185,6 +185,25 @@ router.post('/complete-lesson', auth, async (req, res) => {
   }
 });
 
+router.get('/can-access/:day', auth, async (req, res) => {
+  try {
+    const { day } = req.params;
+    const user = await User.findById(req.user.userId);
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const currentDay = parseInt(day);
+    const previousDay = currentDay - 1;
+
+    if (previousDay <= 0) return res.json({ canAccess: true });
+
+    const isPreviousCompleted = user.lessonProgress?.get(String(previousDay));
+    return res.json({ canAccess: !!isPreviousCompleted });
+  } catch (err) {
+    console.error('can-access error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 
 module.exports = router;

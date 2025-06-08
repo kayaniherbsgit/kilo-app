@@ -146,11 +146,15 @@ const Home = () => {
                 strokeLinecap: 'round',
               })}
             >
-              <img
-                src={`https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`}
-                alt="avatar"
-                style={{ width: 30, height: 30, borderRadius: '50%' }}
-              />
+            <img
+              src={`https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`}
+              onError={(e) => {
+                e.target.src = 'https://kilo-app-backend.onrender.com/uploads/default.png';
+              }}
+              alt="avatar"
+              style={{ width: 30, height: 30, borderRadius: '50%' }}
+            />
+
             </CircularProgressbarWithChildren>
           </div>
         </div>
