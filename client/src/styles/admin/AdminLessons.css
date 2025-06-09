@@ -1,0 +1,57 @@
+.edit-lesson-container {
+  padding: 2rem;
+  max-width: 600px;
+  margin: auto;
+  background: #111;
+  border-radius: 16px;
+  box-shadow: 0 0 12px #00ff6644;
+}
+
+.edit-title {
+  color: #b4ff39;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.edit-lesson-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.edit-lesson-form label {
+  color: #aaa;
+  font-weight: 600;
+}
+
+.edit-lesson-form input,
+.edit-lesson-form textarea {
+  background: #1f1f1f;
+  border: 1px solid #444;
+  padding: 0.75rem;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+}
+
+.floating-save-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: #00ff66;
+  color: #000;
+  padding: 14px 24px;
+  border-radius: 999px;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 0 12px #00ff66aa;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+  z-index: 50;
+}
+.floating-save-btn:hover {
+  box-shadow: 0 0 20px #00ff66cc;
+  transform: scale(1.05);
+}

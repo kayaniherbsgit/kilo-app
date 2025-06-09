@@ -21,6 +21,8 @@ import AdminLessons from './pages/admin/AdminLessons';
 import AdminUploadLesson from "./pages/admin/AdminUploadLesson";
 import AdminLogs from './pages/admin/AdminLogs';
 import AdminSendNotification from './pages/admin/AdminSendNotification';
+import EditLesson from './pages/admin/EditLesson';
+
 
 
 const App = () => {
@@ -43,6 +45,7 @@ const App = () => {
         <Route path="/profile/:username" element={<UserProfile />} />
         <Route path="/admin/notifications" element={<AdminNotifications />} />
         <Route path="/admin/overview" element={<AdminOverview />} />
+        <Route path="/admin/edit-lesson/:id" element={<EditLesson />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/lessons" element={<AdminLessons />} />
         <Route path="/admin/notifications/:id" element={<AdminNotificationDetail />} />

@@ -48,9 +48,9 @@ const AudioCard = ({
       setResumePrompt(true);
     }
 
-delayTimerRef.current = setTimeout(() => {
-  setDelayedAutoPlay(true);
-}, 15000);
+    delayTimerRef.current = setTimeout(() => {
+      setDelayedAutoPlay(true);
+    }, 15000);
 
     axios.post(
       'https://kilo-app-backend.onrender.com/api/users/current-lesson',
@@ -62,13 +62,12 @@ delayTimerRef.current = setTimeout(() => {
   }, [lesson]);
 
   useEffect(() => {
-if (delayedAutoPlay && lesson?.audio && audioRef.current && audioRef.current.paused) {
-      audioRef.current.src = `https://kilo-app-backend.onrender.com${lesson.audio}`;
+    if (delayedAutoPlay && audioRef.current && audioRef.current.paused) {
       audioRef.current.play().catch((err) => {
         console.warn('Auto-play blocked:', err.message);
       });
     }
-  }, [delayedAutoPlay, lesson]);
+  }, [delayedAutoPlay]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -90,10 +89,20 @@ if (delayedAutoPlay && lesson?.audio && audioRef.current && audioRef.current.pau
             { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
           ).catch(err => console.error('Error saving completion:', err.message));
         }
+
         toast.success('🏁 ✅ Completed! Ready to level up.');
+        if (!sessionStorage.getItem(`confetti-shown-${lesson._id}`)) {
+          setShowConfetti(true);
+          sessionStorage.setItem(`confetti-shown-${lesson._id}`, 'true');
+          setTimeout(() => setShowConfetti(false), 5000);
+        }
+
+        toast('🔥 You’ve just added 1 to your streak! Keep going.', {
+          type: 'info',
+          icon: '🔥',
+        });
+
         setLastToastLevel('done');
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 5000);
       } else if (pct >= 70 && lastToastLevel !== 'almost') {
         toast.info('🔥 You’re almost done. Focus!');
         setLastToastLevel('almost');
@@ -225,13 +234,14 @@ if (delayedAutoPlay && lesson?.audio && audioRef.current && audioRef.current.pau
           <div className="meta-item">🎧 {lesson.level}</div>
         </div>
 
-        {/* ✅ Native HTML5 audio player */}
-<audio
-  ref={audioRef}
-  controls
-  src={`https://kilo-app-backend.onrender.com${lesson.audio}`}  // ✅ key fix!
-  style={{ width: '100%', marginTop: '1rem', borderRadius: '10px' }}
-/>
+        {/* ✅ Audio player with key to reset playback */}
+        <audio
+          key={lesson._id}
+          ref={audioRef}
+          controls
+          src={`https://kilo-app-backend.onrender.com${lesson.audio}`}
+          style={{ width: '100%', marginTop: '1rem', borderRadius: '10px' }}
+        />
 
         <div className="nav-buttons-wrapper">
           {currentIndex > 0 && (
@@ -240,17 +250,24 @@ if (delayedAutoPlay && lesson?.audio && audioRef.current && audioRef.current.pau
             </button>
           )}
           {currentIndex < totalLessons - 1 && (
-            <button
-              onClick={handleNextClick}
-              disabled={!isCompleted && progress < 70}
-              className={`neon-btn small ${!isCompleted && progress < 70 ? 'disabled' : ''}`}
-            >
-              {isCompleted
-                ? '➡️ Next'
-                : progress >= 70
-                ? '➡️ Next'
-                : '⏳ 70% to continue'}
-            </button>
+            <div>
+              <button
+                onClick={handleNextClick}
+                disabled={!isCompleted && progress < 70}
+                className={`neon-btn small ${!isCompleted && progress < 70 ? 'disabled' : ''}`}
+              >
+                {isCompleted
+                  ? '➡️ Next'
+                  : progress >= 70
+                  ? '➡️ Next'
+                  : '⏳ 70% to continue'}
+              </button>
+              {progress < 70 && !isCompleted && (
+                <small style={{ color: '#999', display: 'block', marginTop: '0.2rem' }}>
+                  Complete at least 70% to continue
+                </small>
+              )}
+            </div>
           )}
         </div>
       </div>

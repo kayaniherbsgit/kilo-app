@@ -50,9 +50,17 @@ const Home = () => {
         const sortedLessons = lessonsRes.data.sort((a, b) => a.day - b.day);
         setLessons(sortedLessons);
 
-        const lastId = localStorage.getItem('lastPlayedLessonId');
-        const lastIndex = sortedLessons.findIndex(l => l._id === lastId);
-        if (lastIndex !== -1) setCurrentIndex(lastIndex);
+        const savedUser = JSON.parse(localStorage.getItem('user'));
+        const storedLessonMap = JSON.parse(localStorage.getItem('userLessonMap')) || {};
+
+        let startIndex = 0;
+        if (savedUser?.username && storedLessonMap[savedUser.username]) {
+          const savedLessonId = storedLessonMap[savedUser.username];
+          const idx = sortedLessons.findIndex(l => l._id === savedLessonId);
+          if (idx !== -1) startIndex = idx;
+        }
+        setCurrentIndex(startIndex);
+
 
         setCompleted(stateRes.data.completedLessons || []);
         setAudioProgress(stateRes.data.audioProgress || {});
@@ -85,7 +93,9 @@ const Home = () => {
     setCurrentIndex(newIndex);
     const lessonId = lessons[newIndex]?._id;
     if (lessonId) {
-      localStorage.setItem('lastPlayedLessonId', lessonId);
+    const lessonMap = JSON.parse(localStorage.getItem('userLessonMap')) || {};
+    lessonMap[user.username] = lessonId;
+    localStorage.setItem('userLessonMap', JSON.stringify(lessonMap));
       await axios.post('https://kilo-app-backend.onrender.com/api/users/current-lesson', {
         lessonId
       }, {
@@ -167,23 +177,30 @@ const Home = () => {
         </div>
       )}
 
-      <div className="day-tabs-scroll">
-        {lessons.map((lesson, index) => {
-          const isUnlocked = index === 0 || completed.includes(lessons[index - 1]._id);
-          const isActive = index === currentIndex;
+<div className="day-tabs-scroll">
+  {lessons.map((lesson, index) => {
+    const isUnlocked = index === 0 || completed.includes(lessons[index - 1]._id);
+    const isActive = index === currentIndex;
+    const isCompleted = completed.includes(lesson._id);
 
-          return (
-            <button
-              key={lesson._id}
-              className={`day-tab ${isActive ? 'active-day' : ''}`}
-              disabled={!isUnlocked}
-              onClick={() => isUnlocked && saveIndex(index)}
-            >
-              Day {lesson.day}
-            </button>
-          );
-        })}
-      </div>
+    let tabClass = 'day-tab';
+    if (isActive) tabClass += ' active-day';
+    else if (isCompleted) tabClass += ' completed-day';
+    else if (!isUnlocked) tabClass += ' locked-day';
+
+    return (
+      <button
+        key={lesson._id}
+        className={tabClass}
+        disabled={!isUnlocked}
+        onClick={() => isUnlocked && saveIndex(index)}
+      >
+        Day {lesson.day}
+      </button>
+    );
+  })}
+</div>
+
 
       {currentLesson && (
         <AudioCard
