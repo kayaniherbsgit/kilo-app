@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../../styles/AdminLessons.css';
+import { motion, AnimatePresence } from 'framer-motion'; // Optional, for animation
+import "../../styles/admin/EditLesson.css";
 
 const EditLesson = () => {
   const { id } = useParams();
@@ -18,6 +19,8 @@ const EditLesson = () => {
   const [thumbnail, setThumbnail] = useState(null);
   const [previewURL, setPreviewURL] = useState('');
   const [audioURL, setAudioURL] = useState('');
+  const [showNewAudio, setShowNewAudio] = useState(false);
+  const [showNewThumbnail, setShowNewThumbnail] = useState(false);
 
   useEffect(() => {
     axios.get(`https://kilo-app-backend.onrender.com/api/lessons/${id}`, {
@@ -66,11 +69,29 @@ const EditLesson = () => {
   const handleThumbnailChange = (e) => {
     const file = e.target.files[0];
     setThumbnail(file);
+    setShowNewThumbnail(true);
     if (file) {
       const reader = new FileReader();
       reader.onload = () => setPreviewURL(reader.result);
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleAudioChange = (e) => {
+    const file = e.target.files[0];
+    setAudio(file);
+    setShowNewAudio(true);
+  };
+
+  const resetThumbnail = () => {
+    setThumbnail(null);
+    setPreviewURL(lesson.thumbnail);
+    setShowNewThumbnail(false);
+  };
+
+  const resetAudio = () => {
+    setAudio(null);
+    setShowNewAudio(false);
   };
 
   if (!lesson) return <p style={{ color: '#ccc', textAlign: 'center' }}>Loading lesson...</p>;
@@ -100,19 +121,52 @@ const EditLesson = () => {
         <input type="text" value={level} onChange={(e) => setLevel(e.target.value)} />
 
         <label>🔁 Current Audio</label>
-        {audioURL && <audio src={`https://kilo-app-backend.onrender.com${audioURL}`} controls style={{ marginBottom: '1rem' }} />}
+        {!showNewAudio && audioURL && (
+          <audio src={`https://kilo-app-backend.onrender.com${audioURL}`} controls style={{ marginBottom: '1rem' }} />
+        )}
 
         <label>🎵 Replace Audio</label>
-        <input type="file" accept="audio/*" onChange={(e) => setAudio(e.target.files[0])} />
+        <input type="file" accept="audio/*" onChange={handleAudioChange} />
+        <AnimatePresence>
+          {showNewAudio && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <span>New Audio: {audio?.name}</span>
+              <button type="button" onClick={resetAudio} className="neon-btn">❌ Remove</button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <label>🖼️ Current Thumbnail</label>
-        {previewURL && <img src={`https://kilo-app-backend.onrender.com${previewURL}`} alt="Preview" style={{ width: '100%', maxWidth: '300px', borderRadius: '12px', marginBottom: '1rem' }} />}
+        {!showNewThumbnail && previewURL && (
+          <img src={`https://kilo-app-backend.onrender.com${previewURL}`} alt="Current Thumbnail"
+            style={{ width: '100%', maxWidth: '300px', borderRadius: '12px', marginBottom: '1rem' }}
+          />
+        )}
 
         <label>🖼️ Replace Thumbnail</label>
         <input type="file" accept="image/*" onChange={handleThumbnailChange} />
+        <AnimatePresence>
+          {showNewThumbnail && previewURL && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{ marginTop: '1rem', textAlign: 'center' }}
+            >
+              <img src={previewURL} alt="Preview" style={{ width: '100%', maxWidth: '300px', borderRadius: '12px' }} />
+              <button type="button" onClick={resetThumbnail} className="neon-btn" style={{ marginTop: '0.5rem' }}>
+                ❌ Remove
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </form>
 
-      {/* Floating Save Button */}
       <button onClick={handleSubmit} className="floating-save-btn">
         💾 Update Lesson
       </button>

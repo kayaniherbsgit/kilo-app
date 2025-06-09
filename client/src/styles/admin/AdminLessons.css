@@ -1,57 +1,218 @@
-.edit-lesson-container {
-  padding: 2rem;
-  max-width: 600px;
+/* AdminLessons.css – Dark Neon Admin UI */
+
+.admin-lessons {
+  max-width: 1000px;
   margin: auto;
-  background: #111;
-  border-radius: 16px;
-  box-shadow: 0 0 12px #00ff6644;
+  padding: 2rem 1rem;
+  font-family: 'Inter', sans-serif;
+  background: #0d0d0d;
+  color: #eee;
+  min-height: 100vh;
+  position: relative;
 }
 
-.edit-title {
-  color: #b4ff39;
+.admin-lessons h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #48ff91;
+  margin-bottom: 1.2rem;
+}
+
+/* Search Bar */
+.search-bar {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #2a2a2a;
+  background-color: #1b1b1b;
+  color: #fff;
   margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-  text-align: center;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+.search-bar:focus {
+  border: 1px solid #48ff91;
+  outline: none;
 }
 
-.edit-lesson-form {
+/* Lesson List Styling */
+.lesson-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Individual Lesson Card */
+.lesson-card {
+  background: #1a1a1a;
+  padding: 1.2rem;
+  border-radius: 14px;
+  box-shadow: 0 0 14px rgba(0, 255, 123, 0.1);
+  border-left: 4px solid #48ff91;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.lesson-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 0 20px rgba(72, 255, 145, 0.25);
+}
+
+.lesson-info strong {
+  font-size: 1.2rem;
+  color: #fff;
+}
+.lesson-info p {
+  color: #ccc;
+  font-size: 0.95rem;
+}
+.lesson-info audio {
+  width: 100%;
+  margin-top: 0.5rem;
+  border-radius: 6px;
+  background: #000;
+}
+
+/* Edit & Delete Buttons */
+.lesson-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.edit-btn,
+.delete-btn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+.edit-btn {
+  background: #17472e;
+  color: #48ff91;
+}
+.edit-btn:hover {
+  background: #266943;
+  color: #fff;
+}
+.delete-btn {
+  background: #4e1b1b;
+  color: #ff6b6b;
+}
+.delete-btn:hover {
+  background: #712525;
+  color: #fff;
+}
+
+/* Floating Action Button (FAB) */
+.fab {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #48ff91;
+  color: #0d0d0d;
+  border-radius: 50%;
+  padding: 1rem 1.1rem;
+  font-size: 1.5rem;
+  box-shadow: 0 0 20px #48ff91;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+.fab:hover {
+  background: #36e47b;
+  box-shadow: 0 0 25px #36e47b;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Modal Box */
+.modal-box {
+  background: #111;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(72, 255, 145, 0.15);
+}
+
+.modal-box p {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: #eee;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
   gap: 1rem;
 }
 
-.edit-lesson-form label {
-  color: #aaa;
-  font-weight: 600;
-}
-
-.edit-lesson-form input,
-.edit-lesson-form textarea {
-  background: #1f1f1f;
-  border: 1px solid #444;
-  padding: 0.75rem;
+.confirm-btn,
+.cancel-btn {
+  padding: 0.6rem 1.2rem;
   border-radius: 8px;
-  color: white;
-  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  font-size: 0.9rem;
+  transition: background 0.3s;
 }
 
-.floating-save-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background-color: #00ff66;
-  color: #000;
-  padding: 14px 24px;
-  border-radius: 999px;
-  font-weight: bold;
-  font-size: 1rem;
-  box-shadow: 0 0 12px #00ff66aa;
-  border: none;
-  cursor: pointer;
-  transition: 0.3s ease;
-  z-index: 50;
+.confirm-btn {
+  background: #ff4f4f;
+  color: #fff;
 }
-.floating-save-btn:hover {
-  box-shadow: 0 0 20px #00ff66cc;
-  transform: scale(1.05);
+.confirm-btn:hover {
+  background: #e13d3d;
+}
+
+.cancel-btn {
+  background: #444;
+  color: #fff;
+}
+.cancel-btn:hover {
+  background: #666;
+}
+
+
+.lesson-thumb {
+  width: 100%;
+  max-height: 180px;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+  position: relative;
+}
+
+.lesson-thumb img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(72, 255, 145, 0.12);
+  transition: transform 0.3s ease;
+}
+
+.lesson-thumb img:hover {
+  transform: scale(1.02);
 }

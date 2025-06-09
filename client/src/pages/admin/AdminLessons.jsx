@@ -3,17 +3,20 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import '../../styles/AdminLessons.css';
 import BackToDashboard from '../../components/admin/BackToDashboard';
+import '../../styles/admin/AdminLessons.css';
 
 const AdminLessons = () => {
   const [lessons, setLessons] = useState([]);
+  const [search, setSearch] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [playingAudio, setPlayingAudio] = useState(null);
   const token = localStorage.getItem('token');
 
   const fetchLessons = async () => {
     try {
       const res = await axios.get('https://kilo-app-backend.onrender.com/api/lessons', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setLessons(res.data);
     } catch (err) {
@@ -21,12 +24,13 @@ const AdminLessons = () => {
     }
   };
 
-  const deleteLesson = async (id) => {
-    if (!window.confirm('Delete this lesson permanently?')) return;
+  const handleDelete = async () => {
+    if (!confirmDeleteId) return;
     try {
-      await axios.delete(`https://kilo-app-backend.onrender.com/api/lessons/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+      await axios.delete(`https://kilo-app-backend.onrender.com/api/lessons/${confirmDeleteId}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      setConfirmDeleteId(null);
       fetchLessons();
     } catch (err) {
       console.error('Delete failed', err);
@@ -52,26 +56,44 @@ const AdminLessons = () => {
     }
   };
 
+  const handlePlay = (audioSrc) => {
+    if (playingAudio && playingAudio !== audioSrc) {
+      const current = document.getElementById('global-audio');
+      if (current) current.pause();
+    }
+    setPlayingAudio(audioSrc);
+  };
+
   useEffect(() => {
     fetchLessons();
   }, []);
 
+  const filteredLessons = lessons.filter((l) =>
+    l.title.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-  
     <div className="admin-lessons">
-        <BackToDashboard />
+      <BackToDashboard />
 
       <h2>📚 All Lessons</h2>
-      <Link className="create-btn" to="/admin/upload">➕ New Lesson</Link>
 
-      {lessons.length === 0 ? (
+      <input
+        className="search-bar"
+        type="text"
+        placeholder="Search lessons..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
+      {filteredLessons.length === 0 ? (
         <p>No lessons found.</p>
       ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="lessons">
             {(provided) => (
               <ul {...provided.droppableProps} ref={provided.innerRef} className="lesson-list">
-                {lessons.map((lesson, index) => (
+                {filteredLessons.map((lesson, index) => (
                   <Draggable key={lesson._id} draggableId={lesson._id} index={index}>
                     {(provided) => (
                       <li
@@ -80,14 +102,27 @@ const AdminLessons = () => {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                       >
+                        {/* Thumbnail */}
+                        {lesson.thumbnail && (
+                          <div className="lesson-thumb">
+                            <img src={lesson.thumbnail} alt="Thumbnail" />
+                          </div>
+                        )}
+
                         <div className="lesson-info">
                           <strong>{lesson.title}</strong>
                           <p>{lesson.description || 'No description'}</p>
-                          <audio src={lesson.audio} controls />
+                          <audio
+                            id="global-audio"
+                            src={lesson.audio}
+                            controls
+                            onPlay={() => handlePlay(lesson.audio)}
+                          />
                         </div>
+
                         <div className="lesson-actions">
                           <Link to={`/admin/edit-lesson/${lesson._id}`} className="edit-btn">✏️ Edit</Link>
-                          <button onClick={() => deleteLesson(lesson._id)} className="delete-btn">🗑️</button>
+                          <button onClick={() => setConfirmDeleteId(lesson._id)} className="delete-btn">🗑️</button>
                         </div>
                       </li>
                     )}
@@ -98,6 +133,22 @@ const AdminLessons = () => {
             )}
           </Droppable>
         </DragDropContext>
+      )}
+
+      {/* Floating Add Button */}
+      <Link to="/admin/upload" className="fab">➕</Link>
+
+      {/* Delete Confirmation Modal */}
+      {confirmDeleteId && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <p>Are you sure you want to delete this lesson permanently?</p>
+            <div className="modal-actions">
+              <button onClick={handleDelete} className="confirm-btn">Yes, Delete</button>
+              <button onClick={() => setConfirmDeleteId(null)} className="cancel-btn">Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

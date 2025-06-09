@@ -1,7 +1,7 @@
 .audio-card-container {
   position: relative;
   background-color: #121212;
-  border: 1px solid #07bc0c;
+  border: 1px solid #048547;
   border-radius: 12px;
   box-shadow: 0 0 6px rgba(7, 188, 12, 0.5);
   margin-bottom: 2rem;
@@ -32,7 +32,7 @@
 }
 
 .tagline-badge {
-  background-color: #07bc0c;
+  background-color: #048547;
   color: #121212;
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -51,7 +51,7 @@
   font-size: 0.9rem;
   color: #aaaaaa;
   padding: 0.4rem 1rem 0.8rem;
-  border: 1px solid #07bc0c;
+  border: 1px solid #048547;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
@@ -70,7 +70,7 @@
 }
 
 .neon-btn.small {
-  background-color: #07bc0c;
+  background-color: #048547;
   color: #121212;
   border: none;
   border-radius: 8px;
@@ -142,7 +142,7 @@
 }
 
 .resume-btn-group .neon-btn.small:not(.disabled):first-child {
-  background-color: #07bc0c;
+  background-color: #048547;
 }
 
 .resume-btn-group .neon-btn.small:not(.disabled):last-child {
@@ -183,7 +183,7 @@
 
 .spinner {
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-left-color: #07bc0c;
+  border-left-color: #048547;
   border-radius: 50%;
   width: 40px;
   height: 40px;

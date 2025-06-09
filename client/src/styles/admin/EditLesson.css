@@ -1,0 +1,123 @@
+/* AdminLessons.css – Unified Green Theme */
+
+.edit-lesson-container {
+  max-width: 700px;
+  margin: auto;
+  padding: 2rem;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 0 12px #04854755;
+  color: #E6FEF3;
+}
+
+.edit-title {
+  color: #048547;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.edit-lesson-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-lesson-form label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #ccc;
+}
+
+.edit-lesson-form input[type="text"],
+.edit-lesson-form input[type="number"],
+.edit-lesson-form input[type="file"],
+.edit-lesson-form textarea {
+  background: #1f1f1f;
+  border: 1px solid #048547;
+  padding: 0.7rem;
+  margin-bottom: 1.5rem;
+  color: #fff;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.edit-lesson-form input:focus,
+.edit-lesson-form textarea:focus {
+  border-color: #048547;
+  outline: none;
+  box-shadow: 0 0 5px #04854799;
+}
+
+.edit-lesson-form audio {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.preview-thumbnail {
+  width: 100%;
+  max-width: 300px;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 10px #04854744;
+  transition: transform 0.3s ease;
+}
+
+.preview-thumbnail:hover {
+  transform: scale(1.01);
+}
+
+.neon-btn {
+  background-color: #048547;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.neon-btn:hover {
+  background-color: #066b39;
+  color: #fff;
+}
+
+.remove-btn {
+  background-color: #401d1d;
+  color: #ff4f4f;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+  background-color: #601f1f;
+}
+
+/* Floating Save Button */
+.floating-save-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #048547;
+  color: #fff;
+  padding: 0.9rem 1.5rem;
+  border: none;
+  border-radius: 50px;
+  font-weight: bold;
+  box-shadow: 0 0 10px #048547;
+  z-index: 99;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.floating-save-btn:hover {
+  background: #39f99c;
+  color: black;
+}

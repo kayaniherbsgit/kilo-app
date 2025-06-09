@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ActivityLog from '../../components/ActivityLog';
 import BackToDashboard from '../../components/admin/BackToDashboard';
+import "../../styles/admin/AdminLogs.css"
 
 
 const AdminLogs = () => {

@@ -94,7 +94,7 @@ const approveUser = async (id, username) => {
           onClick={() => setFilter('all')}
           style={{
             padding: '0.5rem 1rem',
-            background: filter === 'all' ? '#07bc0c' : '#333',
+            background: filter === 'all' ? '#048547' : '#333',
             color: filter === 'all' ? '#000' : '#ccc',
             border: 'none',
             borderRadius: '6px',
@@ -108,7 +108,7 @@ const approveUser = async (id, username) => {
           onClick={() => setFilter('pending')}
           style={{
             padding: '0.5rem 1rem',
-            background: filter === 'pending' ? '#07bc0c' : '#333',
+            background: filter === 'pending' ? '#048547' : '#333',
             color: filter === 'pending' ? '#000' : '#ccc',
             border: 'none',
             borderRadius: '6px',
@@ -163,7 +163,7 @@ const approveUser = async (id, username) => {
                   <button
                     onClick={() => approveUser(user._id, user.username)}
                     style={{
-                      background: '#07bc0c',
+                      background: '#048547',
                       color: '#000',
                       border: 'none',
                       borderRadius: '8px',
