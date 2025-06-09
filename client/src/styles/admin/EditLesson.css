@@ -121,3 +121,10 @@
   background: #39f99c;
   color: black;
 }
+
+.error-text {
+  color: #ff4f4f;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}

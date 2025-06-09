@@ -1,53 +1,118 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import { FiArrowLeft } from "react-icons/fi";
-import { FaBell } from "react-icons/fa";
-import "../../styles/admin/AdminNotificationDetail.css";
+// src/pages/admin/AdminDashboard.jsx
+import React, { useEffect, useState } from 'react';
+import { FaBell } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import "../../styles/admin/AdminDashboard.css";
 
-const AdminNotificationDetail = () => {
+const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [notification, setNotification] = useState(null);
+  const token = localStorage.getItem('token');
+  const [notifications, setNotifications] = useState([]);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await axios.get('https://kilo-app-backend.onrender.com/api/admin/notifications', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNotifications(res.data);
+    } catch (err) {
+      console.error('Failed to fetch notifications', err);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      await axios.patch(`https://kilo-app-backend.onrender.com/api/admin/notifications/${id}/mark-read`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === id ? { ...n, read: true } : n))
+      );
+    } catch (err) {
+      console.error('Failed to mark notification as read', err);
+    }
+  };
 
   useEffect(() => {
-    const fetchNotification = async () => {
-      try {
-        const res = await axios.get(`https://kilo-app-backend.onrender.com/api/admin/notifications/${id}`);
-        setNotification(res.data); // ✅ fixed: backend returns a single object
-      } catch (error) {
-        console.error("Failed to fetch notification:", error);
-      }
-    };
-    fetchNotification();
-  }, [id]);
+    fetchNotifications();
+  }, []);
 
-  if (!notification) return <p className="loading-msg">Loading...</p>;
+  const cards = [
+    { icon: '📊', title: 'Overview', path: '/admin/overview' },
+    { icon: '👥', title: 'Users', path: '/admin/users' },
+    { icon: '📤', title: 'Upload Lesson', path: '/admin/upload' },
+    { icon: '🎧', title: 'All Lessons', path: '/admin/lessons' },
+    { icon: '📋', title: 'Activity Logs', path: '/admin/logs' },
+    { icon: '✉️', title: 'Send Notification', path: '/admin/send-notification' },
+  ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="admin-notification-detail-container">
-      <button className="back-button" onClick={() => navigate(-1)}>
-        <FiArrowLeft size={16} />
-        Back
-      </button>
+    <div className="admin-dashboard-cards">
+      <div className="admin-header">
+        <h2 className="gradient-title">🛠 Admin Control Panel</h2>
+        <div className="notification-bell-container">
+          <FaBell
+            className="notification-bell"
+            onClick={() => setDropdownVisible(!dropdownVisible)}
+          />
+          {unreadCount > 0 && (
+            <span className="notification-count">{unreadCount}</span>
+          )}
 
-      <div className="notification-card">
-        <div className="icon-circle">
-          <FaBell size={24} />
+          {dropdownVisible && (
+            <div className="notification-dropdown">
+              <h4>Notifications</h4>
+              {notifications.length === 0 ? (
+                <p className="no-notifications">No notifications</p>
+              ) : (
+                notifications.map((note) => (
+                  <div
+                    key={note._id}
+                    className={`notification-item ${note.read ? '' : 'unread'}`}
+                    onClick={() => {
+                      markAsRead(note._id);
+                      navigate(`/admin/notifications/${note._id}`);
+                      setDropdownVisible(false);
+                    }}
+                  >
+                    <p className="note-message">{note.message}</p>
+                    <span className="note-time">{new Date(note.createdAt).toLocaleString()}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
+      </div>
 
-        <div className="notification-content">
-          <h2 className="notification-title">{notification.message}</h2>
-          <p className="notification-body">
-            {notification.body || "This is a system-generated notification. Please take action if needed."}
-          </p>
-          <p className="notification-time">
-            {new Date(notification.createdAt).toLocaleString()}
-          </p>
-        </div>
+      <div className="card-grid">
+        {cards.map(({ icon, title, path }, i) => (
+          <div key={i} className="admin-card" onClick={() => navigate(path)}>
+            <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+            <span style={{ fontWeight: '600' }}>{title}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+        <button
+          className="neon-btn"
+          onClick={handleLogout}
+        >
+          🚪 Logout
+        </button>
       </div>
     </div>
   );
 };
 
-export default AdminNotificationDetail;
+export default AdminDashboard;

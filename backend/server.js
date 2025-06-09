@@ -10,6 +10,8 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+const notificationRoutes = require('./routes/notificationRoutes');
+
 
 // ✅ Socket.io setup
 const io = new Server(server, {
@@ -40,7 +42,7 @@ app.use('/api/lessons', require('./routes/lessonRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 console.log('🔍 Mounted userRoutes on /api/users');
-
+app.use('/api', notificationRoutes);
 app.use('/api/community', require('./routes/communityRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/global-user-setting', require('./routes/globalUserSettingRoutes'));

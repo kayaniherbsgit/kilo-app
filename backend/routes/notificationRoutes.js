@@ -20,4 +20,24 @@ router.get('/unread/:username', async (req, res) => {
   }
 });
 
+// Mark a specific notification as read
+router.patch('/admin/notifications/:id/mark-read', auth, isAdmin, async (req, res) => {
+  try {
+    const updated = await Notification.findByIdAndUpdate(
+      req.params.id,
+      { read: true },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: 'Notification not found' });
+    }
+
+    res.json({ message: 'Marked as read', notification: updated });
+  } catch (err) {
+    res.status(500).json({ message: 'Error marking notification as read' });
+  }
+});
+
+
 module.exports = router;
