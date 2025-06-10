@@ -6,7 +6,6 @@ const getAllLessons = async (req, res) => {
   try {
     const lessons = await Lesson.find().sort({ day: 1 });
 
-    // 🔧 Fix audio path if missing '/uploads'
     lessons.forEach((lesson) => {
       if (lesson.audio && !lesson.audio.startsWith('/uploads')) {
         lesson.audio = `/uploads/${lesson.audio}`;
@@ -25,26 +24,42 @@ const uploadLesson = async (req, res) => {
     const audio = req.files?.audio?.[0]?.filename || '';
     const thumbnail = req.files?.thumbnail?.[0]?.filename || '';
 
+    let steps = [];
+    if (req.body.steps) {
+      try {
+        steps = typeof req.body.steps === 'string' ? JSON.parse(req.body.steps) : req.body.steps;
+      } catch (err) {
+        console.error('❌ Failed to parse steps JSON:', err.message);
+      }
+    }
+
+    // ✅ Inject main audio as first step if available
+    if (audio) {
+      steps.unshift({
+        type: 'audio',
+        src: `/uploads/${audio}`,
+        label: 'Main Audio',
+      });
+    }
+
     const newLesson = new Lesson({
       title,
       description,
       day,
       duration,
       level,
-      audio: audio ? `/uploads/${audio}` : '',
       thumbnail: thumbnail ? `/uploads/${thumbnail}` : '',
+      steps,
     });
 
     await newLesson.save();
 
-    // ✅ Save notification
     await Notification.create({
       title: `📚 New lesson uploaded`,
       message: `${title} is now available (Day ${day})`,
       createdBy: req.user.username || 'admin',
     });
 
-    // ✅ Log activity
     await logActivity({
       action: 'Upload Lesson',
       performedBy: req.user.username || 'admin',
@@ -64,16 +79,36 @@ const updateLesson = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    if (req.files?.audio?.[0]) {
-      updates.audio = `/uploads/${req.files.audio[0].filename}`;
+    const newAudio = req.files?.audio?.[0]?.filename;
+    const newThumbnail = req.files?.thumbnail?.[0]?.filename;
+
+    if (newThumbnail) {
+      updates.thumbnail = `/uploads/${newThumbnail}`;
     }
-    if (req.files?.thumbnail?.[0]) {
-      updates.thumbnail = `/uploads/${req.files.thumbnail[0].filename}`;
+
+    let steps = [];
+    if (updates.steps) {
+      try {
+        steps = typeof updates.steps === 'string' ? JSON.parse(updates.steps) : updates.steps;
+      } catch (err) {
+        console.error('❌ Failed to parse updated steps JSON:', err.message);
+        steps = [];
+      }
     }
+
+    // ✅ Inject new audio as first step if uploaded
+    if (newAudio) {
+      steps.unshift({
+        type: 'audio',
+        src: `/uploads/${newAudio}`,
+        label: 'Main Audio',
+      });
+    }
+
+    updates.steps = steps;
 
     const updated = await Lesson.findByIdAndUpdate(id, updates, { new: true });
 
-    // ✅ Log activity
     await logActivity({
       action: 'Edit Lesson',
       performedBy: req.user.username || 'admin',
@@ -88,11 +123,11 @@ const updateLesson = async (req, res) => {
   }
 };
 
+
 const deleteLesson = async (req, res) => {
   try {
     const deleted = await Lesson.findByIdAndDelete(req.params.id);
 
-    // ✅ Log activity
     if (deleted) {
       await logActivity({
         action: 'Delete Lesson',
@@ -111,17 +146,16 @@ const deleteLesson = async (req, res) => {
 
 const reorderLessons = async (req, res) => {
   try {
-    const { order } = req.body; // array of lesson IDs
+    const { order } = req.body;
     for (let i = 0; i < order.length; i++) {
       await Lesson.findByIdAndUpdate(order[i], { order: i });
     }
 
-    // ✅ Log activity
     await logActivity({
       action: 'Reorder Lessons',
       performedBy: req.user.username || 'admin',
       targetType: 'Lesson',
-      details: `Reordered ${order.length} lessons`
+      details: `Reordered ${order.length} lessons`,
     });
 
     res.json({ message: 'Lessons reordered successfully' });
@@ -135,5 +169,5 @@ module.exports = {
   uploadLesson,
   updateLesson,
   deleteLesson,
-  reorderLessons
+  reorderLessons,
 };

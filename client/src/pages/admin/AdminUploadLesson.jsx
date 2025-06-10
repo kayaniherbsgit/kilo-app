@@ -20,18 +20,53 @@ const AdminUpload = () => {
   const [showNewAudio, setShowNewAudio] = useState(false);
   const [showNewThumbnail, setShowNewThumbnail] = useState(false);
   const [uploading, setUploading] = useState(false);
-
   const [errors, setErrors] = useState({});
+
+  // Step Builder
+  const [steps, setSteps] = useState([]);
+  const [currentStepType, setCurrentStepType] = useState('audio');
+  const [stepData, setStepData] = useState({});
 
   const validate = () => {
     const newErrors = {};
     if (!title.trim()) newErrors.title = 'Title is required';
     if (!day || isNaN(day)) newErrors.day = 'Valid day number required';
-    if (!audio) newErrors.audio = 'Audio file is required';
+    if (!audio) newErrors.audio = 'Main audio is required';
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const addStep = () => {
+    if (!currentStepType) return;
+
+    const newStep = { type: currentStepType };
+
+    if (currentStepType === 'audio') {
+      if (!stepData.audioFile) return alert('Upload an audio file');
+      newStep.src = URL.createObjectURL(stepData.audioFile);
+      newStep._audioFile = stepData.audioFile;
+    }
+
+    if (currentStepType === 'text') {
+      if (!stepData.textContent) return alert('Enter some text');
+      newStep.content = stepData.textContent;
+    }
+
+    if (currentStepType === 'pdf') {
+      if (!stepData.pdfFile) return alert('Upload a PDF');
+      newStep.src = URL.createObjectURL(stepData.pdfFile);
+      newStep._pdfFile = stepData.pdfFile;
+    }
+
+    if (currentStepType === 'questions') {
+      if (!stepData.questions || stepData.questions.length === 0) return alert('Add at least one question');
+      newStep.questions = stepData.questions;
+    }
+
+    setSteps([...steps, newStep]);
+    setStepData({});
+  };
+
+    const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -40,22 +75,44 @@ const AdminUpload = () => {
     }
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('day', day);
-    formData.append('duration', duration);
-    formData.append('level', level);
-    if (audio) formData.append('audio', audio);
-    if (thumbnail) formData.append('thumbnail', thumbnail);
-
     try {
+      const uploadedSteps = await Promise.all(
+        steps.map(async (step) => {
+          if (step.type === 'audio' && step._audioFile) {
+            const form = new FormData();
+            form.append('file', step._audioFile);
+            const res = await axios.post('https://kilo-app-backend.onrender.com/api/lessons/upload-audio', form);
+return { ...step, src: `/uploads/${res.data.filename}` };
+          }
+
+          if (step.type === 'pdf' && step._pdfFile) {
+            const form = new FormData();
+            form.append('file', step._pdfFile);
+            const res = await axios.post('https://kilo-app-backend.onrender.com/api/lessons/upload-pdf', form);
+return { ...step, src: `/uploads/${res.data.filename}` };
+          }
+
+          return step;
+        })
+      );
+
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('day', day);
+      formData.append('duration', duration);
+      formData.append('level', level);
+      if (audio) formData.append('audio', audio);
+      if (thumbnail) formData.append('thumbnail', thumbnail);
+      formData.append('steps', JSON.stringify(uploadedSteps));
+
       await axios.post('https://kilo-app-backend.onrender.com/api/lessons', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         }
       });
+
       alert('✅ Lesson uploaded!');
       navigate('/admin/lessons');
     } catch (err) {
@@ -105,85 +162,96 @@ const AdminUpload = () => {
 
       <form onSubmit={handleSubmit} className="edit-lesson-form">
         <label>📝 Title</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => { setTitle(e.target.value); setErrors({ ...errors, title: null }); }}
-          required
-          placeholder="Enter lesson title"
-        />
+        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Lesson title" />
         {errors.title && <span className="error-text">{errors.title}</span>}
 
         <label>📄 Description</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          placeholder="Briefly describe what this lesson covers"
-        />
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Short description" />
 
         <label>📅 Day</label>
-        <input
-          type="number"
-          value={day}
-          onChange={(e) => { setDay(e.target.value); setErrors({ ...errors, day: null }); }}
-          required
-          placeholder="e.g. 1 for Day 1"
-        />
+        <input type="number" value={day} onChange={(e) => setDay(e.target.value)} placeholder="Day number" />
         {errors.day && <span className="error-text">{errors.day}</span>}
 
         <label>⏱ Duration</label>
-        <input
-          type="text"
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
-          placeholder="e.g. 8 minutes"
-        />
+        <input type="text" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="e.g. 5 mins" />
 
         <label>🎧 Level</label>
-        <input
-          type="text"
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-          placeholder="e.g. Beginner, Intermediate, Advanced"
-        />
+        <input type="text" value={level} onChange={(e) => setLevel(e.target.value)} placeholder="e.g. Beginner" />
 
-        <label>🎵 Upload Audio</label>
-        <input type="file" accept="audio/*" onChange={handleAudioChange} title="Choose audio file" />
+        <label>🎵 Main Audio (Required)</label>
+        <input type="file" accept="audio/*" onChange={handleAudioChange} />
         {errors.audio && <span className="error-text">{errors.audio}</span>}
 
         <AnimatePresence>
           {showNewAudio && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-            >
-              <span>New Audio: {audio?.name}</span>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <span>🎧 New Audio: {audio?.name}</span>
               <button type="button" onClick={resetAudio} className="neon-btn">❌ Remove</button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <label>🖼️ Upload Thumbnail</label>
-        <input type="file" accept="image/*" onChange={handleThumbnailChange} title="Choose image" />
-
+        <label>🖼️ Thumbnail (Optional)</label>
+        <input type="file" accept="image/*" onChange={handleThumbnailChange} />
         <AnimatePresence>
           {showNewThumbnail && previewURL && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{ marginTop: '1rem', textAlign: 'center' }}
-            >
-              <img src={previewURL} alt="Preview" style={{ width: '100%', maxWidth: '300px', borderRadius: '12px' }} />
-              <button type="button" onClick={resetThumbnail} className="neon-btn" style={{ marginTop: '0.5rem' }}>
-                ❌ Remove
-              </button>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <img src={previewURL} alt="Thumbnail Preview" style={{ width: '100%', maxWidth: '300px', borderRadius: '12px' }} />
+              <button type="button" onClick={resetThumbnail} className="neon-btn">❌ Remove</button>
             </motion.div>
           )}
         </AnimatePresence>
+
+        <h3>📚 Add Conditional Steps (optional)</h3>
+        <p style={{ fontSize: '0.9rem', color: '#ccc' }}>
+          These steps will unlock in order after the main audio is completed.
+        </p>
+
+        <div className="step-builder">
+          <select value={currentStepType} onChange={(e) => setCurrentStepType(e.target.value)}>
+            <option value="audio">🎵 Audio</option>
+            <option value="text">📝 Text</option>
+            <option value="pdf">📄 PDF</option>
+            <option value="questions">❓ Questions</option>
+          </select>
+
+          {currentStepType === 'audio' && (
+            <input type="file" accept="audio/*" onChange={(e) => setStepData({ ...stepData, audioFile: e.target.files[0] })} />
+          )}
+          {currentStepType === 'text' && (
+            <textarea placeholder="Enter text content" onChange={(e) => setStepData({ ...stepData, textContent: e.target.value })} />
+          )}
+          {currentStepType === 'pdf' && (
+            <input type="file" accept="application/pdf" onChange={(e) => setStepData({ ...stepData, pdfFile: e.target.files[0] })} />
+          )}
+          {currentStepType === 'questions' && (
+            <textarea placeholder="One question per line" onChange={(e) => setStepData({ ...stepData, questions: e.target.value.split('\n') })} />
+          )}
+
+          <button type="button" onClick={addStep} className="neon-btn" style={{ marginTop: '0.5rem' }}>
+            ➕ Add Step
+          </button>
+
+<div style={{ marginTop: '1rem' }}>
+  {steps.map((step, index) => (
+    <div key={index} className="step-preview">
+      <strong>Step {index + 1}:</strong> {step.type}
+      <button
+        type="button"
+        onClick={() => {
+          const updated = [...steps];
+          updated.splice(index, 1);
+          setSteps(updated);
+        }}
+        style={{ marginLeft: '1rem', color: 'red' }}
+      >
+        ❌ Remove
+      </button>
+    </div>
+  ))}
+</div>
+
+        </div>
 
         <button type="submit" className="floating-save-btn" disabled={uploading}>
           {uploading ? '⏳ Uploading...' : '💾 Save Lesson'}

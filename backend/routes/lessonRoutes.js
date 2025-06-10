@@ -6,6 +6,7 @@ const { reorderLessons } = require('../controllers/lessonController');
 const auth = require('../middleware/auth');
 const Lesson = require('../models/Lesson');
 const isAdmin = require('../middleware/isAdmin');
+const fs = require('fs');
 const {
   getAllLessons,
   uploadLesson,
@@ -16,12 +17,13 @@ const {
 // Multer config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    const dest = 'uploads/lessons/';
+    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+    cb(null, dest);
   },
   filename: function (req, file, cb) {
-    const uniqueName = Date.now() + '-' + file.originalname;
-    cb(null, uniqueName);
-  }
+    cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '_'));
+  },
 });
 
 const upload = multer({ storage });
@@ -59,6 +61,18 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: 'Lesson not found' });
   }
 });
+
+router.post('/upload-audio', upload.single('file'), (req, res) => {
+  const fileUrl = `/uploads/lessons/${req.file.filename}`;
+  res.status(200).json({ url: fileUrl });
+});
+
+// PDF step upload
+router.post('/upload-pdf', upload.single('file'), (req, res) => {
+  const fileUrl = `/uploads/lessons/${req.file.filename}`;
+  res.status(200).json({ url: fileUrl });
+});
+
 
 
 module.exports = router;

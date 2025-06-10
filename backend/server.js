@@ -47,6 +47,10 @@ app.use('/api/community', require('./routes/communityRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/global-user-setting', require('./routes/globalUserSettingRoutes'));
 
+app.use('/uploads', express.static('uploads'));
+app.use('/api/lessons', require('./routes/lessonRoutes'));
+
+
 // ✅ Auto-create admin user
 const createAdminIfNotExists = require('./utils/createAdminIfNotExists');
 

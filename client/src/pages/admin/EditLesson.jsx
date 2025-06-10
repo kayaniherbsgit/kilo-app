@@ -1,8 +1,11 @@
+// ✅ Fully upgraded EditLesson.jsx with add/remove/edit/reorder support for steps
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion'; // Optional, for animation
-import "../../styles/admin/EditLesson.css";
+import { motion, AnimatePresence } from 'framer-motion';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import '../../styles/admin/EditLesson.css';
 
 const EditLesson = () => {
   const { id } = useParams();
@@ -22,18 +25,24 @@ const EditLesson = () => {
   const [showNewAudio, setShowNewAudio] = useState(false);
   const [showNewThumbnail, setShowNewThumbnail] = useState(false);
 
+  const [steps, setSteps] = useState([]);
+  const [newStepType, setNewStepType] = useState('text');
+  const [newStepContent, setNewStepContent] = useState('');
+
   useEffect(() => {
     axios.get(`https://kilo-app-backend.onrender.com/api/lessons/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     }).then(res => {
-      setLesson(res.data);
-      setTitle(res.data.title || '');
-      setDescription(res.data.description || '');
-      setDay(res.data.day || '');
-      setDuration(res.data.duration || '');
-      setLevel(res.data.level || '');
-      setPreviewURL(res.data.thumbnail);
-      setAudioURL(res.data.audio);
+      const data = res.data;
+      setLesson(data);
+      setTitle(data.title || '');
+      setDescription(data.description || '');
+      setDay(data.day || '');
+      setDuration(data.duration || '');
+      setLevel(data.level || '');
+      setPreviewURL(data.thumbnail);
+      setAudioURL(data.audio);
+      setSteps(data.steps || []);
     }).catch(err => {
       alert('Failed to fetch lesson');
       console.error(err);
@@ -42,21 +51,22 @@ const EditLesson = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('day', day);
-    formData.append('duration', duration);
-    formData.append('level', level);
-    if (audio) formData.append('audio', audio);
-    if (thumbnail) formData.append('thumbnail', thumbnail);
-
     try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('day', day);
+      formData.append('duration', duration);
+      formData.append('level', level);
+      if (audio) formData.append('audio', audio);
+      if (thumbnail) formData.append('thumbnail', thumbnail);
+      formData.append('steps', JSON.stringify(steps));
+
       await axios.put(`https://kilo-app-backend.onrender.com/api/lessons/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
-        }
+        },
       });
       alert('✅ Lesson updated!');
       navigate('/admin/lessons');
@@ -64,6 +74,12 @@ const EditLesson = () => {
       alert('❌ Update failed');
       console.error(err);
     }
+  };
+
+  const handleAudioChange = (e) => {
+    const file = e.target.files[0];
+    setAudio(file);
+    setShowNewAudio(true);
   };
 
   const handleThumbnailChange = (e) => {
@@ -77,12 +93,6 @@ const EditLesson = () => {
     }
   };
 
-  const handleAudioChange = (e) => {
-    const file = e.target.files[0];
-    setAudio(file);
-    setShowNewAudio(true);
-  };
-
   const resetThumbnail = () => {
     setThumbnail(null);
     setPreviewURL(lesson.thumbnail);
@@ -94,16 +104,28 @@ const EditLesson = () => {
     setShowNewAudio(false);
   };
 
+  const handleAddStep = () => {
+    const newStep = { type: newStepType };
+    if (newStepType === 'text') newStep.content = newStepContent;
+    if (newStepType === 'questions') newStep.questions = newStepContent.split('\n');
+    setSteps([...steps, newStep]);
+    setNewStepContent('');
+  };
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    const reordered = Array.from(steps);
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+    setSteps(reordered);
+  };
+
   if (!lesson) return <p style={{ color: '#ccc', textAlign: 'center' }}>Loading lesson...</p>;
 
   return (
     <div className="edit-lesson-container">
-      <button onClick={() => navigate('/admin')} className="neon-btn" style={{ marginBottom: '1.5rem' }}>
-        🔙 Back to Dashboard
-      </button>
-
+      <button onClick={() => navigate('/admin')} className="neon-btn" style={{ marginBottom: '1.5rem' }}>🔙 Back</button>
       <h2 className="edit-title">✏️ Edit Lesson</h2>
-
       <form onSubmit={handleSubmit} className="edit-lesson-form">
         <label>📝 Title</label>
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
@@ -121,55 +143,72 @@ const EditLesson = () => {
         <input type="text" value={level} onChange={(e) => setLevel(e.target.value)} />
 
         <label>🔁 Current Audio</label>
-        {!showNewAudio && audioURL && (
-          <audio src={`https://kilo-app-backend.onrender.com${audioURL}`} controls style={{ marginBottom: '1rem' }} />
-        )}
+        {!showNewAudio && audioURL && <audio src={`https://kilo-app-backend.onrender.com${audioURL}`} controls />}
 
         <label>🎵 Replace Audio</label>
         <input type="file" accept="audio/*" onChange={handleAudioChange} />
-        <AnimatePresence>
-          {showNewAudio && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-            >
-              <span>New Audio: {audio?.name}</span>
-              <button type="button" onClick={resetAudio} className="neon-btn">❌ Remove</button>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <label>🖼️ Current Thumbnail</label>
-        {!showNewThumbnail && previewURL && (
-          <img src={`https://kilo-app-backend.onrender.com${previewURL}`} alt="Current Thumbnail"
-            style={{ width: '100%', maxWidth: '300px', borderRadius: '12px', marginBottom: '1rem' }}
-          />
-        )}
+        {!showNewThumbnail && previewURL && <img src={`https://kilo-app-backend.onrender.com${previewURL}`} alt="Current Thumbnail" style={{ width: '100%', maxWidth: '300px', borderRadius: '12px' }} />}
 
         <label>🖼️ Replace Thumbnail</label>
         <input type="file" accept="image/*" onChange={handleThumbnailChange} />
-        <AnimatePresence>
-          {showNewThumbnail && previewURL && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{ marginTop: '1rem', textAlign: 'center' }}
-            >
-              <img src={previewURL} alt="Preview" style={{ width: '100%', maxWidth: '300px', borderRadius: '12px' }} />
-              <button type="button" onClick={resetThumbnail} className="neon-btn" style={{ marginTop: '0.5rem' }}>
-                ❌ Remove
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </form>
 
-      <button onClick={handleSubmit} className="floating-save-btn">
-        💾 Update Lesson
-      </button>
+        <h3 style={{ marginTop: '1.5rem' }}>🧩 Conditional Steps</h3>
+
+        <div>
+          <select value={newStepType} onChange={(e) => setNewStepType(e.target.value)}>
+            <option value="text">Text</option>
+            <option value="questions">Questions</option>
+          </select>
+          <textarea
+            placeholder={newStepType === 'questions' ? 'One question per line' : 'Step content...'}
+            value={newStepContent}
+            onChange={(e) => setNewStepContent(e.target.value)}
+          />
+          <button type="button" onClick={handleAddStep} className="neon-btn">➕ Add Step</button>
+        </div>
+
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="steps">
+            {(provided) => (
+              <ul {...provided.droppableProps} ref={provided.innerRef} style={{ background: '#111', padding: '1rem', borderRadius: '8px' }}>
+                {steps.map((step, index) => (
+                  <Draggable key={index} draggableId={`step-${index}`} index={index}>
+                    {(provided) => (
+                      <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} style={{ marginBottom: '0.5rem', padding: '0.5rem', background: '#222', borderRadius: '6px' }}>
+                        <strong>{index + 1}. {step.type}</strong>
+                        <button onClick={() => {
+                          const updated = [...steps];
+                          updated.splice(index, 1);
+                          setSteps(updated);
+                        }} style={{ float: 'right', color: 'red' }}>❌</button>
+                        {step.type === 'text' && (
+                          <textarea value={step.content || ''} onChange={(e) => {
+                            const updated = [...steps];
+                            updated[index].content = e.target.value;
+                            setSteps(updated);
+                          }} />
+                        )}
+                        {step.type === 'questions' && (
+                          <textarea value={(step.questions || []).join('\n')} onChange={(e) => {
+                            const updated = [...steps];
+                            updated[index].questions = e.target.value.split('\n');
+                            setSteps(updated);
+                          }} />
+                        )}
+                      </li>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
+
+        <button type="submit" className="floating-save-btn">💾 Update Lesson</button>
+      </form>
     </div>
   );
 };

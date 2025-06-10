@@ -1,4 +1,3 @@
-// src/components/AudioCard.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import Confetti from 'react-confetti';
 import { useWindowSize } from '@react-hook/window-size';
@@ -31,15 +30,31 @@ const AudioCard = ({
   const delayTimerRef = useRef(null);
   const [lastToastLevel, setLastToastLevel] = useState(null);
 
-  useEffect(() => {
-    if (countdownRef.current) clearInterval(countdownRef.current);
-    if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
+  const [stepIndex, setStepIndex] = useState(0);
+  const steps = [
+    {
+      type: 'main',
+      src: `https://kilo-app-backend.onrender.com${lesson.audio}`,
+      description: lesson.description,
+      thumbnail: lesson.thumbnail,
+      title: lesson.title,
+      level: lesson.level,
+      duration: lesson.duration,
+    },
+    ...(lesson.steps || []),
+  ];
+  const currentStep = steps[stepIndex];
 
+  useEffect(() => {
     setProgress(0);
     setShowAutoPlay(false);
     setAutoPlayCancelled(false);
     setDelayedAutoPlay(false);
     setLastToastLevel(null);
+    setStepIndex(0);
+
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
 
     const saved = localStorage.getItem(`lesson-progress-${lesson._id}`);
     const resumedFlag = sessionStorage.getItem(`resumed-${lesson._id}`);
@@ -71,7 +86,7 @@ const AudioCard = ({
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || (currentStep.type !== 'main' && currentStep.type !== 'audio')) return;
 
     const handleUpdate = () => {
       const currentTime = audio.currentTime;
@@ -97,11 +112,7 @@ const AudioCard = ({
           setTimeout(() => setShowConfetti(false), 5000);
         }
 
-        toast('🔥 You’ve just added 1 to your streak! Keep going.', {
-          type: 'info',
-          icon: '🔥',
-        });
-
+        toast('🔥 You’ve just added 1 to your streak! Keep going.', { type: 'info', icon: '🔥' });
         setLastToastLevel('done');
       } else if (pct >= 70 && lastToastLevel !== 'almost') {
         toast.info('🔥 You’re almost done. Focus!');
@@ -119,50 +130,43 @@ const AudioCard = ({
     };
 
     const handleEnd = () => {
-      setShowAutoPlay(true);
-      setAutoPlayTimer(10);
-      let timer = 10;
-      countdownRef.current = setInterval(() => {
-        if (autoPlayCancelled) {
-          clearInterval(countdownRef.current);
-          setShowAutoPlay(false);
-          return;
-        }
-        timer -= 1;
-        setAutoPlayTimer(timer);
-        if (timer <= 0) {
-          clearInterval(countdownRef.current);
-          setShowAutoPlay(false);
-          onNext();
-        }
-      }, 1000);
+      if (stepIndex < steps.length - 1) {
+        setShowAutoPlay(true);
+        setAutoPlayTimer(10);
+        let timer = 10;
+        countdownRef.current = setInterval(() => {
+          if (autoPlayCancelled) {
+            clearInterval(countdownRef.current);
+            setShowAutoPlay(false);
+            return;
+          }
+          timer -= 1;
+          setAutoPlayTimer(timer);
+          if (timer <= 0) {
+            clearInterval(countdownRef.current);
+            setShowAutoPlay(false);
+            setStepIndex(stepIndex + 1);
+          }
+        }, 1000);
+      } else {
+        onNext();
+      }
     };
 
     audio.addEventListener('timeupdate', handleUpdate);
     audio.addEventListener('ended', handleEnd);
-
     return () => {
       audio.removeEventListener('timeupdate', handleUpdate);
       audio.removeEventListener('ended', handleEnd);
     };
-  }, [audioRef, completed, lesson._id, onMarkComplete, onNext, lastToastLevel]);
+  }, [audioRef, completed, lesson._id, onMarkComplete, stepIndex, currentStep]);
 
-  const formatTime = (sec) => {
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
-
-  const handleNextClick = async () => {
-    if (!completed.includes(lesson._id)) {
-      await axios.post(
-        'https://kilo-app-backend.onrender.com/api/users/mark-complete',
-        { lessonId: lesson._id },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      ).catch(err => console.error('Error saving completion:', err.message));
-      onMarkComplete(lesson._id);
+  const handleNextStep = () => {
+    if (stepIndex < steps.length - 1) {
+      setStepIndex(stepIndex + 1);
+    } else {
+      onNext();
     }
-    onNext();
   };
 
   return (
@@ -173,22 +177,18 @@ const AudioCard = ({
         <div className="resume-modal">
           <div className="resume-box">
             <h4>⏪ Resume?</h4>
-            <p>Continue from {formatTime(resumeTime)}?</p>
+            <p>Continue from {Math.floor(resumeTime / 60)}:{String(Math.floor(resumeTime % 60)).padStart(2, '0')}?</p>
             <div className="resume-btn-group">
               <button className="neon-btn small" onClick={() => {
                 audioRef.current.currentTime = resumeTime;
                 sessionStorage.setItem(`resumed-${lesson._id}`, 'true');
                 setResumePrompt(false);
-              }}>
-                Yes, resume
-              </button>
+              }}>Yes</button>
               <button className="neon-btn small" onClick={() => {
                 audioRef.current.currentTime = 0;
                 sessionStorage.setItem(`resumed-${lesson._id}`, 'true');
                 setResumePrompt(false);
-              }}>
-                No, start over
-              </button>
+              }}>No</button>
             </div>
           </div>
         </div>
@@ -197,77 +197,81 @@ const AudioCard = ({
       {showAutoPlay && (
         <div className="auto-play-overlay">
           <div className="countdown-box">
-            <p>Auto‐playing next lesson in</p>
+            <p>Next step starting in</p>
             <h1>{autoPlayTimer}s</h1>
-            <div className="resume-btn-group" style={{ marginTop: '0.5rem' }}>
+            <div className="resume-btn-group">
               <button className="neon-btn small" onClick={() => {
                 clearInterval(countdownRef.current);
                 setShowAutoPlay(false);
-                onNext();
-              }}>
-                ⏭ Next Now
-              </button>
+                handleNextStep();
+              }}>⏭ Skip Timer</button>
               <button className="neon-btn small" onClick={() => {
                 setAutoPlayCancelled(true);
                 setShowAutoPlay(false);
-              }}>
-                ✖ Stay Here
-              </button>
+              }}>✖ Stay</button>
             </div>
           </div>
         </div>
       )}
 
-      <img
-        src={`https://kilo-app-backend.onrender.com${lesson.thumbnail}`}
-        alt="Lesson Thumbnail"
-        className="lesson-thumbnail"
-      />
+      {currentStep.thumbnail && currentStep.type === 'main' && (
+        <img
+          src={`https://kilo-app-backend.onrender.com${currentStep.thumbnail}`}
+          alt="Lesson Thumbnail"
+          className="lesson-thumbnail"
+        />
+      )}
 
       <div className="audio-card-content">
-        <h3 className="lesson-title">{lesson.title}</h3>
-        <p className="lesson-description">{lesson.description || 'No description provided.'}</p>
-        {lesson.tagline && <div className="tagline-badge">{lesson.tagline}</div>}
-        <div className="lesson-meta-bar">
-          <div className="meta-item">📅 Day {lesson.day}</div>
-          <div className="meta-item">⏱ {lesson.duration || 'Unknown'}</div>
-          <div className="meta-item">🎧 {lesson.level}</div>
-        </div>
+        <h3 className="lesson-title">{currentStep.title || lesson.title}</h3>
 
-        {/* ✅ Audio player with key to reset playback */}
-        <audio
-          key={lesson._id}
-          ref={audioRef}
-          controls
-          src={`https://kilo-app-backend.onrender.com${lesson.audio}`}
-          style={{ width: '100%', marginTop: '1rem', borderRadius: '10px' }}
-        />
+        {currentStep.description && (
+          <p className="lesson-description">{currentStep.description}</p>
+        )}
+
+        {currentStep.type === 'text' && (
+          <div className="text-step-box">
+            <p style={{ whiteSpace: 'pre-wrap' }}>{currentStep.content}</p>
+            <button className="neon-btn small" onClick={handleNextStep}>⏭ Endelea</button>
+          </div>
+        )}
+
+        {(currentStep.type === 'main' || currentStep.type === 'audio') && (
+          <audio
+            key={lesson._id + stepIndex}
+            ref={audioRef}
+            controls
+            src={currentStep.src}
+            style={{ width: '100%', borderRadius: '10px' }}
+          />
+        )}
+
+        {currentStep.type === 'pdf' && (
+          <a
+            className="neon-btn small"
+            target="_blank"
+            href={`https://kilo-app-backend.onrender.com${currentStep.src}`}
+            rel="noreferrer"
+          >
+            📥 Open PDF
+          </a>
+        )}
+
+        {currentStep.type === 'questions' && (
+          <div className="question-box">
+            {currentStep.questions.map((q, i) => (
+              <p key={i}>❓ {q}</p>
+            ))}
+            <button onClick={handleNextStep} className="neon-btn small">⏭ Endelea</button>
+          </div>
+        )}
 
         <div className="nav-buttons-wrapper">
           {currentIndex > 0 && (
-            <button onClick={onPrev} className="neon-btn small">
-              ⬅️ Previous
-            </button>
+            <button onClick={onPrev} className="neon-btn small">⬅️ Previous</button>
           )}
-          {currentIndex < totalLessons - 1 && (
-            <div>
-              <button
-                onClick={handleNextClick}
-                disabled={!isCompleted && progress < 70}
-                className={`neon-btn small ${!isCompleted && progress < 70 ? 'disabled' : ''}`}
-              >
-                {isCompleted
-                  ? '➡️ Next'
-                  : progress >= 70
-                  ? '➡️ Next'
-                  : '⏳ 70% to continue'}
-              </button>
-              {progress < 70 && !isCompleted && (
-                <small style={{ color: '#999', display: 'block', marginTop: '0.2rem' }}>
-                  Complete at least 70% to continue
-                </small>
-              )}
-            </div>
+          {stepIndex >= steps.length - 1 && currentIndex < totalLessons - 1 && (
+            <button onClick={onNext} className="neon-btn small">➡️ Next Lesson</button>
           )}
         </div>
       </div>
