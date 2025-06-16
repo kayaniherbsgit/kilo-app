@@ -77,7 +77,8 @@ const Homepage = () => {
         <img
           src={carouselImages[currentImg]}
           alt="Kayani Slide"
-          className="hero-image"
+          className="hero-image fade-slide"
+          key={currentImg} // key ensures React re-renders with animation
         />
         <h1 className="title">Kayani Herbs</h1>
         <p className="slogan">🌿 Cure from Nature 🌿</p>
