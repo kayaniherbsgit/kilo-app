@@ -1,111 +1,107 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { motion } from 'framer-motion';
 import './Homepage.css';
 import logo from '../assets/kayani-logo.jpg';
 
-const programList = [
-  { name: 'Kayani Men Program', path: '/program-intro' },
-  { name: 'Tumbolux Program', path: '/digestive' },
-  { name: 'Bawasiri Cure Program', path: '/women' },
-];
-
-const carouselImages = [
-  '/images/kayani1.jpg',
-  '/images/kayani2.jpg',
-  '/images/kayani3.png',
-];
-
-const infoCards = [
-  '🍃 100% Herbal Formulations — Trusted by thousands.',
-  '🧠 Energy, Digestion, Fertility, Mental Calm.',
-  '🌍 Healing Africa with Pure Remedies.',
-];
-
 const Homepage = () => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [currentImg, setCurrentImg] = useState(0);
-  const [currentCard, setCurrentCard] = useState(0);
-
-  useEffect(() => {
-    const imgTimer = setInterval(() => {
-      setCurrentImg((prev) => (prev + 1) % carouselImages.length);
-    }, 3000);
-    return () => clearInterval(imgTimer);
-  }, []);
-
-  const enterProgram = () => {
-    setLoading(true);
-    setTimeout(() => navigate('/program-intro'), 2000);
-  };
-
   return (
-    <div className="landing-container">
-      <div className="overlay" />
-
-      {/* Top Navigation */}
-      <div className="top-bar">
-        <div className="brand">
-          <img src={logo} alt="Kayani Herbs" className="small-logo" />
-          <span className="brand-name">Kayani Herbs</span>
+    <div className="homepage">
+      {/* Navbar */}
+      <header className="navbar">
+        <div className="logo">
+          <img src={logo} alt="Kayani Herbs" />
+          <span>Kayani Herbs</span>
         </div>
+        <nav className="nav-links">
+          <a href="#mission">Mission</a>
+          <a href="#programs">Programs</a>
+          <a href="#testimonials">Testimonials</a>
+          <a href="#join">Join</a>
+        </nav>
+      </header>
 
-        <div className="menu">
-          <button onClick={() => setMenuOpen(!menuOpen)} className="menu-btn">☰</button>
-          {menuOpen && (
-            <div className="menu-dropdown">
-              {programList.map((prog, i) => (
-                <div
-                  key={i}
-                  className="menu-item"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate(prog.path);
-                  }}
-                >
-                  {prog.name}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Section 1: Hero Carousel */}
-      <section className="hero-section">
-        <img
-          src={carouselImages[currentImg]}
-          alt="Kayani Slide"
-          className="hero-image fade-slide"
-          key={currentImg} // key ensures React re-renders with animation
-        />
-        <h1 className="title">Kayani Herbs</h1>
-        <p className="slogan">🌿 Cure from Nature 🌿</p>
-        <button className="enter-btn" onClick={enterProgram} disabled={loading}>
-          {loading ? 'Loading Your Custom Formula...' : 'Enter Kayani Men Program'}
-        </button>
+      {/* Hero Section */}
+      <section className="hero">
+        <div className="hero-overlay" />
+        <motion.div
+          className="hero-content"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+        >
+          <h1>Healing. Naturally.</h1>
+          <p>🌿 Restoring Africa with Pure Herbal Wisdom</p>
+          <a href="#programs" className="hero-btn">Explore Programs</a>
+        </motion.div>
       </section>
 
-      {/* Section 2: Info Swiper */}
-      <section className="info-section">
-        <div className="info-swiper">
-          <button onClick={() => setCurrentCard((prev) => (prev === 0 ? infoCards.length - 1 : prev - 1))}>
-            ◀
-          </button>
-          <p>{infoCards[currentCard]}</p>
-          <button onClick={() => setCurrentCard((prev) => (prev + 1) % infoCards.length)}>
-            ▶
-          </button>
-        </div>
-      </section>
+      {/* Mission Section */}
+      <motion.section
+        className="section mission"
+        id="mission"
+        initial={{ opacity: 0, y: 60 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2>Our Mission</h2>
+        <p>To bring back the power of nature to every home across Africa, with remedies tested by generations and crafted with care.</p>
+      </motion.section>
 
-      {/* Section 3: About or CTA */}
-      <section className="about-section">
-        <h2>Why Choose Kayani?</h2>
-        <p>💚 We blend tradition with nature. All our remedies are backed by decades of indigenous knowledge.</p>
-        <p>✨ Trusted by thousands across Africa. Safe, natural, and tested by time.</p>
-      </section>
+      {/* Programs Section */}
+      <motion.section
+        className="section programs"
+        id="programs"
+        initial={{ opacity: 0, y: 60 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2>Our Signature Programs</h2>
+        <div className="program-cards">
+          <div className="card">
+            <h3>Kayani Men Power</h3>
+            <p>Boost endurance, confidence & strength naturally.</p>
+          </div>
+          <div className="card">
+            <h3>Tumbolux</h3>
+            <p>Ultimate gut and stomach restoration therapy.</p>
+          </div>
+          <div className="card">
+            <h3>Bawasiri Cleanse</h3>
+            <p>Target hemorrhoids and rectal health naturally.</p>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Testimonials */}
+      <motion.section
+        className="section testimonials"
+        id="testimonials"
+        initial={{ opacity: 0, y: 60 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2>What People Say</h2>
+        <blockquote>"After 7 days, my energy returned like magic. Thank you Kayani Herbs!"</blockquote>
+        <blockquote>"No more ulcers. Tumbolux is a miracle from nature."</blockquote>
+      </motion.section>
+
+      {/* CTA */}
+      <motion.section
+        className="section join"
+        id="join"
+        initial={{ opacity: 0, y: 60 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2>Join the Healing Movement</h2>
+        <p>We’ve helped thousands. Now it’s your turn.</p>
+        <a href="#programs" className="hero-btn">Start Your Journey</a>
+      </motion.section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <p>&copy; {new Date().getFullYear()} Kayani Herbs. All rights reserved.</p>
+      </footer>
     </div>
   );
 };
