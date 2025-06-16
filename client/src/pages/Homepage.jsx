@@ -186,7 +186,7 @@ const Homepage = () => {
           transition={{ duration: 0.6 }}
         >
           <button className="lang-float" onClick={toggleLang}>
-            {lang === 'sw' ? '🇬🇧 English' : '🇰🇪 Kiswahili'}
+{lang === 'sw' ? '🇬🇧 English' : '🇹🇿 Kiswahili'}
           </button>
         </motion.div>
       )}
