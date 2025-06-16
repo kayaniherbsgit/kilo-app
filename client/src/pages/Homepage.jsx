@@ -41,20 +41,20 @@ const content = {
   sw: {
     nav: ['Dhamira', 'Programu', 'Ushuhuda', 'Jiunge'],
     hero: {
-      title: 'Uponyaji wa Asili.',
-      subtitle: '🌿 Tunarejesha Afya ya Kiafrika kwa Tiba za Asili',
-      button: 'Angalia Programu',
+      title: 'Tiba Kwa Mimea Asili.',
+      subtitle: '🌿 Jitibu Changamoto Zako Za Kiafya Kiasili Ukiwa Na Kayani Herbs',
+      button: 'Peruzi Tiba Zetu',
     },
     mission: {
       title: 'Dhamira Yetu',
       text: 'Kurudisha nguvu ya tiba za asili katika kila nyumba barani Afrika, kwa kutumia maarifa ya vizazi.',
     },
     programs: {
-      title: 'Programu Zetu Maarufu',
+      title: 'Tiba [Programu] Zetu Maarufu',
       items: [
-        ['Kayani Men Power', 'Ongeza nguvu, ujasiri, na uwezo wa kudumu kwa njia ya asili.'],
-        ['Tumbolux', 'Tiba kamili ya tumbo na mfumo wa mmeng’enyo.'],
-        ['Bawasiri Cleanse', 'Ondoa bawasiri na maradhi ya njia ya haja kwa tiba asilia.'],
+        ['Kayani Men Power', 'Ongeza Nguvu Za Kiume, Ujasiri, Na Uwezo Wa Kudumu Hadi Dak 30 Kwenye Shoo Kwa Njia Asili.'],
+        ['Tumbolux', 'Tiba Kamili Ya Tumbo Na Mfumo Wa Mmeng’enyo.'],
+        ['Bawasiri Cure', 'Ondoa Bawasiri Na Maradhi Ya Njia Ya Haja Kwa Tiba Asilia.'],
       ],
     },
     testimonials: {
