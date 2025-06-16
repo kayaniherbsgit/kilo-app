@@ -1,9 +1,12 @@
 // src/pages/admin/AdminUploadLesson.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import supabase from '../../utils/supabaseClient';
+import "../../styles/admin/AdminUploadLesson.css";
 
 const AdminUploadLesson = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [day, setDay] = useState(1);
@@ -16,31 +19,33 @@ const AdminUploadLesson = () => {
 
   // Upload to Supabase
 const uploadToSupabase = async (file, folder = 'lessons') => {
-  const fileName = `${Date.now()}-${file.name}`;
+  if (!file) return null;
 
-  console.log("Uploading:", file.name);
+  const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
 
-  const { data, error } = await supabase.storage
+  const { data, error: uploadError } = await supabase.storage
     .from(folder)
     .upload(fileName, file);
 
-  if (error) {
-    console.error("❌ Upload error from Supabase:", error.message);
+  if (uploadError) {
+    console.error("❌ Upload failed:", uploadError.message);
     return null;
   }
 
-  // ✅ Properly generate public URL
-const { data: publicData } = supabase
-  .storage
-  .from(folder)
-  .getPublicUrl(fileName);
+  const { data: publicData, error: urlError } = supabase
+    .storage
+    .from(folder)
+    .getPublicUrl(fileName);
 
-const publicUrl = publicData?.publicUrl;
+  if (urlError) {
+    console.error("❌ Failed to get public URL:", urlError.message);
+    return null;
+  }
 
-console.log("✅ File uploaded successfully. Public URL:", publicUrl);
-return publicUrl;
-
+  console.log("✅ Uploaded to Supabase:", publicData.publicUrl);
+  return publicData.publicUrl;
 };
+
 
  const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +61,8 @@ return publicUrl;
       if (thumbnail && !thumbnailUrl) throw new Error('Thumbnail upload failed');
 
       const token = localStorage.getItem('token');
+
+      console.log('🖼️ Final Thumbnail URL:', thumbnailUrl);
 
       const lessonData = {
 
@@ -126,6 +133,24 @@ return publicUrl;
         </button>
         {message && <p style={{ marginTop: '10px' }}>{message}</p>}
       </form>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '2rem' }}>
+  <button
+    className="back-dashboard-btn"
+    onClick={() => navigate('/admin')}
+  >
+    ⬅ Back to Admin Dashboard
+  </button>
+
+  <button
+    className="view-lessons-btn"
+    onClick={() => navigate('/admin/lessons')}
+  >
+    📚 View All Lessons
+  </button>
+</div>
+
+
     </div>
   );
 };

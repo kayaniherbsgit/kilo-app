@@ -1,0 +1,97 @@
+/* src/styles/admin/AdminUploadLesson.css */
+.admin-upload-page {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #121212;
+  border-radius: 16px;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0, 255, 150, 0.1);
+}
+
+.admin-upload-page h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #b4ff39;
+}
+
+.admin-upload-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-upload-page input,
+.admin-upload-page textarea {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: #1e1e1e;
+  color: white;
+  font-size: 1rem;
+}
+
+.admin-upload-page input[type="file"] {
+  padding: 0.5rem;
+  background: #222;
+}
+
+.admin-upload-page label {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  color: #ccc;
+}
+
+.admin-upload-page button {
+  padding: 0.8rem;
+  background: linear-gradient(90deg, #00cc66, #b4ff39);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.admin-upload-page button:hover {
+  transform: scale(1.02);
+}
+
+.admin-upload-page p {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.back-dashboard-btn {
+  padding: 0.75rem 1.2rem;
+  background-color: transparent;
+  border: 2px solid #b4ff39;
+  color: #b4ff39;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  display: block;
+  margin: 0 auto;
+}
+
+.back-dashboard-btn:hover {
+  background-color: #b4ff39;
+  color: #121212;
+}
+
+.view-lessons-btn {
+  background-color: #2d89ef;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.view-lessons-btn:hover {
+  background-color: #1c6ed2;
+}
