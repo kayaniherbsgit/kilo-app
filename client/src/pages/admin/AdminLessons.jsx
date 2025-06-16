@@ -18,7 +18,16 @@ const AdminLessons = () => {
       const res = await axios.get('https://kilo-app-backend.onrender.com/api/lessons', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setLessons(res.data);
+
+      const enriched = res.data.map(lesson => {
+        const audioStep = lesson.steps?.find(step => step.type === 'audio');
+        return {
+          ...lesson,
+          resolvedAudio: lesson.audio || audioStep?.src || ''
+        };
+      });
+
+      setLessons(enriched);
     } catch (err) {
       console.error('Failed to fetch lessons', err);
     }
@@ -105,19 +114,25 @@ const AdminLessons = () => {
                         {/* Thumbnail */}
                         {lesson.thumbnail && (
                           <div className="lesson-thumb">
-                            <img src={lesson.thumbnail} alt="Thumbnail" />
+                            <img
+                              src={lesson.thumbnail}
+                              alt="Thumbnail"
+                            />
                           </div>
                         )}
 
                         <div className="lesson-info">
                           <strong>{lesson.title}</strong>
                           <p>{lesson.description || 'No description'}</p>
-                          <audio
-                            id="global-audio"
-                            src={lesson.audio}
-                            controls
-                            onPlay={() => handlePlay(lesson.audio)}
-                          />
+
+                          {lesson.resolvedAudio && (
+                            <audio
+                              id="global-audio"
+                              controls
+                              src={lesson.resolvedAudio}
+                              onPlay={() => handlePlay(lesson.resolvedAudio)}
+                            />
+                          )}
                         </div>
 
                         <div className="lesson-actions">

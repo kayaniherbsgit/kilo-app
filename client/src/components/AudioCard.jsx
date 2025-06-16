@@ -28,29 +28,19 @@ const AudioCard = ({
   const { audioRef } = useAudio();
   const countdownRef = useRef(null);
   const delayTimerRef = useRef(null);
-  const [lastToastLevel, setLastToastLevel] = useState(null);
 
   const [stepIndex, setStepIndex] = useState(0);
-  const steps = [
-    {
-      type: 'main',
-      src: `https://kilo-app-backend.onrender.com${lesson.audio}`,
-      description: lesson.description,
-      thumbnail: lesson.thumbnail,
-      title: lesson.title,
-      level: lesson.level,
-      duration: lesson.duration,
-    },
-    ...(lesson.steps || []),
-  ];
-  const currentStep = steps[stepIndex];
+  const steps = Array.isArray(lesson.steps) && lesson.steps.length > 0
+    ? lesson.steps
+    : [{ type: 'audio', src: lesson.audio || '', content: '', label: 'Default Audio' }];
+
+  const currentStep = steps[stepIndex] || {};
 
   useEffect(() => {
     setProgress(0);
     setShowAutoPlay(false);
     setAutoPlayCancelled(false);
     setDelayedAutoPlay(false);
-    setLastToastLevel(null);
     setStepIndex(0);
 
     if (countdownRef.current) clearInterval(countdownRef.current);
@@ -78,7 +68,7 @@ const AudioCard = ({
 
   useEffect(() => {
     if (delayedAutoPlay && audioRef.current && audioRef.current.paused) {
-      audioRef.current.play().catch((err) => {
+      audioRef.current.play().catch(err => {
         console.warn('Auto-play blocked:', err.message);
       });
     }
@@ -86,7 +76,7 @@ const AudioCard = ({
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || (currentStep.type !== 'main' && currentStep.type !== 'audio')) return;
+    if (!audio || currentStep.type !== 'audio') return;
 
     const handleUpdate = () => {
       const currentTime = audio.currentTime;
@@ -95,7 +85,7 @@ const AudioCard = ({
       setProgress(pct);
       localStorage.setItem(`lesson-progress-${lesson._id}`, currentTime);
 
-      if (pct >= 99 && lastToastLevel !== 'done') {
+      if (pct >= 99) {
         if (!completed.includes(lesson._id)) {
           onMarkComplete(lesson._id);
           axios.post(
@@ -111,21 +101,6 @@ const AudioCard = ({
           sessionStorage.setItem(`confetti-shown-${lesson._id}`, 'true');
           setTimeout(() => setShowConfetti(false), 5000);
         }
-
-        toast('🔥 You’ve just added 1 to your streak! Keep going.', { type: 'info', icon: '🔥' });
-        setLastToastLevel('done');
-      } else if (pct >= 70 && lastToastLevel !== 'almost') {
-        toast.info('🔥 You’re almost done. Focus!');
-        setLastToastLevel('almost');
-      } else if (pct >= 50 && lastToastLevel !== 'half') {
-        toast.info('⚡ Halfway there — don’t stop now!');
-        setLastToastLevel('half');
-      } else if (pct >= 25 && lastToastLevel !== 'quarter') {
-        toast.info('🎧 Nice flow... keep listening.');
-        setLastToastLevel('quarter');
-      } else if (pct > 0 && lastToastLevel !== 'start') {
-        toast.info('🚀 Let’s go! Your journey begins.');
-        setLastToastLevel('start');
       }
     };
 
@@ -214,19 +189,26 @@ const AudioCard = ({
         </div>
       )}
 
-      {currentStep.thumbnail && currentStep.type === 'main' && (
-        <img
-          src={`https://kilo-app-backend.onrender.com${currentStep.thumbnail}`}
-          alt="Lesson Thumbnail"
-          className="lesson-thumbnail"
-        />
-      )}
-
       <div className="audio-card-content">
-        <h3 className="lesson-title">{currentStep.title || lesson.title}</h3>
+        {lesson.thumbnail && stepIndex === 0 && (
+          <img
+            src={lesson.thumbnail}
+            alt="Lesson Thumbnail"
+            className="lesson-thumbnail"
+            style={{
+              width: '100%',
+              maxHeight: '220px',
+              borderRadius: '12px',
+              objectFit: 'cover',
+              marginBottom: '1rem',
+            }}
+          />
+        )}
 
-        {currentStep.description && (
-          <p className="lesson-description">{currentStep.description}</p>
+        <h3 className="lesson-title">{lesson.title}</h3>
+
+        {lesson.description && stepIndex === 0 && (
+          <p className="lesson-description">{lesson.description}</p>
         )}
 
         {currentStep.type === 'text' && (
@@ -236,7 +218,7 @@ const AudioCard = ({
           </div>
         )}
 
-        {(currentStep.type === 'main' || currentStep.type === 'audio') && (
+        {currentStep.type === 'audio' && (
           <audio
             key={lesson._id + stepIndex}
             ref={audioRef}
@@ -250,7 +232,7 @@ const AudioCard = ({
           <a
             className="neon-btn small"
             target="_blank"
-            href={`https://kilo-app-backend.onrender.com${currentStep.src}`}
+            href={currentStep.src}
             rel="noreferrer"
           >
             📥 Open PDF

@@ -1,10 +1,9 @@
-// ✅ Fully upgraded EditLesson.jsx with add/remove/edit/reorder support for steps
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { supabase } from '../../supabaseClient'; // 👈 Make sure you have this file
 import '../../styles/admin/EditLesson.css';
 
 const EditLesson = () => {
@@ -41,7 +40,9 @@ const EditLesson = () => {
       setDuration(data.duration || '');
       setLevel(data.level || '');
       setPreviewURL(data.thumbnail);
-      setAudioURL(data.audio);
+      setAudioURL(
+        data.steps?.find((s) => s.type === 'audio')?.src || ''
+      );
       setSteps(data.steps || []);
     }).catch(err => {
       alert('Failed to fetch lesson');
@@ -51,23 +52,44 @@ const EditLesson = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('description', description);
-      formData.append('day', day);
-      formData.append('duration', duration);
-      formData.append('level', level);
-      if (audio) formData.append('audio', audio);
-      if (thumbnail) formData.append('thumbnail', thumbnail);
-      formData.append('steps', JSON.stringify(steps));
 
-      await axios.put(`https://kilo-app-backend.onrender.com/api/lessons/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
+    try {
+      let uploadedAudioUrl = audioURL;
+      let uploadedThumbnailUrl = previewURL;
+
+      if (audio) {
+        const { data, error } = await supabase.storage
+          .from('lesson-assets')
+          .upload(`audio/${Date.now()}-${audio.name}`, audio, { cacheControl: '3600' });
+        if (error) throw error;
+        uploadedAudioUrl = supabase.storage.from('lesson-assets').getPublicUrl(data.path).publicUrl;
+      }
+
+      if (thumbnail) {
+        const { data, error } = await supabase.storage
+          .from('lesson-assets')
+          .upload(`thumbnails/${Date.now()}-${thumbnail.name}`, thumbnail, { cacheControl: '3600' });
+        if (error) throw error;
+        uploadedThumbnailUrl = supabase.storage.from('lesson-assets').getPublicUrl(data.path).publicUrl;
+      }
+
+      const updatedLesson = {
+        title,
+        description,
+        day,
+        duration,
+        level,
+        thumbnail: uploadedThumbnailUrl,
+        steps: [
+          ...(uploadedAudioUrl ? [{ type: 'audio', src: uploadedAudioUrl, label: 'Main Audio' }] : []),
+          ...steps.filter((s) => s.type !== 'audio'),
+        ],
+      };
+
+      await axios.put(`https://kilo-app-backend.onrender.com/api/lessons/${id}`, updatedLesson, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+
       alert('✅ Lesson updated!');
       navigate('/admin/lessons');
     } catch (err) {
@@ -91,17 +113,6 @@ const EditLesson = () => {
       reader.onload = () => setPreviewURL(reader.result);
       reader.readAsDataURL(file);
     }
-  };
-
-  const resetThumbnail = () => {
-    setThumbnail(null);
-    setPreviewURL(lesson.thumbnail);
-    setShowNewThumbnail(false);
-  };
-
-  const resetAudio = () => {
-    setAudio(null);
-    setShowNewAudio(false);
   };
 
   const handleAddStep = () => {
@@ -143,13 +154,13 @@ const EditLesson = () => {
         <input type="text" value={level} onChange={(e) => setLevel(e.target.value)} />
 
         <label>🔁 Current Audio</label>
-        {!showNewAudio && audioURL && <audio src={`https://kilo-app-backend.onrender.com${audioURL}`} controls />}
+        {!showNewAudio && audioURL && <audio src={audioURL} controls />}
 
         <label>🎵 Replace Audio</label>
         <input type="file" accept="audio/*" onChange={handleAudioChange} />
 
         <label>🖼️ Current Thumbnail</label>
-        {!showNewThumbnail && previewURL && <img src={`https://kilo-app-backend.onrender.com${previewURL}`} alt="Current Thumbnail" style={{ width: '100%', maxWidth: '300px', borderRadius: '12px' }} />}
+        {!showNewThumbnail && previewURL && <img src={previewURL} alt="Current Thumbnail" style={{ width: '100%', maxWidth: '300px', borderRadius: '12px' }} />}
 
         <label>🖼️ Replace Thumbnail</label>
         <input type="file" accept="image/*" onChange={handleThumbnailChange} />

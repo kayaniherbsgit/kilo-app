@@ -77,8 +77,7 @@ const LessonManager = ({
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             {lesson.thumbnail && (
                               <img
-                                src={`https://kilo-app-backend.onrender.com${lesson.thumbnail}`}
-                                alt="thumbnail"
+                                src={lesson.thumbnail} alt="thumbnail"
                                 className="lesson-thumb"
                               />
                             )}
@@ -94,7 +93,7 @@ const LessonManager = ({
                           </p>
                           {lesson.audio && (
                             <audio controls style={{ width: '100%', marginTop: '10px' }}>
-                              <source src={`https://kilo-app-backend.onrender.com${lesson.audio}`} />
+                              <source src={lesson.audio} />
                             </audio>
                           )}
                           <div style={{ marginTop: '10px', display: 'flex', gap: '1rem' }}>

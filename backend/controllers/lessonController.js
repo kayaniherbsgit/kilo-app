@@ -7,8 +7,11 @@ const getAllLessons = async (req, res) => {
     const lessons = await Lesson.find().sort({ day: 1 });
 
     lessons.forEach((lesson) => {
-      if (lesson.audio && !lesson.audio.startsWith('/uploads')) {
-        lesson.audio = `/uploads/${lesson.audio}`;
+      if (!lesson.audio && Array.isArray(lesson.steps)) {
+        const firstAudioStep = lesson.steps.find(step => step.type === 'audio');
+        if (firstAudioStep) {
+          lesson.audio = firstAudioStep.src;
+        }
       }
     });
 
@@ -20,27 +23,9 @@ const getAllLessons = async (req, res) => {
 
 const uploadLesson = async (req, res) => {
   try {
-    const { title, description, day, duration, level } = req.body;
-    const audio = req.files?.audio?.[0]?.filename || '';
-    const thumbnail = req.files?.thumbnail?.[0]?.filename || '';
+    console.log('📦 Incoming lesson payload:', req.body); // 🧠 LOG HERE
 
-    let steps = [];
-    if (req.body.steps) {
-      try {
-        steps = typeof req.body.steps === 'string' ? JSON.parse(req.body.steps) : req.body.steps;
-      } catch (err) {
-        console.error('❌ Failed to parse steps JSON:', err.message);
-      }
-    }
-
-    // ✅ Inject main audio as first step if available
-    if (audio) {
-      steps.unshift({
-        type: 'audio',
-        src: `/uploads/${audio}`,
-        label: 'Main Audio',
-      });
-    }
+    const { title, description, day, duration, level, thumbnail, steps } = req.body;
 
     const newLesson = new Lesson({
       title,
@@ -48,7 +33,7 @@ const uploadLesson = async (req, res) => {
       day,
       duration,
       level,
-      thumbnail: thumbnail ? `/uploads/${thumbnail}` : '',
+      thumbnail,
       steps,
     });
 
@@ -79,34 +64,6 @@ const updateLesson = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    const newAudio = req.files?.audio?.[0]?.filename;
-    const newThumbnail = req.files?.thumbnail?.[0]?.filename;
-
-    if (newThumbnail) {
-      updates.thumbnail = `/uploads/${newThumbnail}`;
-    }
-
-    let steps = [];
-    if (updates.steps) {
-      try {
-        steps = typeof updates.steps === 'string' ? JSON.parse(updates.steps) : updates.steps;
-      } catch (err) {
-        console.error('❌ Failed to parse updated steps JSON:', err.message);
-        steps = [];
-      }
-    }
-
-    // ✅ Inject new audio as first step if uploaded
-    if (newAudio) {
-      steps.unshift({
-        type: 'audio',
-        src: `/uploads/${newAudio}`,
-        label: 'Main Audio',
-      });
-    }
-
-    updates.steps = steps;
-
     const updated = await Lesson.findByIdAndUpdate(id, updates, { new: true });
 
     await logActivity({
@@ -122,7 +79,6 @@ const updateLesson = async (req, res) => {
     res.status(500).json({ error: 'Update failed', details: err.message });
   }
 };
-
 
 const deleteLesson = async (req, res) => {
   try {

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
+import { toast } from 'react-toastify'; // ✅ new import
 
 const Login = () => {
-  // Only username + password now
   const [formData, setFormData] = useState({ username: '', password: '' });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -13,34 +15,40 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('🚀 Submitting login with:', formData);
+    setLoading(true);
 
     try {
-      // Send just { username, password }
       const res = await axios.post(
         'https://kilo-app-backend.onrender.com/api/auth/login',
         formData,
         { headers: { 'Content-Type': 'application/json' } }
       );
+
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
-      alert('Login successful!');
+      toast.success('Login successful!'); // ✅ replaced alert
 
-      if (res.data.user.isAdmin) {
-        navigate('/admin');
-      } else {
-        navigate('/home');
-      }
+      setTimeout(() => {
+        if (res.data.user.isAdmin) {
+          navigate('/admin');
+        } else {
+          navigate('/home');
+        }
+      }, 1000); // slight delay for toast display
+
     } catch (error) {
-      alert(error.response?.data?.message || 'Login failed');
+      toast.error(error?.response?.data?.message || 'Login failed'); // ✅ replaced alert
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div style={containerStyle}>
+      {loading && <Loader />}
       <div style={boxStyle}>
         <h2 style={titleStyle}>Login</h2>
         <form onSubmit={handleSubmit}>
-          {/* Change name from usernameOrEmail → username */}
           <input
             type="text"
             name="username"
@@ -72,7 +80,7 @@ const Login = () => {
   );
 };
 
-// (Styled objects unchanged)
+// Styled objects
 const containerStyle = {
   background: 'var(--bg)',
   minHeight: '100vh',

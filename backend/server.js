@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -10,8 +11,6 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const notificationRoutes = require('./routes/notificationRoutes');
-
 
 // ✅ Socket.io setup
 const io = new Server(server, {
@@ -27,34 +26,29 @@ app.use((req, res, next) => {
   next();
 });
 
-// middleware
+// ✅ Middlewares
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
 
-// serve avatar uploads statically
+// ✅ Serve uploads statically (thumbnails & audio)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ✅ Main Routes
+// ✅ Main API Routes
 app.get('/', (req, res) => res.send('🚀 Kilo App Backend is running!'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/lessons', require('./routes/lessonRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
-console.log('🔍 Mounted userRoutes on /api/users');
-app.use('/api', notificationRoutes);
+app.use('/api', require('./routes/notificationRoutes')); // still used?
 app.use('/api/community', require('./routes/communityRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/global-user-setting', require('./routes/globalUserSettingRoutes'));
 
-app.use('/uploads', express.static('uploads'));
-app.use('/api/lessons', require('./routes/lessonRoutes'));
-
-
-// ✅ Auto-create admin user
+// ✅ Auto-create admin if not exists
 const createAdminIfNotExists = require('./utils/createAdminIfNotExists');
 
-// 🔥 Global error handler (last middleware)
+// 🔥 Global error handler
 app.use((err, req, res, next) => {
   console.error('🔥 Uncaught error:', err);
   res.status(500).json({
@@ -64,14 +58,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-
+// ✅ MongoDB + server start
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
 .then(async () => {
   console.log('✅ MongoDB connected');
-  await createAdminIfNotExists(); // 👈 Here
+  await createAdminIfNotExists();
   const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);

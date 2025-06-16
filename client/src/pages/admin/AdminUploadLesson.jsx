@@ -1,264 +1,133 @@
+// src/pages/admin/AdminUploadLesson.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import '../../styles/AdminUpload.css';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import '../../styles/admin/EditLesson.css';
+import supabase from '../../utils/supabaseClient';
 
-const AdminUpload = () => {
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
-
+const AdminUploadLesson = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [day, setDay] = useState('');
+  const [day, setDay] = useState(1);
   const [duration, setDuration] = useState('');
   const [level, setLevel] = useState('');
   const [audio, setAudio] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
-  const [previewURL, setPreviewURL] = useState('');
-  const [showNewAudio, setShowNewAudio] = useState(false);
-  const [showNewThumbnail, setShowNewThumbnail] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-  // Step Builder
-  const [steps, setSteps] = useState([]);
-  const [currentStepType, setCurrentStepType] = useState('audio');
-  const [stepData, setStepData] = useState({});
+  // Upload to Supabase
+const uploadToSupabase = async (file, folder = 'lessons') => {
+  const fileName = `${Date.now()}-${file.name}`;
 
-  const validate = () => {
-    const newErrors = {};
-    if (!title.trim()) newErrors.title = 'Title is required';
-    if (!day || isNaN(day)) newErrors.day = 'Valid day number required';
-    if (!audio) newErrors.audio = 'Main audio is required';
-    return newErrors;
-  };
+  console.log("Uploading:", file.name);
 
-  const addStep = () => {
-    if (!currentStepType) return;
+  const { data, error } = await supabase.storage
+    .from(folder)
+    .upload(fileName, file);
 
-    const newStep = { type: currentStepType };
+  if (error) {
+    console.error("❌ Upload error from Supabase:", error.message);
+    return null;
+  }
 
-    if (currentStepType === 'audio') {
-      if (!stepData.audioFile) return alert('Upload an audio file');
-      newStep.src = URL.createObjectURL(stepData.audioFile);
-      newStep._audioFile = stepData.audioFile;
-    }
+  // ✅ Properly generate public URL
+const { data: publicData } = supabase
+  .storage
+  .from(folder)
+  .getPublicUrl(fileName);
 
-    if (currentStepType === 'text') {
-      if (!stepData.textContent) return alert('Enter some text');
-      newStep.content = stepData.textContent;
-    }
+const publicUrl = publicData?.publicUrl;
 
-    if (currentStepType === 'pdf') {
-      if (!stepData.pdfFile) return alert('Upload a PDF');
-      newStep.src = URL.createObjectURL(stepData.pdfFile);
-      newStep._pdfFile = stepData.pdfFile;
-    }
+console.log("✅ File uploaded successfully. Public URL:", publicUrl);
+return publicUrl;
 
-    if (currentStepType === 'questions') {
-      if (!stepData.questions || stepData.questions.length === 0) return alert('Add at least one question');
-      newStep.questions = stepData.questions;
-    }
+};
 
-    setSteps([...steps, newStep]);
-    setStepData({});
-  };
-
-    const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
+    setLoading(true);
+    setMessage('');
 
-    setUploading(true);
     try {
-      const uploadedSteps = await Promise.all(
-        steps.map(async (step) => {
-          if (step.type === 'audio' && step._audioFile) {
-            const form = new FormData();
-            form.append('file', step._audioFile);
-            const res = await axios.post('https://kilo-app-backend.onrender.com/api/lessons/upload-audio', form);
-return { ...step, src: `/uploads/${res.data.filename}` };
-          }
+      // Upload files to Supabase
+      const audioUrl = audio ? await uploadToSupabase(audio, 'lessons') : '';
+      const thumbnailUrl = thumbnail ? await uploadToSupabase(thumbnail, 'lessons') : '';
 
-          if (step.type === 'pdf' && step._pdfFile) {
-            const form = new FormData();
-            form.append('file', step._pdfFile);
-            const res = await axios.post('https://kilo-app-backend.onrender.com/api/lessons/upload-pdf', form);
-return { ...step, src: `/uploads/${res.data.filename}` };
-          }
+      if (audio && !audioUrl) throw new Error('Audio upload failed');
+      if (thumbnail && !thumbnailUrl) throw new Error('Thumbnail upload failed');
 
-          return step;
-        })
+      const token = localStorage.getItem('token');
+
+      const lessonData = {
+
+        title,
+        description,
+        day,
+        duration,
+        level,
+        thumbnail: thumbnailUrl,
+        steps: [
+          {
+            type: 'audio',
+            src: audioUrl,
+            label: 'Main Audio',
+          },
+        ],
+      };
+
+      // Post to backend
+      const res = await axios.post(
+        'https://kilo-app-backend.onrender.com/api/lessons',
+        lessonData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('description', description);
-      formData.append('day', day);
-      formData.append('duration', duration);
-      formData.append('level', level);
-      if (audio) formData.append('audio', audio);
-      if (thumbnail) formData.append('thumbnail', thumbnail);
-      formData.append('steps', JSON.stringify(uploadedSteps));
+      setMessage('✅ Lesson uploaded successfully!');
+      console.log(res.data);
 
-      await axios.post('https://kilo-app-backend.onrender.com/api/lessons', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        }
-      });
-
-      alert('✅ Lesson uploaded!');
-      navigate('/admin/lessons');
+      // Reset
+      setTitle('');
+      setDescription('');
+      setDay(1);
+      setDuration('');
+      setLevel('');
+      setAudio(null);
+      setThumbnail(null);
     } catch (err) {
-      alert('❌ Upload failed');
       console.error(err);
+      setMessage('❌ Upload failed. Try again.');
     } finally {
-      setUploading(false);
+      setLoading(false);
     }
-  };
-
-  const handleAudioChange = (e) => {
-    const file = e.target.files[0];
-    setAudio(file);
-    setShowNewAudio(true);
-    setErrors({ ...errors, audio: null });
-  };
-
-  const handleThumbnailChange = (e) => {
-    const file = e.target.files[0];
-    setThumbnail(file);
-    setShowNewThumbnail(true);
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => setPreviewURL(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const resetAudio = () => {
-    setAudio(null);
-    setShowNewAudio(false);
-  };
-
-  const resetThumbnail = () => {
-    setThumbnail(null);
-    setShowNewThumbnail(false);
-    setPreviewURL('');
   };
 
   return (
-    <div className="edit-lesson-container">
-      <button onClick={() => navigate('/admin')} className="neon-btn" style={{ marginBottom: '1.5rem' }}>
-        🔙 Back to Dashboard
-      </button>
+    <div className="admin-upload-page">
+      <h2>📤 Upload New Lesson</h2>
+      <form onSubmit={handleSubmit}>
+        <input type="text" placeholder="Title" value={title} required onChange={(e) => setTitle(e.target.value)} />
+        <textarea placeholder="Description" value={description} required onChange={(e) => setDescription(e.target.value)} />
+        <input type="number" placeholder="Day" value={day} required onChange={(e) => setDay(e.target.value)} />
+        <input type="text" placeholder="Duration (e.g. Dak 5)" value={duration} onChange={(e) => setDuration(e.target.value)} />
+        <input type="text" placeholder="Level (e.g. Beginner)" value={level} onChange={(e) => setLevel(e.target.value)} />
+        
+        <label>🎵 Upload Audio File</label>
+        <input type="file" accept="audio/*" onChange={(e) => setAudio(e.target.files[0])} />
 
-      <h2 className="edit-title">📤 Upload New Lesson</h2>
+        <label>🖼️ Upload Thumbnail</label>
+        <input type="file" accept="image/*" onChange={(e) => setThumbnail(e.target.files[0])} />
 
-      <form onSubmit={handleSubmit} className="edit-lesson-form">
-        <label>📝 Title</label>
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Lesson title" />
-        {errors.title && <span className="error-text">{errors.title}</span>}
-
-        <label>📄 Description</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Short description" />
-
-        <label>📅 Day</label>
-        <input type="number" value={day} onChange={(e) => setDay(e.target.value)} placeholder="Day number" />
-        {errors.day && <span className="error-text">{errors.day}</span>}
-
-        <label>⏱ Duration</label>
-        <input type="text" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="e.g. 5 mins" />
-
-        <label>🎧 Level</label>
-        <input type="text" value={level} onChange={(e) => setLevel(e.target.value)} placeholder="e.g. Beginner" />
-
-        <label>🎵 Main Audio (Required)</label>
-        <input type="file" accept="audio/*" onChange={handleAudioChange} />
-        {errors.audio && <span className="error-text">{errors.audio}</span>}
-
-        <AnimatePresence>
-          {showNewAudio && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <span>🎧 New Audio: {audio?.name}</span>
-              <button type="button" onClick={resetAudio} className="neon-btn">❌ Remove</button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <label>🖼️ Thumbnail (Optional)</label>
-        <input type="file" accept="image/*" onChange={handleThumbnailChange} />
-        <AnimatePresence>
-          {showNewThumbnail && previewURL && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <img src={previewURL} alt="Thumbnail Preview" style={{ width: '100%', maxWidth: '300px', borderRadius: '12px' }} />
-              <button type="button" onClick={resetThumbnail} className="neon-btn">❌ Remove</button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <h3>📚 Add Conditional Steps (optional)</h3>
-        <p style={{ fontSize: '0.9rem', color: '#ccc' }}>
-          These steps will unlock in order after the main audio is completed.
-        </p>
-
-        <div className="step-builder">
-          <select value={currentStepType} onChange={(e) => setCurrentStepType(e.target.value)}>
-            <option value="audio">🎵 Audio</option>
-            <option value="text">📝 Text</option>
-            <option value="pdf">📄 PDF</option>
-            <option value="questions">❓ Questions</option>
-          </select>
-
-          {currentStepType === 'audio' && (
-            <input type="file" accept="audio/*" onChange={(e) => setStepData({ ...stepData, audioFile: e.target.files[0] })} />
-          )}
-          {currentStepType === 'text' && (
-            <textarea placeholder="Enter text content" onChange={(e) => setStepData({ ...stepData, textContent: e.target.value })} />
-          )}
-          {currentStepType === 'pdf' && (
-            <input type="file" accept="application/pdf" onChange={(e) => setStepData({ ...stepData, pdfFile: e.target.files[0] })} />
-          )}
-          {currentStepType === 'questions' && (
-            <textarea placeholder="One question per line" onChange={(e) => setStepData({ ...stepData, questions: e.target.value.split('\n') })} />
-          )}
-
-          <button type="button" onClick={addStep} className="neon-btn" style={{ marginTop: '0.5rem' }}>
-            ➕ Add Step
-          </button>
-
-<div style={{ marginTop: '1rem' }}>
-  {steps.map((step, index) => (
-    <div key={index} className="step-preview">
-      <strong>Step {index + 1}:</strong> {step.type}
-      <button
-        type="button"
-        onClick={() => {
-          const updated = [...steps];
-          updated.splice(index, 1);
-          setSteps(updated);
-        }}
-        style={{ marginLeft: '1rem', color: 'red' }}
-      >
-        ❌ Remove
-      </button>
-    </div>
-  ))}
-</div>
-
-        </div>
-
-        <button type="submit" className="floating-save-btn" disabled={uploading}>
-          {uploading ? '⏳ Uploading...' : '💾 Save Lesson'}
+        <button type="submit" disabled={loading}>
+          {loading ? 'Uploading...' : 'Upload Lesson'}
         </button>
+        {message && <p style={{ marginTop: '10px' }}>{message}</p>}
       </form>
     </div>
   );
 };
 
-export default AdminUpload;
+export default AdminUploadLesson;

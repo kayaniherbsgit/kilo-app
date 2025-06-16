@@ -1,4 +1,3 @@
-// ✅ Fully updated Home.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useSwipeable } from 'react-swipeable';
@@ -26,14 +25,12 @@ const Home = () => {
   const bellRef = useRef();
   const navigate = useNavigate();
 
-  // Load user once
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (!storedUser) return navigate('/login');
     setUser(storedUser);
   }, []);
 
-  // Fetch data when user is ready
   useEffect(() => {
     if (!user?.username) return;
 
@@ -61,19 +58,16 @@ const Home = () => {
         }
         setCurrentIndex(startIndex);
 
-
         setCompleted(stateRes.data.completedLessons || []);
         setAudioProgress(stateRes.data.audioProgress || {});
         setStreak(streakRes.data.streak || 0);
         setUnreadCount(notifRes.data.unreadCount || 0);
         setTopUsers(leaderboardRes.data || []);
 
-        // 🎉 Confetti for streak 7
         if (streakRes.data.streak === 7) {
           confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
         }
 
-        // 🔥 Show streak banner randomly or first time
         const once = localStorage.getItem('showStreakOnce');
         if (!once) {
           setShowStreak(true);
@@ -93,9 +87,9 @@ const Home = () => {
     setCurrentIndex(newIndex);
     const lessonId = lessons[newIndex]?._id;
     if (lessonId) {
-    const lessonMap = JSON.parse(localStorage.getItem('userLessonMap')) || {};
-    lessonMap[user.username] = lessonId;
-    localStorage.setItem('userLessonMap', JSON.stringify(lessonMap));
+      const lessonMap = JSON.parse(localStorage.getItem('userLessonMap')) || {};
+      lessonMap[user.username] = lessonId;
+      localStorage.setItem('userLessonMap', JSON.stringify(lessonMap));
       await axios.post('https://kilo-app-backend.onrender.com/api/users/current-lesson', {
         lessonId
       }, {
@@ -156,15 +150,18 @@ const Home = () => {
                 strokeLinecap: 'round',
               })}
             >
-            <img
-              src={`https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`}
-              onError={(e) => {
-                e.target.src = 'https://kilo-app-backend.onrender.com/uploads/default.png';
-              }}
-              alt="avatar"
-              style={{ width: 30, height: 30, borderRadius: '50%' }}
-            />
-
+              <img
+                src={
+                  user?.avatar?.startsWith('http')
+                    ? user.avatar
+                    : `https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`
+                }
+                onError={(e) => {
+                  e.target.src = 'https://kilo-app-backend.onrender.com/uploads/default.png';
+                }}
+                alt="avatar"
+                style={{ width: 30, height: 30, borderRadius: '50%' }}
+              />
             </CircularProgressbarWithChildren>
           </div>
         </div>
@@ -177,30 +174,29 @@ const Home = () => {
         </div>
       )}
 
-<div className="day-tabs-scroll">
-  {lessons.map((lesson, index) => {
-    const isUnlocked = index === 0 || completed.includes(lessons[index - 1]._id);
-    const isActive = index === currentIndex;
-    const isCompleted = completed.includes(lesson._id);
+      <div className="day-tabs-scroll">
+        {lessons.map((lesson, index) => {
+          const isUnlocked = index === 0 || completed.includes(lessons[index - 1]._id);
+          const isActive = index === currentIndex;
+          const isCompleted = completed.includes(lesson._id);
 
-    let tabClass = 'day-tab';
-    if (isActive) tabClass += ' active-day';
-    else if (isCompleted) tabClass += ' completed-day';
-    else if (!isUnlocked) tabClass += ' locked-day';
+          let tabClass = 'day-tab';
+          if (isActive) tabClass += ' active-day';
+          else if (isCompleted) tabClass += ' completed-day';
+          else if (!isUnlocked) tabClass += ' locked-day';
 
-    return (
-      <button
-        key={lesson._id}
-        className={tabClass}
-        disabled={!isUnlocked}
-        onClick={() => isUnlocked && saveIndex(index)}
-      >
-        Day {lesson.day}
-      </button>
-    );
-  })}
-</div>
-
+          return (
+            <button
+              key={lesson._id}
+              className={tabClass}
+              disabled={!isUnlocked}
+              onClick={() => isUnlocked && saveIndex(index)}
+            >
+              Day {lesson.day}
+            </button>
+          );
+        })}
+      </div>
 
       {currentLesson && (
         <AudioCard
