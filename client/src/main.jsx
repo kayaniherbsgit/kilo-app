@@ -1,20 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './styles/theme.css';
 import { registerSW } from 'virtual:pwa-register';
 import { AudioProvider } from './contexts/AudioContext';
-import { ToastContainer } from 'react-toastify'; // ✅ added
-import 'react-toastify/dist/ReactToastify.css'; // ✅ added
+import { ThemeProvider } from './contexts/ThemeContext'; // ✅ add this
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AudioProvider>
-        <App />
-        <ToastContainer position="top-center" autoClose={2500} theme="dark" />
-      </AudioProvider>
+      <ThemeProvider>
+        <AudioProvider>
+          <App />
+          <ToastContainer position="top-center" autoClose={2500} theme="dark" />
+        </AudioProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

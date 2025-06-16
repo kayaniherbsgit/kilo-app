@@ -22,7 +22,8 @@ import AdminUploadLesson from "./pages/admin/AdminUploadLesson";
 import AdminLogs from './pages/admin/AdminLogs';
 import AdminSendNotification from './pages/admin/AdminSendNotification';
 import EditLesson from './pages/admin/EditLesson';
-
+import Settings from '../src/components/Settings';
+import ThemeSwitcher from './components/ThemeSwitcher';
 
 
 const App = () => {
@@ -53,6 +54,7 @@ const App = () => {
         <Route path="/admin/logs" element={<AdminLogs />} />
         <Route path="/admin/send-notification" element={<AdminSendNotification />} />
         <Route path="/lesson/:id" element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}><Lesson /></motion.div>} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </AnimatePresence>
   );

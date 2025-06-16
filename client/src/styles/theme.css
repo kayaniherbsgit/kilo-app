@@ -12,6 +12,19 @@
   --font: 'Inter', 'Segoe UI', sans-serif;
 }
 
+:root[data-theme='light'] {
+  --bg: #f7f7f7;
+  --text: #111;
+  --card-bg: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  --bg: #111;
+  --text: #f7f7f7;
+  --card-bg: #1e1e1e;
+}
+
+
 body {
   margin: 0;
   padding: 0;
@@ -124,4 +137,51 @@ p {
   accent-color: var(--accent);
   background: #333;
   border-radius: 4px;
+}
+
+.font-serif {
+  font-family: 'Georgia', 'Times New Roman', serif !important;
+}
+
+.font-sans {
+  font-family: 'Inter', 'Segoe UI', sans-serif !important;
+}
+
+.font-hand {
+  font-family: 'Comic Sans MS', 'Patrick Hand', cursive !important;
+}
+
+
+.font-select-btn {
+  background-color: var(--card-bg);
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+  color: var(--text);
+}
+
+.font-select-btn:hover {
+  background-color: var(--button-hover);
+  color: white;
+}
+
+.font-select-btn.active {
+  border-color: var(--accent);
+  background-color: var(--accent);
+  color: black;
+}
+
+.font-serif {
+  font-family: 'Georgia', 'Times New Roman', serif !important;
+}
+
+.font-sans {
+  font-family: 'Inter', 'Segoe UI', sans-serif !important;
+}
+
+.font-hand {
+  font-family: 'Comic Sans MS', 'Patrick Hand', cursive !important;
 }
