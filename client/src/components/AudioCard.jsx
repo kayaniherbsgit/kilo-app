@@ -85,23 +85,35 @@ const AudioCard = ({
       setProgress(pct);
       localStorage.setItem(`lesson-progress-${lesson._id}`, currentTime);
 
-      if (pct >= 99) {
-        if (!completed.includes(lesson._id)) {
-          onMarkComplete(lesson._id);
-          axios.post(
-            'https://kilo-app-backend.onrender.com/api/user/mark-complete',
-            { lessonId: lesson._id },
-            { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-          ).catch(err => console.error('Error saving completion:', err.message));
-        }
-
-        toast.success('🏁 ✅ Completed! Ready to level up.');
-        if (!sessionStorage.getItem(`confetti-shown-${lesson._id}`)) {
-          setShowConfetti(true);
-          sessionStorage.setItem(`confetti-shown-${lesson._id}`, 'true');
-          setTimeout(() => setShowConfetti(false), 5000);
+    if (pct >= 99) {
+  // Mark as complete if not already
+  if (!completed.includes(lesson._id)) {
+    onMarkComplete(lesson._id);
+    axios.post(
+      'https://kilo-app-backend.onrender.com/api/users/mark-complete',
+      { lessonId: lesson._id },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       }
+    ).catch(err => console.error('Error saving completion:', err.message));
+  }
+
+  // ✅ Only show toast once per lesson per session
+  if (!sessionStorage.getItem(`toast-shown-${lesson._id}`)) {
+    toast.success('🏁 ✅ Completed! Ready to level up.');
+    sessionStorage.setItem(`toast-shown-${lesson._id}`, 'true');
+  }
+
+  // 🎉 Only trigger confetti once per lesson
+  if (!sessionStorage.getItem(`confetti-shown-${lesson._id}`)) {
+    setShowConfetti(true);
+    sessionStorage.setItem(`confetti-shown-${lesson._id}`, 'true');
+    setTimeout(() => setShowConfetti(false), 5000);
+  }
+}
+
     };
 
     const handleEnd = () => {
