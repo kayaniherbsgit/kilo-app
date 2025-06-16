@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import './Homepage.css';
 import logo from '../assets/kayani-logo.jpg';
 
+
 const content = {
   en: {
     nav: ['Mission', 'Programs', 'Testimonials', 'Join'],
@@ -11,10 +12,14 @@ const content = {
       subtitle: '🌿 Restoring Africa with Pure Herbal Wisdom',
       button: 'Explore Programs',
     },
-    mission: {
-      title: 'Our Mission',
-      text: 'To bring back the power of nature to every home across Africa, with remedies tested by generations and crafted with care.',
-    },
+        mission: {
+        title: 'Our Mission',
+        short: `To bring back the power of nature to every home across Africa.We don’t just treat diseases — we revive body, mind, and soul.`,
+        more: `We’ve built a fortress of hope for all suffering physically or emotionally. We believe healing isn’t just in injections — it's in herbs, food, conversations, and belief. Kayani is more than medicine; it’s a lifestyle.
+
+        Welcome to the world of natural healing, where every challenge has a solution — in your language, through natural ingredients, and from the heart.`,
+        },
+
     programs: {
       title: 'Our Signature Programs',
       items: [
@@ -39,16 +44,20 @@ const content = {
   },
 
   sw: {
-    nav: ['Dhamira', 'Programu', 'Ushuhuda', 'Jiunge'],
+    nav: ['Dhamira', 'Tiba', 'Ushuhuda', 'Jiunge'],
     hero: {
       title: 'Tiba Kwa Mimea Asili.',
       subtitle: '🌿 Jitibu Changamoto Zako Za Kiafya Kiasili Ukiwa Na Kayani Herbs',
-      button: 'Peruzi Tiba Zetu',
+      button: 'Angalia Tiba Zetu',
     },
-    mission: {
-      title: 'Dhamira Yetu',
-      text: 'Kurudisha nguvu ya tiba za asili katika kila nyumba barani Afrika, kwa kutumia maarifa ya vizazi.',
-    },
+  mission: {
+  title: '🌿 Dhamira Yetu',
+  short: `Tunarudisha nguvu ya tiba ya asili, moja kwa moja kutoka kwa mizizi ya mababu hadi kizazi cha leo. Hatutibu tu magonjwa – tunafufua mwili, akili, na roho.`,
+  more: `Tumejenga ngome ya matumaini kwa wote wanaoteseka kimwili au kihisia. Tunaamini tiba haiko kwenye sindano tu – ipo kwenye mimea, chakula, mazungumzo, na imani. Kayani ni zaidi ya dawa; ni mtindo wa maisha.
+
+Karibu katika ulimwengu wa tiba mbadala, ambapo kila tatizo lina suluhisho lake – kwa lugha ya asili, kwa viungo vya asili, na kwa moyo wa kweli.`,
+},
+
     programs: {
       title: 'Tiba [Programu] Zetu Maarufu',
       items: [
@@ -85,6 +94,8 @@ const Homepage = () => {
 
   const t = content[lang];
   const [showLangToggle, setShowLangToggle] = useState(true);
+  const [showMore, setShowMore] = useState(false);
+
 
   // Scroll toggle for language button
   useEffect(() => {
@@ -138,13 +149,48 @@ const Homepage = () => {
         </motion.div>
       </section>
 
-      {/* Mission */}
-      <motion.section className="section mission" id="mission" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-        <h2>{t.mission.title}</h2>
-        <p>{t.mission.text}</p>
-      </motion.section>
+             {/* Mission */}
+<motion.section
+  className="section mission"
+  id="mission"
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+>
+  <h2>{t.mission.title}</h2>
 
-      {/* Programs */}
+  <div className="mission-card">
+    <p className="dhamira-text">
+      {t.mission.short}
+    </p>
+  </div>
+
+  {!showMore && (
+    <button className="learn-more-btn" onClick={() => setShowMore(true)}>
+      📖 {lang === 'sw' ? 'Soma Zaidi' : 'Learn More'}
+    </button>
+  )}
+
+  {showMore && (
+    <>
+      <motion.div
+        className="mission-card"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <p className="dhamira-text">{t.mission.more}</p>
+      </motion.div>
+
+      <button className="learn-more-btn" onClick={() => setShowMore(false)}>
+        🔽 {lang === 'sw' ? 'Funga Maelezo' : 'Collapse'}
+      </button>
+    </>
+  )}
+</motion.section>
+
+
+     {/* Programs */}
       <motion.section className="section programs" id="programs" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <h2>{t.programs.title}</h2>
         <div className="program-cards">
