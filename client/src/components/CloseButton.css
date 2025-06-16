@@ -1,0 +1,21 @@
+/* src/components/CloseButton.css */
+.close-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: #1a1a1a;
+  color: #fff;
+  border: 2px solid #555;
+  font-size: 1.1rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  z-index: 9999;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: #ff4444;
+  border-color: #ff4444;
+  color: white;
+}

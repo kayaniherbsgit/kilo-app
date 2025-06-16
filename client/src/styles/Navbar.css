@@ -1,0 +1,148 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+  transition: all 0.3s ease;
+}
+
+/* Shrink on scroll */
+.navbar.shrink {
+  padding: 0.6rem 1.2rem;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #b4ff39;
+}
+
+.logo img {
+  height: 36px;
+  width: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* Nav Links */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: #ccc;
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  padding-bottom: 4px;
+  transition: all 0.2s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background-color: #b4ff39;
+  border-radius: 1px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hamburger Menu */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.hamburger span {
+  height: 3px;
+  width: 22px;
+  background: #fff;
+  border-radius: 2px;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: #121212;
+  position: absolute;
+  top: 100%;
+  right: 1rem;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 998;
+}
+
+.mobile-menu a {
+  padding: 1rem;
+  border-bottom: 1px solid #1e1e1e;
+  color: #eee;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.mobile-menu a:hover {
+  background: #1e1e1e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: flex;
+    width: 180px;
+  }
+}
+
+.lang-toggle-mobile {
+  background: #1a1a1a;
+  color: #b4ff39;
+  border: 1px solid #34a853;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  margin: 0.8rem;
+  border-radius: 40px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.lang-toggle-mobile:hover {
+  background: #34a853;
+  color: black;
+}

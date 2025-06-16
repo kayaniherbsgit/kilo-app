@@ -148,12 +148,22 @@ const Homepage = () => {
       <motion.section className="section programs" id="programs" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <h2>{t.programs.title}</h2>
         <div className="program-cards">
-          {t.programs.items.map(([title, desc], i) => (
-            <div className="card" key={i}>
-              <h3>{title}</h3>
-              <p>{desc}</p>
-            </div>
-          ))}
+{t.programs.items.map(([title, desc], i) => (
+  <div
+    className="card"
+    key={i}
+    onClick={() => {
+      if (title === 'Kayani Men Power') {
+        window.location.href = '/program-intro';
+      }
+    }}
+    style={{ cursor: title === 'Kayani Men Power' ? 'pointer' : 'default' }}
+  >
+    <h3>{title}</h3>
+    <p>{desc}</p>
+  </div>
+))}
+
         </div>
       </motion.section>
 

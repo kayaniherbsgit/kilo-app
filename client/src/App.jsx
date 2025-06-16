@@ -28,6 +28,8 @@ import Settings from './components/Settings';
 
 import Homepage from './pages/Homepage';
 import ProgramIntro from './pages/ProgramIntro';
+import AboutMenProgram from './pages/AboutMenProgram';
+
 
 const App = () => {
   const location = useLocation();
@@ -38,6 +40,8 @@ const App = () => {
         {/* 🌐 Public Homepage Route */}
         <Route path="/" element={<Homepage />} />
         <Route path="/program-intro" element={<ProgramIntro />} />
+        <Route path="/about-men-program" element={<AboutMenProgram />} />
+
 
         {/* 🔐 Auth Routes */}
         <Route path="/register" element={<Register />} />
