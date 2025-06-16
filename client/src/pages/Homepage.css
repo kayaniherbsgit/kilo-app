@@ -24,37 +24,70 @@ html {
   position: fixed;
   top: 0;
   width: 100%;
-  padding: 1rem 2rem;
+  padding: 1rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(6px);
   z-index: 100;
+  gap: 1rem;
+  flex-wrap: nowrap;
+    font-size: 0.85rem;
+      padding: 0.8rem 0.8rem;
+
+
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  font-weight: bold;
-  font-size: 1rem;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   color: #b4ff39;
+  white-space: nowrap;
+  flex-shrink: 0;
+    font-size: 0.85rem;
+  gap: 0.3rem;
 }
 
+
 .logo img {
-  height: 34px;
-  width: 34px;
+  height: 28px;
+  width: 28px;
   border-radius: 6px;
   object-fit: cover;
 }
 
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-size: 0.95rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex-grow: 1;
+  justify-content: flex-start;
+    gap: 1rem;
+  font-size: 0.85rem;
+}
+
+.nav-links::-webkit-scrollbar {
+  display: none;
+}
+
 .nav-links a {
-  margin-left: 1.5rem;
+  display: inline-flex;
+  align-items: center;
   color: #ccc;
   text-decoration: none;
   font-size: 0.95rem;
+  font-weight: 500;
   transition: color 0.2s ease;
+  line-height: 1;
+  font-size: 0.85rem;
 }
 
 .nav-links a:hover {
@@ -177,20 +210,68 @@ html {
   margin-top: 2rem;
 }
 
+/* Floating Language Toggle */
+.floating-lang {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lang-float {
+  background: #1a1a1a;
+  color: #b4ff39;
+  border: 2px solid #34a853;
+  padding: 0.5rem 1.2rem;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.lang-float:hover {
+  background: #34a853;
+  color: black;
+  transform: translateY(-2px);
+}
+
 /* Responsive */
-@media (min-width: 768px) {
+@media (max-width: 768px) {
   .hero h1 {
-    font-size: 3.5rem;
+    font-size: 2.4rem;
   }
 
   .hero p {
-    font-size: 1.3rem;
-  }
-
-  .nav-links a {
     font-size: 1rem;
   }
 
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  font-size: 0.95rem;
+}
+
+
+  .logo span {
+    font-size: 0.95rem;
+  }
+
+  .program-cards {
+    flex-direction: column;
+  }
+
+  .card {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
   .program-cards {
     flex-direction: row;
     justify-content: center;
