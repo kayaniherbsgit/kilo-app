@@ -13,10 +13,16 @@
 }
 
 :root[data-theme='light'] {
-  --bg: #f7f7f7;
-  --text: #111;
-  --card-bg: #ffffff;
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --subtext: #555;
+  --card-bg: #f9f9f9;
+  --accent: #22c55e;
+  --button-bg: #22c55e;
+  --button-hover: #16a34a;
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
+
 
 :root[data-theme='dark'] {
   --bg: #111;
@@ -36,11 +42,12 @@ body {
 }
 
 .card {
-  background: var(--card);
+  background: var(--card-bg);
   border-radius: 18px;
   padding: 1.2rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow);
   margin-bottom: 1.5rem;
+  color: var(--text);
 }
 
 /* COMMUNITY COMING SOON PAGE */
