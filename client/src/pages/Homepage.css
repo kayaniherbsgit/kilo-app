@@ -435,6 +435,14 @@ html {
   color: #b4ff39;
 }
 
+.nav-links a.active,
+.mobile-menu-links a.active {
+  color: #b4ff39;
+  font-weight: 600;
+  border-bottom: 2px solid #b4ff39;
+}
+
+
 .close-btn {
   position: absolute;
   top: 1.2rem;

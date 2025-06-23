@@ -97,6 +97,7 @@ const Homepage = () => {
   const [showMore, setShowMore] = useState(false);
   const [shrink, setShrink] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -108,6 +109,28 @@ const Homepage = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+  const sections = document.querySelectorAll('section[id]');
+
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    },
+    {
+      rootMargin: '-40% 0px -55% 0px',
+      threshold: 0.1,
+    }
+  );
+
+  sections.forEach(section => observer.observe(section));
+  return () => sections.forEach(section => observer.unobserve(section));
+}, []);
+
 
   useEffect(() => {
   document.body.style.overflow = menuOpen ? 'hidden' : 'auto';
@@ -131,12 +154,12 @@ const Homepage = () => {
       </div>
 
 
-        <nav className="nav-links">
-          <a href="#mission">{t.nav[0]}</a>
-          <a href="#programs">{t.nav[1]}</a>
-          <a href="#testimonials">{t.nav[2]}</a>
-          <a href="#join">{t.nav[3]}</a>
-        </nav>
+            <nav className="nav-links">
+        <a href="#mission" className={activeSection === 'mission' ? 'active' : ''}>{t.nav[0]}</a>
+        <a href="#programs" className={activeSection === 'programs' ? 'active' : ''}>{t.nav[1]}</a>
+        <a href="#testimonials" className={activeSection === 'testimonials' ? 'active' : ''}>{t.nav[2]}</a>
+        <a href="#join" className={activeSection === 'join' ? 'active' : ''}>{t.nav[3]}</a>
+      </nav>
 
         <div className={`hamburger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
           <span />
@@ -164,9 +187,6 @@ const Homepage = () => {
           )}
 
           </AnimatePresence>
-
-
-
 
       </header>
 
