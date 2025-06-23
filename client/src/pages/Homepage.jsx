@@ -138,7 +138,7 @@ const Homepage = () => {
           <a href="#join">{t.nav[3]}</a>
         </nav>
 
-        <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+        <div className={`hamburger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
           <span />
           <span />
           <span />
@@ -154,7 +154,6 @@ const Homepage = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
             >
-              <button className="close-btn" onClick={() => setMenuOpen(false)}>✕</button>
               <div className="mobile-menu-links">
                 <a href="#mission" onClick={() => setMenuOpen(false)}>{t.nav[0]}</a>
                 <a href="#programs" onClick={() => setMenuOpen(false)}>{t.nav[1]}</a>
