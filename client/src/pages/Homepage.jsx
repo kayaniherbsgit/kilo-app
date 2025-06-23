@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Homepage.css';
-import logo from '../assets/kayani-logo.jpg';
+import logo from '../assets/kayacirclelogo.png';
 import { motion, AnimatePresence } from 'framer-motion';
 
 
@@ -46,8 +46,8 @@ const content = {
   sw: {
     nav: ['Dhamira', 'Tiba', 'Ushuhuda', 'Jiunge'],
     hero: {
-      title: 'Tiba Kwa Mimea Asili.',
-      subtitle: '🌿 Jitibu Changamoto Zako Za Kiafya Kiasili Ukiwa Na Kayani Herbs',
+      title: 'Jitibu Changamoto Zako Za Kiafya Kwa Njia Asilia',
+      subtitle: '🌿 Usiendelee kuteseka wakati tiba iko karibu nawe.\nKutoka kwenye mimea, viungo, mizizi hadi mazoea ya mababu — tiba asilia haipambwi, lakini ina nguvu ya kweli.',
       button: 'Angalia Tiba Zetu',
     },
   mission: {
@@ -200,7 +200,11 @@ const Homepage = () => {
           transition={{ duration: 1 }}
         >
           <h1>{t.hero.title}</h1>
-          <p>{t.hero.subtitle}</p>
+          <div className="subtitle">
+            {t.hero.subtitle.split('\n').map((line, index) => (
+              <p key={index}>{line}</p>
+            ))}
+          </div>
           <a href="#programs" className="hero-btn">{t.hero.button}</a>
         </motion.div>
       </section>
@@ -281,7 +285,7 @@ const Homepage = () => {
       <motion.section className="section join" id="join" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <h2>{t.join.title}</h2>
         <p>{t.join.text}</p>
-        <a href="#programs" className="hero-btn">{t.join.button}</a>
+        <a href="#programs" className="cta-btn">{t.join.button}</a>
       </motion.section>
 
       {/* Footer */}
