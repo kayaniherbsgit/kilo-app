@@ -13,44 +13,38 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Main Container */
 .homepage {
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
   overflow-x: hidden;
+  position: relative;
 }
 
-/* Navbar */
 .navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: #111;
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
-  padding: 1rem 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(6px);
-  z-index: 100;
-  gap: 1rem;
-  flex-wrap: nowrap;
-    font-size: 0.85rem;
-      padding: 0.8rem 0.8rem;
-
-
+  z-index: 999;
 }
+
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #b4ff39;
+  gap: 0.6rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: white;
   white-space: nowrap;
-  flex-shrink: 0;
-    font-size: 0.85rem;
-  gap: 0.3rem;
+  margin-right: auto; /* Push nav links to right */
 }
+
 
 
 .logo img {
@@ -60,19 +54,14 @@ html {
   object-fit: cover;
 }
 
-
 .nav-links {
   display: flex;
+  gap: 2.5rem;
   align-items: center;
-  gap: 1.1rem;
-  font-size: 0.95rem;
-  overflow-x: auto;
-  white-space: nowrap;
-  flex-grow: 1;
-  justify-content: flex-start;
-    gap: 1rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
+  font-weight: 500;
 }
+
 
 .nav-links::-webkit-scrollbar {
   display: none;
@@ -85,7 +74,7 @@ html {
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 500;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease-in-out;
   line-height: 1;
   font-size: 0.85rem;
 }
@@ -329,4 +318,184 @@ html {
   line-height: 1.9;
   font-size: 1rem;
   margin-bottom: 0.5rem;
+}
+
+/* Shrink effect */
+.navbar.shrink {
+  padding: 0.6rem 1.2rem;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Hamburger menu */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.hamburger span {
+  height: 2px;
+  width: 25px;
+  background: #aaa;
+  border-radius: 2px;
+}
+
+/* Mobile dropdown */
+.mobile-menu {
+  position: absolute;
+  top: 100%;
+  right: 1rem;
+  background: #222;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.mobile-menu a {
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #333;
+  color: #eee;
+  text-decoration: none;
+}
+
+.mobile-menu a:hover {
+  background: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.4s ease;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  text-align: center;
+}
+
+.mobile-menu-links a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.4rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.mobile-menu-links a:hover {
+  color: #b4ff39;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.5rem;
+  font-size: 2rem;
+  color: #ccc;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 2100;
+}
+
+.mobile-menu-dropdown {
+  position: fixed; /* not absolute */
+  top: 0;          /* cover navbar */
+  left: 0;
+  width: 100vw;
+  background: #111;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  z-index: 2000;  /* higher than navbar */
+  animation: slideDown 0.3s ease;
+}
+
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.close-btn {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.dropdown-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.dropdown-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.dropdown-links a:hover {
+  color: #b4ff39;
+}
+
+.logo img {
+  height: 30px;
+  width: 30px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.navbar.shrink {
+  padding: 0.5rem 2rem;
 }

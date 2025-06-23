@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import './Homepage.css';
 import logo from '../assets/kayani-logo.jpg';
 
-
 const content = {
   en: {
     nav: ['Mission', 'Programs', 'Testimonials', 'Join'],
@@ -95,43 +94,71 @@ const Homepage = () => {
   const t = content[lang];
   const [showLangToggle, setShowLangToggle] = useState(true);
   const [showMore, setShowMore] = useState(false);
+  const [shrink, setShrink] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-
-  // Scroll toggle for language button
   useEffect(() => {
     let lastScrollY = window.scrollY;
     const handleScroll = () => {
-      if (window.scrollY > lastScrollY) {
-        setShowLangToggle(false);
-      } else {
-        setShowLangToggle(true);
-      }
+      setShowLangToggle(window.scrollY < lastScrollY);
+      setShrink(window.scrollY > 50);
       lastScrollY = window.scrollY;
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Toggle language and store
+  useEffect(() => {
+  document.body.style.overflow = menuOpen ? 'hidden' : 'auto';
+}, [menuOpen]);
+
+
   const toggleLang = () => {
     const next = lang === 'sw' ? 'en' : 'sw';
     setLang(next);
     localStorage.setItem('kayani_lang', next);
   };
 
+
   return (
-    <div className="homepage">
+ <div className="homepage">
       {/* Navbar */}
-      <header className="navbar">
-        <div className="logo">
-          <img src={logo} alt="Kayani Herbs" />
-          <span>Kayani Herbs</span>
-        </div>
+      <header className={`navbar ${shrink ? 'shrink' : ''}`}>
+            <div className="logo">
+        <img src={logo} alt="Kayani Herbs" />
+        <span>KAYANI</span>
+      </div>
+
+
         <nav className="nav-links">
           <a href="#mission">{t.nav[0]}</a>
           <a href="#programs">{t.nav[1]}</a>
           <a href="#testimonials">{t.nav[2]}</a>
+          <a href="#join">{t.nav[3]}</a>
         </nav>
+
+        <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+          <span />
+          <span />
+          <span />
+        </div>
+
+        {menuOpen && (
+          <div className="mobile-menu-dropdown">
+            <div className="dropdown-header">
+              <span>KAYANI</span>
+              <button className="close-btn" onClick={() => setMenuOpen(false)}>✕</button>
+            </div>
+            <div className="dropdown-links">
+              <a href="#mission" onClick={() => setMenuOpen(false)}>{t.nav[0]}</a>
+              <a href="#programs" onClick={() => setMenuOpen(false)}>{t.nav[1]}</a>
+              <a href="#testimonials" onClick={() => setMenuOpen(false)}>{t.nav[2]}</a>
+              <a href="#join" onClick={() => setMenuOpen(false)}>{t.nav[3]}</a>
+            </div>
+          </div>
+        )}
+
+
       </header>
 
       {/* Hero */}
