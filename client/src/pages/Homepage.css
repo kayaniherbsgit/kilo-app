@@ -397,6 +397,12 @@ html {
   }
 }
 
+@media (min-width: 769px) {
+  .hamburger {
+    display: none !important;
+  }
+}
+
 .mobile-menu-overlay {
   position: fixed;
   top: 64px; /* Matches navbar height */
