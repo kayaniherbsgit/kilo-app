@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import './Homepage.css';
 import logo from '../assets/kayani-logo.jpg';
+import { motion, AnimatePresence } from 'framer-motion';
+
 
 const content = {
   en: {
@@ -143,20 +144,29 @@ const Homepage = () => {
           <span />
         </div>
 
-        {menuOpen && (
-          <div className="mobile-menu-dropdown">
-            <div className="dropdown-header">
-              <span>KAYANI</span>
+          <AnimatePresence>
+
+          {menuOpen && (
+            <motion.div
+              className="mobile-menu-overlay"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
               <button className="close-btn" onClick={() => setMenuOpen(false)}>✕</button>
-            </div>
-            <div className="dropdown-links">
-              <a href="#mission" onClick={() => setMenuOpen(false)}>{t.nav[0]}</a>
-              <a href="#programs" onClick={() => setMenuOpen(false)}>{t.nav[1]}</a>
-              <a href="#testimonials" onClick={() => setMenuOpen(false)}>{t.nav[2]}</a>
-              <a href="#join" onClick={() => setMenuOpen(false)}>{t.nav[3]}</a>
-            </div>
-          </div>
-        )}
+              <div className="mobile-menu-links">
+                <a href="#mission" onClick={() => setMenuOpen(false)}>{t.nav[0]}</a>
+                <a href="#programs" onClick={() => setMenuOpen(false)}>{t.nav[1]}</a>
+                <a href="#testimonials" onClick={() => setMenuOpen(false)}>{t.nav[2]}</a>
+                <a href="#join" onClick={() => setMenuOpen(false)}>{t.nav[3]}</a>
+              </div>
+            </motion.div>
+          )}
+
+          </AnimatePresence>
+
+
 
 
       </header>
