@@ -8,17 +8,17 @@
     "server": "cd backend && npm start",
     "client": "cd client && npm run dev"
   },
-"dependencies": {
-  "bcryptjs": "^3.0.2",
-  "cors": "^2.8.5",
-  "dotenv": "^16.5.0",
-  "express": "^4.18.2",
-  "jsonwebtoken": "^9.0.2",
-  "mongoose": "^8.15.0",
-  "multer": "1.4.5-lts.1",
-  "readable-stream": "^3.6.2",
-  "socket.io": "^4.8.1"
-},
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.15.0",
+    "multer": "^1.4.5-lts.1",
+    "readable-stream": "^3.6.2",
+    "socket.io": "^4.8.1"
+  },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
     "concurrently": "^9.1.2",
