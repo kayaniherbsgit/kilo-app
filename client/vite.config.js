@@ -22,7 +22,7 @@ export default {
             type: 'image/png',
           },
           {
-            src: '/logo512.png',
+            src: '/kayacirclelogo.png',
             sizes: '512x512',
             type: 'image/png',
           },
