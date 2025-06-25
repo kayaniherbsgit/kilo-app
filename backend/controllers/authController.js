@@ -27,8 +27,9 @@ exports.register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const isAdmin = username === 'kayaniadmin';
+
+    const avatarPath = req.file ? `/uploads/${req.file.filename}` : '/uploads/default.png';
 
     const user = await User.create({
       fullName,
@@ -38,7 +39,7 @@ exports.register = async (req, res) => {
       whatsappNumber,
       region,
       password: hashedPassword,
-      avatar: '', // 🔥 No avatar
+      avatar: avatarPath,
       isAdmin,
       isApproved: isAdmin
     });
@@ -54,6 +55,7 @@ exports.register = async (req, res) => {
     res.status(500).json({ message: 'Registration failed', error: err.message });
   }
 };
+
 
 exports.login = async (req, res) => {
   try {

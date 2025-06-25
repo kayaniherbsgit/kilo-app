@@ -28,30 +28,29 @@ const Register = () => {
     setFormData({ ...formData, [name]: files ? files[0] : value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const isAdmin = formData.username.trim().toLowerCase() === 'kayaniadmin';
+  const isAdmin = formData.username.trim().toLowerCase() === 'kayaniadmin';
+  const data = new FormData();
 
-    const data = {
-      fullName: formData.fullName,
-      username: formData.username,
-      email: formData.email,
-      phoneNumber: formData.phoneNumber,
-      whatsappNumber: formData.whatsappNumber,
-      region: formData.region,
-      password: formData.password,
-    };
+  for (const key in formData) {
+    data.append(key, formData[key]);
+  }
 
-    try {
-      await axios.post('http://localhost:5000/api/auth/register', data);
-      alert(isAdmin ? 'Admin registered! You can now login.' : 'Registration successful! Wait for admin approval.');
-      navigate('/login');
-    } catch (error) {
-      console.log('❌ Register error full:', error.response?.data);
-      alert(error.response?.data?.message || 'Registration failed');
-    }
-  };
+  try {
+    await axios.post('http://localhost:5000/api/auth/register', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    alert(isAdmin ? 'Admin registered! You can now login.' : 'Registration successful! Wait for admin approval.');
+    navigate('/login');
+  } catch (error) {
+    console.log('❌ Register error full:', error.response?.data);
+    alert(error.response?.data?.message || 'Registration failed');
+  }
+};
+
 
   return (
     <>
