@@ -1,135 +1,207 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import BottomNav from '../components/BottomNav';
-import "../styles/admin/Community.css"
+import { FiImage, FiSmile, FiSend, FiSearch, FiUser } from 'react-icons/fi';
+import EmojiPicker from 'emoji-picker-react';
+import { io } from 'socket.io-client';
+import '../styles/Community.css';
 
 const Community = () => {
-  return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center text-center bg-[#0e0e0e] text-white px-4"
-      style={{ paddingBottom: '6rem' }}
-    >
-      <h1 className="text-4xl font-bold mb-4">👥 Community</h1>
-      <p className="text-lg text-gray-400 mb-2">We're cooking up something powerful... 🔥</p>
-      <p className="text-md text-gray-500">Stay tuned — the Community feature is coming soon.</p>
-      <BottomNav />
-    </div>
-  );
-
-  /* 
-  🔒 FULL COMMUNITY UI (TEMPORARILY DISABLED)
-
-  import React, { useEffect, useState, useRef } from 'react';
-  import axios from 'axios';
-  import io from 'socket.io-client';
-  import BottomNav from '../components/BottomNav';
-  import { motion, AnimatePresence } from 'framer-motion';
-  import postSound from '../assets/post.mp3';
-  import { toast } from 'react-toastify';
-  import EmojiPicker from 'emoji-picker-react';
-
-  const socket = io('http://localhost:5000');
-
   const [posts, setPosts] = useState([]);
-  const [leaders, setLeaders] = useState([]);
   const [text, setText] = useState('');
   const [media, setMedia] = useState(null);
-  const [tab, setTab] = useState('all');
   const [showEmoji, setShowEmoji] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user'));
+  const [query, setQuery] = useState('');
+  const [tab, setTab] = useState('all');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const fileRef = useRef();
-  const postRef = useRef();
+  const loaderRef = useRef();
+  const socket = useRef(null);
+  const user = JSON.parse(localStorage.getItem('user'));
 
-  useEffect(() => {
-    fetchPosts();
-    fetchLeaders();
-
-    socket.on('newPost', (newPost) => {
-      postRef.current?.play();
-      setPosts((prev) => [newPost, ...prev]);
-    });
-
-    socket.on('updatePost', (updated) => {
-      setPosts((prev) => prev.map((p) => (p._id === updated._id ? updated : p)));
-    });
-
-    socket.on('deletePost', (postId) => {
-      setPosts((prev) => prev.filter((p) => p._id !== postId));
-    });
-
-    return () => {
-      socket.off('newPost');
-      socket.off('updatePost');
-      socket.off('deletePost');
-    };
-  }, []);
-
-  const fetchPosts = async () => {
-    const res = await axios.get('http://localhost:5000/api/community');
-    setPosts(res.data);
-  };
-
-  const fetchLeaders = async () => {
-    const res = await axios.get('http://localhost:5000/api/community/leaderboard');
-    setLeaders(res.data);
-  };
-
-  const submitPost = async () => {
-    if (!text.trim() && !media) return;
-
-    const formData = new FormData();
-    formData.append('username', user.username);
-    formData.append('content', text);
-    if (media) formData.append('media', media);
-
-    await axios.post('http://localhost:5000/api/community', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-
-    setText('');
-    setMedia(null);
-    setShowEmoji(false);
-  };
-
-  const react = async (id, emoji) => {
-    await axios.post(\`http://localhost:5000/api/community/\${id}/reaction\`, { emoji });
-  };
-
-  const comment = async (id, commentText) => {
-    if (!commentText) return;
-    await axios.post(\`http://localhost:5000/api/community/\${id}/comment\`, {
-      username: user.username,
-      avatar: user.avatar || '',
-      text: commentText,
-    });
-  };
-
-  const deletePost = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this post?");
-    if (!confirmDelete) return;
-
+  const fetchMore = async () => {
     try {
-      await axios.delete(\`http://localhost:5000/api/community/\${id}\`, {
-        headers: {
-          Authorization: \`Bearer \${localStorage.getItem("token")}\`,
-        },
-      });
-      setPosts(posts.filter((p) => p._id !== id));
-      toast.success("Post deleted!");
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Delete failed");
+      const res = await axios.get(`http://localhost:5000/api/community?page=${page}&limit=10`);
+      if (res.data.length === 0) {
+        setHasMore(false);
+      } else {
+        setPosts(prev => [...prev, ...res.data]);
+        setPage(prev => prev + 1);
+      }
+    } catch {
+      toast.error('Failed to load more posts');
     }
   };
 
-  const filtered = posts.filter((post) => {
-    if (tab === 'media') return post.media;
-    if (tab === 'mine') return post.username === user.username;
-    return true;
+  useEffect(() => {
+    socket.current = io('http://localhost:5000');
+
+    socket.current.on('newPost', newPost => {
+      setPosts(prev => [newPost, ...prev]);
+    });
+
+    socket.current.on('reactionUpdate', updatedPost => {
+      setPosts(prev =>
+        prev.map(p => (p._id === updatedPost._id ? updatedPost : p))
+      );
+    });
+
+    socket.current.on('newComment', ({ postId, comment }) => {
+      setPosts(prev =>
+        prev.map(p => {
+          if (p._id === postId) {
+            return { ...p, comments: [...p.comments, comment] };
+          }
+          return p;
+        })
+      );
+    });
+
+    return () => socket.current.disconnect();
+  }, []);
+
+  useEffect(() => {
+    fetchMore();
+  }, []);
+
+  useEffect(() => {
+    if (!loaderRef.current) return;
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) fetchMore();
+    });
+    observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [hasMore]);
+
+  const handleSubmit = async () => {
+    if (!text && !media) return;
+    const formData = new FormData();
+    formData.append('username', user.username);
+    formData.append('avatar', user.avatar || '');
+    formData.append('content', text);
+    if (media) formData.append('media', media);
+
+    try {
+      await axios.post('http://localhost:5000/api/community', formData);
+      setText('');
+      setMedia(null);
+      setShowEmoji(false);
+      toast.success('Posted!');
+    } catch (err) {
+      toast.error('Post failed!');
+    }
+  };
+
+  const handleReaction = async (id, emoji) => {
+    try {
+      await axios.post(`http://localhost:5000/api/community/${id}/reaction`, { emoji });
+    } catch {
+      toast.error('Failed to react');
+    }
+  };
+
+  const filteredPosts = posts.filter(post => {
+    const matchesQuery = post.content.toLowerCase().includes(query.toLowerCase());
+    if (tab === 'mine') return post.username === user.username && matchesQuery;
+    return matchesQuery;
   });
 
-  // ... original return block with JSX UI omitted for brevity
-  */
+  return (
+    <div className="community-container">
+      <h2 className="gradient-title">👥 Community</h2>
+
+      <div className="tab-bar">
+        <button onClick={() => setTab('all')} className={tab === 'all' ? 'active' : ''}>All</button>
+        <button onClick={() => setTab('mine')} className={tab === 'mine' ? 'active' : ''}><FiUser /> My Posts</button>
+      </div>
+
+      <input
+        type="text"
+        placeholder="Search posts..."
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+        className="search-input"
+      />
+
+      <div className="post-input-box">
+        <textarea
+          placeholder="What's on your mind?"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        {media && (
+          <div className="preview-media">
+            <img src={URL.createObjectURL(media)} alt="preview" />
+          </div>
+        )}
+        <div className="actions-row">
+          <FiImage onClick={() => fileRef.current.click()} />
+          <FiSmile onClick={() => setShowEmoji(!showEmoji)} />
+          <button className="neon-btn" onClick={handleSubmit}>
+            <FiSend /> Post
+          </button>
+        </div>
+        {showEmoji && (
+          <EmojiPicker
+            onEmojiClick={(e) => setText(prev => prev + e.emoji)}
+            theme="dark"
+          />
+        )}
+        <input
+          type="file"
+          hidden
+          ref={fileRef}
+          accept="image/*,video/*,audio/*"
+          onChange={(e) => setMedia(e.target.files[0])}
+        />
+      </div>
+
+      <div className="feed">
+        {filteredPosts.map(post => (
+          <div className="post-card" key={post._id}>
+            <div className="post-header">
+              <img
+                src={
+                  post.avatar?.startsWith('http')
+                    ? post.avatar
+                    : `http://localhost:5000${post.avatar || '/uploads/default.png'}`
+                }
+                onError={(e) => {
+                  e.target.src = 'http://localhost:5000/uploads/default.png';
+                }}
+                alt="avatar"
+                style={{ width: 32, height: 32, borderRadius: '50%' }}
+              />
+              <span>{post.username}</span>
+            </div>
+            <p className="post-content">{post.content}</p>
+            {post.media && (
+              <div className="media-preview">
+                {post.mediaType === 'video' ? (
+                  <video controls src={`http://localhost:5000${post.media}`} />
+                ) : post.mediaType === 'audio' ? (
+                  <audio controls src={`http://localhost:5000${post.media}`} />
+                ) : (
+                  <img src={`http://localhost:5000${post.media}`} alt="media" />
+                )}
+              </div>
+            )}
+            <div className="post-reactions">
+              <button onClick={() => handleReaction(post._id, 'like')}>👍 {post.reactions?.like || 0}</button>
+              <button onClick={() => handleReaction(post._id, 'fire')}>🔥 {post.reactions?.fire || 0}</button>
+              <button onClick={() => handleReaction(post._id, 'heart')}>❤️ {post.reactions?.heart || 0}</button>
+            </div>
+          </div>
+        ))}
+        {hasMore && <div ref={loaderRef} style={{ height: 60 }} />}
+      </div>
+
+      <BottomNav />
+    </div>
+  );
 };
 
 export default Community;

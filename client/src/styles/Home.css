@@ -77,6 +77,13 @@
   text-align: center;
 }
 
+.avatar-hover:hover {
+  transform: scale(1.12);
+  box-shadow: 0 0 12px #00ffccaa;
+  transition: all 0.3s ease;
+}
+
+
 .audio-title {
   font-size: 1.2rem;
   font-weight: 600;
