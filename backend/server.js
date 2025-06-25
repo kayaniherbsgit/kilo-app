@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs'); // ✅ Added for folder check
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -25,6 +26,12 @@ app.use((req, res, next) => {
   req.io = io;
   next();
 });
+
+// ✅ Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
 // ✅ Middlewares
 app.use(cors());
