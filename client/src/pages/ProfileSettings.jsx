@@ -39,7 +39,7 @@ useEffect(() => {
     if (avatar) form.append('avatar', avatar);
 
     try {
-      const res = await axios.patch(`https://kilo-app-backend.onrender.com/api/users/${storedUser._id}`, form, {
+      const res = await axios.patch(`http://localhost:5000/api/users/${storedUser._id}`, form, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'multipart/form-data',

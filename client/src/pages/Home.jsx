@@ -37,11 +37,11 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [lessonsRes, stateRes, streakRes, notifRes, leaderboardRes] = await Promise.all([
-          axios.get('https://kilo-app-backend.onrender.com/api/lessons'),
-          axios.get(`https://kilo-app-backend.onrender.com/api/users/state/${user.username}`),
-          axios.get(`https://kilo-app-backend.onrender.com/api/users/streak/${user.username}`),
-          axios.get(`https://kilo-app-backend.onrender.com/api/notifications/unread/${user.username}`),
-          axios.get('https://kilo-app-backend.onrender.com/api/community/leaderboard')
+          axios.get('http://localhost:5000/api/lessons'),
+          axios.get(`http://localhost:5000/api/users/state/${user.username}`),
+          axios.get(`http://localhost:5000/api/users/streak/${user.username}`),
+          axios.get(`http://localhost:5000/api/notifications/unread/${user.username}`),
+          axios.get('http://localhost:5000/api/community/leaderboard')
         ]);
 
         const sortedLessons = lessonsRes.data.sort((a, b) => a.day - b.day);
@@ -90,7 +90,7 @@ const Home = () => {
       const lessonMap = JSON.parse(localStorage.getItem('userLessonMap')) || {};
       lessonMap[user.username] = lessonId;
       localStorage.setItem('userLessonMap', JSON.stringify(lessonMap));
-      await axios.post('https://kilo-app-backend.onrender.com/api/users/current-lesson', {
+      await axios.post('http://localhost:5000/api/users/current-lesson', {
         lessonId
       }, {
         headers: { Authorization: `Bearer ${user?.token}` }
@@ -102,7 +102,7 @@ const Home = () => {
     if (!completed.includes(lessonId)) {
       const updated = [...completed, lessonId];
       setCompleted(updated);
-      await axios.post('https://kilo-app-backend.onrender.com/api/users/mark-complete', {
+      await axios.post('http://localhost:5000/api/users/mark-complete', {
         lessonId
       }, {
         headers: { Authorization: `Bearer ${user?.token}` }
@@ -154,10 +154,10 @@ const Home = () => {
                 src={
                   user?.avatar?.startsWith('http')
                     ? user.avatar
-                    : `https://kilo-app-backend.onrender.com${user?.avatar || '/uploads/default.png'}`
+                    : `http://localhost:5000${user?.avatar || '/uploads/default.png'}`
                 }
                 onError={(e) => {
-                  e.target.src = 'https://kilo-app-backend.onrender.com/uploads/default.png';
+                  e.target.src = 'http://localhost:5000/uploads/default.png';
                 }}
                 alt="avatar"
                 style={{ width: 30, height: 30, borderRadius: '50%' }}

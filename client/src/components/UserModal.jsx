@@ -8,7 +8,7 @@ const UserModal = ({ user, onClose }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <img
-          src={`https://kilo-app-backend.onrender.com/uploads/${user.avatar || 'default.png'}`}
+          src={`http://localhost:5000/uploads/${user.avatar || 'default.png'}`}
           alt="avatar"
           className="user-avatar"
         />

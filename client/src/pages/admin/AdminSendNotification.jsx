@@ -12,7 +12,7 @@ const SendNotification = () => {
   }, []);
 
   const fetchUsers = async () => {
-    const res = await axios.get('https://kilo-app-backend.onrender.com/api/users/all', {
+    const res = await axios.get('http://localhost:5000/api/users/all', {
       headers: { Authorization: `Bearer ${token}` }
     });
     setUsers(res.data);
@@ -24,7 +24,7 @@ const SendNotification = () => {
 
     try {
       await axios.post(
-        'https://kilo-app-backend.onrender.com/api/admin/notifications',
+        'http://localhost:5000/api/admin/notifications',
         form,
         { headers: { Authorization: `Bearer ${token}` } }
       );

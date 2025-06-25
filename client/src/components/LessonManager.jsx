@@ -38,7 +38,7 @@ const LessonManager = ({
           reordered.splice(result.destination.index, 0, removed);
           setLessons(reordered);
 
-          fetch('https://kilo-app-backend.onrender.com/api/admin/reorder-lessons', {
+          fetch('http://localhost:5000/api/admin/reorder-lessons', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

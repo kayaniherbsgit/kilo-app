@@ -16,7 +16,7 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('https://kilo-app-backend.onrender.com/api/users/all', {
+      const res = await axios.get('http://localhost:5000/api/users/all', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data);
@@ -28,7 +28,7 @@ const AdminUsers = () => {
   const deleteUser = async (id, username) => {
     if (!window.confirm(`⚠️ Delete ${username}? This cannot be undone.`)) return;
     try {
-      await axios.delete(`https://kilo-app-backend.onrender.com/api/users/${id}`, {
+      await axios.delete(`http://localhost:5000/api/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert(`${username} deleted successfully.`);
@@ -42,7 +42,7 @@ const AdminUsers = () => {
 const approveUser = async (id, username) => {
   try {
     const res = await axios.put(
-      `https://kilo-app-backend.onrender.com/api/users/${id}/approve`, 
+      `http://localhost:5000/api/users/${id}/approve`, 
       {}, 
       {
         headers: { Authorization: `Bearer ${token}` },

@@ -27,12 +27,12 @@ useEffect(() => {
 
     const fetchData = async () => {
       try {
-        const lessonsRes = await axios.get('https://kilo-app-backend.onrender.com/api/lessons');
+        const lessonsRes = await axios.get('http://localhost:5000/api/lessons');
         const sortedLessons = lessonsRes.data.sort((a, b) => a.day - b.day);
         setLessons(sortedLessons);
 
         if (storedUser?.username) {
-          const progressRes = await axios.get(`https://kilo-app-backend.onrender.com/api/users/state/${storedUser.username}`);
+          const progressRes = await axios.get(`http://localhost:5000/api/users/state/${storedUser.username}`);
           setCompleted(progressRes.data.completedLessons || []);
         }
       } catch (err) {
@@ -66,7 +66,7 @@ useEffect(() => {
 
     const fetchTimeline = async () => {
       try {
-        const res = await axios.get(`https://kilo-app-backend.onrender.com/api/users/activity/${storedUser.username}`);
+        const res = await axios.get(`http://localhost:5000/api/users/activity/${storedUser.username}`);
         const grouped = groupTimeline(res.data || []);
         setTimeline(grouped);
       } catch (err) {

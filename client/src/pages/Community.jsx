@@ -27,7 +27,7 @@ const Community = () => {
   import { toast } from 'react-toastify';
   import EmojiPicker from 'emoji-picker-react';
 
-  const socket = io('https://kilo-app-backend.onrender.com');
+  const socket = io('http://localhost:5000');
 
   const [posts, setPosts] = useState([]);
   const [leaders, setLeaders] = useState([]);
@@ -65,12 +65,12 @@ const Community = () => {
   }, []);
 
   const fetchPosts = async () => {
-    const res = await axios.get('https://kilo-app-backend.onrender.com/api/community');
+    const res = await axios.get('http://localhost:5000/api/community');
     setPosts(res.data);
   };
 
   const fetchLeaders = async () => {
-    const res = await axios.get('https://kilo-app-backend.onrender.com/api/community/leaderboard');
+    const res = await axios.get('http://localhost:5000/api/community/leaderboard');
     setLeaders(res.data);
   };
 
@@ -82,7 +82,7 @@ const Community = () => {
     formData.append('content', text);
     if (media) formData.append('media', media);
 
-    await axios.post('https://kilo-app-backend.onrender.com/api/community', formData, {
+    await axios.post('http://localhost:5000/api/community', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 
@@ -92,12 +92,12 @@ const Community = () => {
   };
 
   const react = async (id, emoji) => {
-    await axios.post(\`https://kilo-app-backend.onrender.com/api/community/\${id}/reaction\`, { emoji });
+    await axios.post(\`http://localhost:5000/api/community/\${id}/reaction\`, { emoji });
   };
 
   const comment = async (id, commentText) => {
     if (!commentText) return;
-    await axios.post(\`https://kilo-app-backend.onrender.com/api/community/\${id}/comment\`, {
+    await axios.post(\`http://localhost:5000/api/community/\${id}/comment\`, {
       username: user.username,
       avatar: user.avatar || '',
       text: commentText,
@@ -109,7 +109,7 @@ const Community = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(\`https://kilo-app-backend.onrender.com/api/community/\${id}\`, {
+      await axios.delete(\`http://localhost:5000/api/community/\${id}\`, {
         headers: {
           Authorization: \`Bearer \${localStorage.getItem("token")}\`,
         },

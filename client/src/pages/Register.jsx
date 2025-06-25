@@ -44,7 +44,7 @@ const Register = () => {
     };
 
     try {
-      await axios.post('https://kilo-app-backend.onrender.com/api/auth/register', data);
+      await axios.post('http://localhost:5000/api/auth/register', data);
       alert(isAdmin ? 'Admin registered! You can now login.' : 'Registration successful! Wait for admin approval.');
       navigate('/login');
     } catch (error) {

@@ -29,7 +29,7 @@ const EditLesson = () => {
   const [newStepContent, setNewStepContent] = useState('');
 
   useEffect(() => {
-    axios.get(`https://kilo-app-backend.onrender.com/api/lessons/${id}`, {
+    axios.get(`http://localhost:5000/api/lessons/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     }).then(res => {
       const data = res.data;
@@ -86,7 +86,7 @@ const EditLesson = () => {
         ],
       };
 
-      await axios.put(`https://kilo-app-backend.onrender.com/api/lessons/${id}`, updatedLesson, {
+      await axios.put(`http://localhost:5000/api/lessons/${id}`, updatedLesson, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

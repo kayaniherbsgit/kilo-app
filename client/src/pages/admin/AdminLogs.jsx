@@ -13,7 +13,7 @@ const AdminLogs = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await axios.get('https://kilo-app-backend.onrender.com/api/admin/activity-logs', {
+        const res = await axios.get('http://localhost:5000/api/admin/activity-logs', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setLogs(res.data);

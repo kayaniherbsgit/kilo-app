@@ -18,7 +18,7 @@ const Login = () => {
 
     try {
       const res = await axios.post(
-        'https://kilo-app-backend.onrender.com/api/auth/login',
+        'http://localhost:5000/api/auth/login',
         formData,
         { headers: { 'Content-Type': 'application/json' } }
       );

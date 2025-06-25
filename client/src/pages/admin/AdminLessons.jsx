@@ -15,7 +15,7 @@ const AdminLessons = () => {
 
   const fetchLessons = async () => {
     try {
-      const res = await axios.get('https://kilo-app-backend.onrender.com/api/lessons', {
+      const res = await axios.get('http://localhost:5000/api/lessons', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -36,7 +36,7 @@ const AdminLessons = () => {
   const handleDelete = async () => {
     if (!confirmDeleteId) return;
     try {
-      await axios.delete(`https://kilo-app-backend.onrender.com/api/lessons/${confirmDeleteId}`, {
+      await axios.delete(`http://localhost:5000/api/lessons/${confirmDeleteId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setConfirmDeleteId(null);
@@ -56,7 +56,7 @@ const AdminLessons = () => {
     try {
       const order = reordered.map((l) => l._id);
       await axios.patch(
-        'https://kilo-app-backend.onrender.com/api/lessons/reorder',
+        'http://localhost:5000/api/lessons/reorder',
         { order },
         { headers: { Authorization: `Bearer ${token}` } }
       );

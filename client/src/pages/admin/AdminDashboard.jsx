@@ -24,7 +24,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     axios
-      .get("https://kilo-app-backend.onrender.com/api/admin/notifications", {
+      .get("http://localhost:5000/api/admin/notifications", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

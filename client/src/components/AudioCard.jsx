@@ -58,7 +58,7 @@ const AudioCard = ({
     }, 15000);
 
     axios.post(
-      'https://kilo-app-backend.onrender.com/api/users/current-lesson',
+      'http://localhost:5000/api/users/current-lesson',
       { lessonId: lesson._id },
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     ).catch(err => console.error('Failed to save current lesson:', err.message));
@@ -90,7 +90,7 @@ const AudioCard = ({
   if (!completed.includes(lesson._id)) {
     onMarkComplete(lesson._id);
     axios.post(
-      'https://kilo-app-backend.onrender.com/api/users/mark-complete',
+      'http://localhost:5000/api/users/mark-complete',
       { lessonId: lesson._id },
       {
         headers: {

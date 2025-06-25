@@ -13,7 +13,7 @@ const AdminDashboard = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('https://kilo-app-backend.onrender.com/api/admin/notifications', {
+      const res = await axios.get('http://localhost:5000/api/admin/notifications', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotifications(res.data);
@@ -24,7 +24,7 @@ const AdminDashboard = () => {
 
   const markAsRead = async (id) => {
     try {
-      await axios.patch(`https://kilo-app-backend.onrender.com/api/admin/notifications/${id}/mark-read`, {}, {
+      await axios.patch(`http://localhost:5000/api/admin/notifications/${id}/mark-read`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotifications((prev) =>

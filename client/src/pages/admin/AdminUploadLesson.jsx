@@ -83,7 +83,7 @@ const uploadToSupabase = async (file, folder = 'lessons') => {
 
       // Post to backend
       const res = await axios.post(
-        'https://kilo-app-backend.onrender.com/api/lessons',
+        'http://localhost:5000/api/lessons',
         lessonData,
         {
           headers: {

@@ -12,7 +12,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`https://kilo-app-backend.onrender.com/api/users/profile/${username}`, {
+        const res = await axios.get(`http://localhost:5000/api/users/profile/${username}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(res.data);

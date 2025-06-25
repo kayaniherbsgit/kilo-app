@@ -9,7 +9,7 @@ const Lesson = () => {
 
   useEffect(() => {
   axios
-    .get(`https://kilo-app-backend.onrender.com/api/lessons/${id}`)
+    .get(`http://localhost:5000/api/lessons/${id}`)
     .then((res) => {
       const lessonData = res.data;
 
@@ -50,7 +50,7 @@ const handleStepComplete = async (index) => {
     if (lesson && nextStep === lesson.steps.length) {
       try {
         await axios.post(
-          'https://kilo-app-backend.onrender.com/api/users/mark-complete',
+          'http://localhost:5000/api/users/mark-complete',
           { lessonId: lesson._id },
           {
             headers: {
@@ -97,7 +97,7 @@ const handleStepComplete = async (index) => {
             {step.type === 'audio' && (
               <audio
                 controls
-                src={`https://kilo-app-backend.onrender.com${step.src}`}
+                src={`http://localhost:5000${step.src}`}
                 onEnded={() => handleStepComplete(index)}
                 style={{ width: '100%' }}
               />
@@ -112,7 +112,7 @@ const handleStepComplete = async (index) => {
             {step.type === 'pdf' && (
               <div>
                 <a
-                  href={`https://kilo-app-backend.onrender.com${step.src}`}
+                  href={`http://localhost:5000${step.src}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => handleStepComplete(index)}

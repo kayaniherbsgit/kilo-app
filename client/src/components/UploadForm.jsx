@@ -47,8 +47,8 @@ const UploadForm = ({
 
     try {
       const endpoint = editLesson
-        ? `https://kilo-app-backend.onrender.com/api/lessons/${lessonData._id}`
-        : 'https://kilo-app-backend.onrender.com/api/lessons';
+        ? `http://localhost:5000/api/lessons/${lessonData._id}`
+        : 'http://localhost:5000/api/lessons';
 
       const method = editLesson ? 'PUT' : 'POST';
 

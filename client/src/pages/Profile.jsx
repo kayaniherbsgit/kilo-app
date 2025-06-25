@@ -46,7 +46,7 @@ const Profile = () => {
     const fetchProgress = async () => {
       try {
         const res = await axios.get(
-          `https://kilo-app-backend.onrender.com/api/users/state/${storedUser.username}`
+          `http://localhost:5000/api/users/state/${storedUser.username}`
         );
         setCompletedCount(res.data.completedLessons.length);
         setXp(res.data.xp || 0);
@@ -63,7 +63,7 @@ const Profile = () => {
 
       try {
         const res = await axios.get(
-          `https://kilo-app-backend.onrender.com/api/users/streak/${storedUser.username}`
+          `http://localhost:5000/api/users/streak/${storedUser.username}`
         );
         setStreak(res.data.streak || 0);
       } catch (err) {
@@ -72,7 +72,7 @@ const Profile = () => {
 
       try {
         const res = await axios.get(
-          `https://kilo-app-backend.onrender.com/api/lessons/count`
+          `http://localhost:5000/api/lessons/count`
         );
         setTotalLessons(res.data.total);
       } catch (err) {
@@ -119,9 +119,9 @@ const Profile = () => {
       {/* Avatar + Username */}
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <img
-          src={`https://kilo-app-backend.onrender.com${userData?.avatar || '/uploads/default.png'}`}
+          src={`http://localhost:5000${userData?.avatar || '/uploads/default.png'}`}
           onError={(e) => {
-            e.target.src = 'https://kilo-app-backend.onrender.com/uploads/default.png';
+            e.target.src = 'http://localhost:5000/uploads/default.png';
           }}
           alt="avatar"
           style={{ width: 50, height: 50, borderRadius: '50%' }}
