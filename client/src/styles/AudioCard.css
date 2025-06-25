@@ -64,35 +64,64 @@
 
 .nav-buttons-wrapper {
   display: flex;
-  justify-content: center;
-  gap: 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
   margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.neon-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
 }
 
 .neon-btn.small {
-  background-color: #048547;
-  color: #121212;
-  border: none;
-  border-radius: 8px;
-  padding: 0.65rem 1.2rem;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 0 0 8px rgba(7, 188, 12, 0.8);
-  transition: background-color 0.15s, box-shadow 0.15s;
+  font-size: 0.9rem;
+  padding: 0.6rem 1.2rem;
 }
 
-.neon-btn.small:hover {
-  background-color: #a4ff57;
-  box-shadow: 0 0 12px rgba(164, 255, 87, 1);
+/* ACTIVE = clickable */
+.neon-btn.enabled {
+  background-color: #00cc66;
+  color: white;
+  box-shadow: 0 0 10px #00cc66aa;
 }
 
-.neon-btn.small.disabled {
-  background-color: #444;
-  color: #666;
+/* DISABLED = not clickable */
+.neon-btn.disabled {
+  background-color: #555;
+  color: #ccc;
+  opacity: 0.6;
   cursor: not-allowed;
   box-shadow: none;
 }
+
+/* Previous button style */
+.nav-buttons-wrapper .prev-btn {
+  background-color: #0088cc;
+  color: white;
+}
+
+/* Add a responsive message style */
+.audio-warning {
+  font-size: 0.85rem;
+  color: #f87171;
+  margin-top: 0.5rem;
+  text-align: center;
+  flex: 1 1 100%;
+}
+
+.neon-btn.enabled:hover {
+  background-color: #00e676;
+  box-shadow: 0 0 15px #00e676aa;
+}
+
 
 .resume-modal {
   position: absolute;

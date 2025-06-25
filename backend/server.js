@@ -49,6 +49,7 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api', require('./routes/notificationRoutes')); // still used?
 app.use('/api/community', require('./routes/communityRoutes'));
+app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/global-user-setting', require('./routes/globalUserSettingRoutes'));
 

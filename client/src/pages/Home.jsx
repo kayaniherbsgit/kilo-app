@@ -150,18 +150,24 @@ const Home = () => {
                 strokeLinecap: 'round',
               })}
             >
-              <img
-                src={
-                  user?.avatar?.startsWith('http')
-                    ? user.avatar
-                    : `http://localhost:5000${user?.avatar || '/uploads/default.png'}`
-                }
-                onError={(e) => {
-                  e.target.src = 'http://localhost:5000/uploads/default.png';
-                }}
-                alt="avatar"
-                style={{ width: 30, height: 30, borderRadius: '50%' }}
-              />
+                    <div
+            onClick={() => navigate('/profile')}
+            style={{ cursor: 'pointer' }}
+          >
+            <img
+              src={
+                user?.avatar?.startsWith('http')
+                  ? user.avatar
+                  : `http://localhost:5000${user?.avatar || '/uploads/default.png'}`
+              }
+              onError={(e) => {
+                e.target.src = 'http://localhost:5000/uploads/default.png';
+              }}
+              alt="avatar"
+              style={{ width: 30, height: 30, borderRadius: '50%' }}
+            />
+          </div>
+
             </CircularProgressbarWithChildren>
           </div>
         </div>

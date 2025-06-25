@@ -16,6 +16,7 @@ const AudioCard = ({
   completed,
 }) => {
   const [progress, setProgress] = useState(0);
+  const [isSeventyFiveReached, setIsSeventyFiveReached] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [resumePrompt, setResumePrompt] = useState(false);
   const [resumeTime, setResumeTime] = useState(0);
@@ -28,16 +29,31 @@ const AudioCard = ({
   const { audioRef } = useAudio();
   const countdownRef = useRef(null);
   const delayTimerRef = useRef(null);
-
   const [stepIndex, setStepIndex] = useState(0);
+
   const steps = Array.isArray(lesson.steps) && lesson.steps.length > 0
     ? lesson.steps
     : [{ type: 'audio', src: lesson.audio || '', content: '', label: 'Default Audio' }];
-
   const currentStep = steps[stepIndex] || {};
+
+  const trackEvent = async (event, data = {}) => {
+    try {
+      await axios.post('http://localhost:5000/api/analytics/track', {
+        event,
+        data
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+    } catch (err) {
+      console.warn('Analytics failed:', event, err.message);
+    }
+  };
 
   useEffect(() => {
     setProgress(0);
+    setIsSeventyFiveReached(false);
     setShowAutoPlay(false);
     setAutoPlayCancelled(false);
     setDelayedAutoPlay(false);
@@ -57,8 +73,7 @@ const AudioCard = ({
       setDelayedAutoPlay(true);
     }, 15000);
 
-    axios.post(
-      'http://localhost:5000/api/users/current-lesson',
+    axios.post('http://localhost:5000/api/users/current-lesson',
       { lessonId: lesson._id },
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     ).catch(err => console.error('Failed to save current lesson:', err.message));
@@ -85,38 +100,51 @@ const AudioCard = ({
       setProgress(pct);
       localStorage.setItem(`lesson-progress-${lesson._id}`, currentTime);
 
-    if (pct >= 99) {
-  // Mark as complete if not already
-  if (!completed.includes(lesson._id)) {
-    onMarkComplete(lesson._id);
-    axios.post(
-      'http://localhost:5000/api/users/mark-complete',
-      { lessonId: lesson._id },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+      if (pct >= 75 && !isSeventyFiveReached) {
+        setIsSeventyFiveReached(true);
+        trackEvent('audio_75_percent', { lessonId: lesson._id, stepIndex, time: currentTime });
+      }
+
+      if (pct >= 99) {
+        trackEvent('audio_complete', {
+          lessonId: lesson._id,
+          stepIndex,
+          time: currentTime,
+          duration
+        });
+
+        if (!completed.includes(lesson._id)) {
+          onMarkComplete(lesson._id);
+          axios.post('http://localhost:5000/api/users/mark-complete',
+            { lessonId: lesson._id },
+            { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+          ).catch(err => console.error('Error saving completion:', err.message));
+        }
+
+        if (!sessionStorage.getItem(`toast-shown-${lesson._id}`)) {
+          toast.success('🏁 ✅ Completed! Ready to level up.');
+          sessionStorage.setItem(`toast-shown-${lesson._id}`, 'true');
+        }
+
+        if (!sessionStorage.getItem(`confetti-shown-${lesson._id}`)) {
+          setShowConfetti(true);
+          sessionStorage.setItem(`confetti-shown-${lesson._id}`, 'true');
+          setTimeout(() => setShowConfetti(false), 5000);
         }
       }
-    ).catch(err => console.error('Error saving completion:', err.message));
-  }
+    };
 
-  // ✅ Only show toast once per lesson per session
-  if (!sessionStorage.getItem(`toast-shown-${lesson._id}`)) {
-    toast.success('🏁 ✅ Completed! Ready to level up.');
-    sessionStorage.setItem(`toast-shown-${lesson._id}`, 'true');
-  }
+    const handlePlay = () => {
+      trackEvent('audio_play', { lessonId: lesson._id, stepIndex, time: audio.currentTime });
+    };
 
-  // 🎉 Only trigger confetti once per lesson
-  if (!sessionStorage.getItem(`confetti-shown-${lesson._id}`)) {
-    setShowConfetti(true);
-    sessionStorage.setItem(`confetti-shown-${lesson._id}`, 'true');
-    setTimeout(() => setShowConfetti(false), 5000);
-  }
-}
-
+    const handlePause = () => {
+      trackEvent('audio_pause', { lessonId: lesson._id, stepIndex, time: audio.currentTime });
     };
 
     const handleEnd = () => {
+      trackEvent('audio_ended', { lessonId: lesson._id, stepIndex, time: audio.currentTime });
+
       if (stepIndex < steps.length - 1) {
         setShowAutoPlay(true);
         setAutoPlayTimer(10);
@@ -141,12 +169,17 @@ const AudioCard = ({
     };
 
     audio.addEventListener('timeupdate', handleUpdate);
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
     audio.addEventListener('ended', handleEnd);
+
     return () => {
       audio.removeEventListener('timeupdate', handleUpdate);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('ended', handleEnd);
     };
-  }, [audioRef, completed, lesson._id, onMarkComplete, stepIndex, currentStep]);
+  }, [audioRef, completed, lesson._id, onMarkComplete, stepIndex, currentStep, isSeventyFiveReached]);
 
   const handleNextStep = () => {
     if (stepIndex < steps.length - 1) {
@@ -241,12 +274,7 @@ const AudioCard = ({
         )}
 
         {currentStep.type === 'pdf' && (
-          <a
-            className="neon-btn small"
-            target="_blank"
-            href={currentStep.src}
-            rel="noreferrer"
-          >
+          <a className="neon-btn small" target="_blank" href={currentStep.src} rel="noreferrer">
             📥 Open PDF
           </a>
         )}
@@ -262,10 +290,21 @@ const AudioCard = ({
 
         <div className="nav-buttons-wrapper">
           {currentIndex > 0 && (
-            <button onClick={onPrev} className="neon-btn small">⬅️ Previous</button>
+            <button onClick={onPrev} className="neon-btn small prev-btn">⬅️ Previous</button>
           )}
           {stepIndex >= steps.length - 1 && currentIndex < totalLessons - 1 && (
-            <button onClick={onNext} className="neon-btn small">➡️ Next Lesson</button>
+            <button
+              onClick={onNext}
+              className={`neon-btn small ${isSeventyFiveReached ? 'enabled' : 'disabled'}`}
+              disabled={!isSeventyFiveReached}
+            >
+              ➡️ Next Lesson
+            </button>
+          )}
+          {stepIndex >= steps.length - 1 && !isSeventyFiveReached && (
+            <p className="audio-warning">
+              ⏳ Sikiliza angalau 75% ya somo ili kufungua somo linalofuata.
+            </p>
           )}
         </div>
       </div>
