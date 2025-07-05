@@ -139,9 +139,18 @@ html {
 
 /* Sections */
 .section {
-  padding: 6rem 1.5rem 4rem;
   text-align: center;
+  padding: 6rem 1.5rem 4rem;
+  background: linear-gradient(to bottom, #111, #0f0f0f);
 }
+
+.section {
+  background-image: url('/images/leaf-texture.png');
+  background-size: cover;
+  background-blend-mode: overlay;
+  background-color: #0f0f0f;
+}
+
 
 .section h2 {
   font-size: 2rem;
@@ -160,6 +169,23 @@ html {
   line-height: 1.7;
 }
 
+.cta-btn {
+  background: linear-gradient(135deg, #b4ff39, #5fe271);
+  color: #0f0f0f;
+  font-weight: 700;
+  border-radius: 20px;
+  box-shadow: 0 6px 14px rgba(52, 168, 83, 0.4);
+}
+
+.section h2 {
+  font-size: 2rem;
+  color: #b4ff39;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Poppins', sans-serif;
+}
+
+
 .program-cards {
   display: flex;
   flex-direction: column;
@@ -168,10 +194,14 @@ html {
 }
 
 .card {
-  background: #181818;
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: #1c1c1c;
+  color: #eee;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(52, 168, 83, 0.2);
 }
 
 .card h3 {
@@ -360,7 +390,6 @@ html {
   transform: rotate(-45deg) translate(4px, -4px);
 }
 
-
 /* Mobile dropdown */
 .mobile-menu {
   position: absolute;
@@ -447,7 +476,6 @@ html {
   font-weight: 600;
   border-bottom: 2px solid #b4ff39;
 }
-
 
 .close-btn {
   position: absolute;
@@ -569,4 +597,13 @@ html {
   color: white;
   transform: scale(1.05);
   box-shadow: 0 10px 24px rgba(52, 168, 83, 0.4);
+}
+
+
+.section:nth-child(even) {
+  background-color: #0f0f0f; /* deep dark */
+}
+
+.section:nth-child(odd) {
+  background-color: #121212; /* slightly different shade */
 }
