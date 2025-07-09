@@ -98,4 +98,37 @@ router.delete('/:id', auth, async (req, res) => {
   res.json({ message: 'Deleted' });
 });
 
+// ✅ Leaderboard route
+router.get('/leaderboard', async (req, res) => {
+    console.log('📊 /leaderboard route HIT!');
+
+  try {
+    const topUsers = await CommunityPost.aggregate([
+      {
+        $group: {
+          _id: '$username',
+          avatar: { $first: '$avatar' },
+          totalPosts: { $sum: 1 },
+          totalReactions: {
+            $sum: {
+              $reduce: {
+                input: { $objectToArray: '$reactions' },
+                initialValue: 0,
+                in: { $add: ['$$value', '$$this.v'] }
+              }
+            }
+          }
+        }
+      },
+      { $sort: { totalReactions: -1, totalPosts: -1 } },
+      { $limit: 10 }
+    ]);
+
+    res.json({ data: topUsers });
+  } catch (err) {
+    console.error('🔥 Leaderboard error:', err.message);
+    res.status(500).json({ message: 'Failed to fetch leaderboard' });
+  }
+});
+
 module.exports = router;

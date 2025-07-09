@@ -33,7 +33,8 @@ const AudioCard = ({
 
   const steps = Array.isArray(lesson.steps) && lesson.steps.length > 0
     ? lesson.steps
-    : [{ type: 'audio', src: lesson.audio || '', content: '', label: 'Default Audio' }];
+    : [];
+
   const currentStep = steps[stepIndex] || {};
 
   const trackEvent = async (event, data = {}) => {
@@ -52,6 +53,10 @@ const AudioCard = ({
   };
 
   useEffect(() => {
+    console.log('🧠 AudioCard loaded with lesson:', lesson);
+    console.log('🧠 Steps:', steps);
+    console.log('🧠 Current Step:', currentStep);
+
     setProgress(0);
     setIsSeventyFiveReached(false);
     setShowAutoPlay(false);
@@ -197,7 +202,7 @@ const AudioCard = ({
         <div className="resume-modal">
           <div className="resume-box">
             <h4>⏪ Resume?</h4>
-            <p>Continue from {Math.floor(resumeTime / 60)}:{String(Math.floor(resumeTime % 60)).padStart(2, '0')}?</p>
+            <p>Continue from {Math.floor(resumeTime / 60)}:{String(Math.floor(resumeTime % 60)).padStart(2, '0')}</p>
             <div className="resume-btn-group">
               <button className="neon-btn small" onClick={() => {
                 audioRef.current.currentTime = resumeTime;
@@ -235,6 +240,22 @@ const AudioCard = ({
       )}
 
       <div className="audio-card-content">
+        {/* ⚠️ Show fallback if no steps */}
+        {(!Array.isArray(steps) || steps.length === 0) && (
+          <div
+            style={{
+              padding: '1.5rem',
+              background: '#222',
+              color: '#fff',
+              textAlign: 'center',
+              borderRadius: '10px',
+              marginBottom: '1.5rem',
+            }}
+          >
+            ⚠️ Somo hili halina content bado. Tafadhali jaribu tena baadaye au wasiliana na admin.
+          </div>
+        )}
+
         {lesson.thumbnail && stepIndex === 0 && (
           <img
             src={lesson.thumbnail}

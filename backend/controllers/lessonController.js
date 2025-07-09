@@ -6,20 +6,19 @@ const getAllLessons = async (req, res) => {
   try {
     const lessons = await Lesson.find().sort({ day: 1 });
 
-    lessons.forEach((lesson) => {
-      if (!lesson.audio && Array.isArray(lesson.steps)) {
-        const firstAudioStep = lesson.steps.find(step => step.type === 'audio');
-        if (firstAudioStep) {
-          lesson.audio = firstAudioStep.src;
-        }
-      }
+    const cleanLessons = lessons.map((lessonDoc) => {
+      const lesson = lessonDoc.toObject(); // ✅ convert to plain JS object
+      const firstAudioStep = lesson.steps?.find(step => step.type === 'audio');
+      lesson.audio = firstAudioStep?.src || ''; // fallback
+      return lesson;
     });
 
-    res.json(lessons);
+    res.json(cleanLessons);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch lessons', error: err.message });
   }
 };
+
 
 const uploadLesson = async (req, res) => {
   try {
