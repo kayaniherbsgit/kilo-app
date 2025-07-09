@@ -3,6 +3,8 @@ import './Homepage.css';
 import logo from '../assets/kayacirclelogo.png';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const heroBg = '/images/kayani1.jpg';
+
 const content = {
   en: {
     nav: ['Mission', 'Programs', 'Testimonials', 'Join'],
@@ -173,9 +175,17 @@ const Homepage = () => {
       </header>
 
       {/* Hero */}
-      <section className="hero">
+ <section
+        className="hero"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      >
         <div className="hero-overlay" />
-        <motion.div className="hero-content" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
+        <motion.div
+          className="hero-content"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+        >
           <h1>{t.hero.title}</h1>
           <div className="subtitle">
             {t.hero.subtitle.split('\n').map((line, index) => (
