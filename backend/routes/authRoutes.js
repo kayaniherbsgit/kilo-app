@@ -5,13 +5,9 @@ const { register, login } = require('../controllers/authController');
 
 // ✅ Setup multer storage
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + file.originalname;
-    cb(null, uniqueName);
-  }
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) =>
+    cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '_')),
 });
 
 const upload = multer({ storage });
