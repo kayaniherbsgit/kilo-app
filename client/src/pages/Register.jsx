@@ -57,9 +57,18 @@ const handleSubmit = async (e) => {
     alert(isAdmin ? 'Admin registered! You can now login.' : 'Registration successful! Wait for admin approval.');
     navigate('/login');
   } catch (error) {
-    console.log('❌ Register error full:', error.response?.data);
-    alert(error.response?.data?.message || 'Registration failed');
-  }
+  console.error('❌ FULL REGISTER ERROR:', error); // Show full error
+  console.error('❌ RESPONSE DATA:', error.response?.data); // Log server response
+  console.error('❌ STATUS:', error.response?.status); // Show status code
+  console.error('❌ HEADERS:', error.response?.headers); // Show headers
+
+  alert(
+    error.response?.data?.message ||
+    error.message ||
+    'Registration failed (unknown error)'
+  );
+}
+
 };
 
 
