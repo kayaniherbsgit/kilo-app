@@ -7,6 +7,8 @@ import EmojiPicker from 'emoji-picker-react';
 import { io } from 'socket.io-client';
 import '../styles/Community.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const Community = () => {
   const [posts, setPosts] = useState([]);
   const [text, setText] = useState('');
@@ -24,7 +26,7 @@ const Community = () => {
 
   const fetchMore = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/community?page=${page}&limit=10`);
+      const res = await axios.get(`${BASE_URL}/api/community?page=${page}&limit=10`);
       if (res.data.length === 0) {
         setHasMore(false);
       } else {
@@ -37,7 +39,7 @@ const Community = () => {
   };
 
   useEffect(() => {
-    socket.current = io('http://localhost:5000');
+    socket.current = io(BASE_URL);
 
     socket.current.on('newPost', newPost => {
       setPosts(prev => [newPost, ...prev]);
@@ -85,7 +87,7 @@ const Community = () => {
     if (media) formData.append('media', media);
 
     try {
-      await axios.post('http://localhost:5000/api/community', formData);
+      await axios.post(`${BASE_URL}/api/community`, formData);
       setText('');
       setMedia(null);
       setShowEmoji(false);
@@ -97,7 +99,7 @@ const Community = () => {
 
   const handleReaction = async (id, emoji) => {
     try {
-      await axios.post(`http://localhost:5000/api/community/${id}/reaction`, { emoji });
+      await axios.post(`${BASE_URL}/api/community/${id}/reaction`, { emoji });
     } catch {
       toast.error('Failed to react');
     }
@@ -167,10 +169,10 @@ const Community = () => {
                 src={
                   post.avatar?.startsWith('http')
                     ? post.avatar
-                    : `http://localhost:5000${post.avatar || '/uploads/default.png'}`
+                    : `${BASE_URL}${post.avatar || '/uploads/default.png'}`
                 }
                 onError={(e) => {
-                  e.target.src = 'http://localhost:5000/uploads/default.png';
+                  e.target.src = `${BASE_URL}/uploads/default.png`;
                 }}
                 alt="avatar"
                 style={{ width: 32, height: 32, borderRadius: '50%' }}
@@ -181,11 +183,11 @@ const Community = () => {
             {post.media && (
               <div className="media-preview">
                 {post.mediaType === 'video' ? (
-                  <video controls src={`http://localhost:5000${post.media}`} />
+                  <video controls src={`${BASE_URL}${post.media}`} />
                 ) : post.mediaType === 'audio' ? (
-                  <audio controls src={`http://localhost:5000${post.media}`} />
+                  <audio controls src={`${BASE_URL}${post.media}`} />
                 ) : (
-                  <img src={`http://localhost:5000${post.media}`} alt="media" />
+                  <img src={`${BASE_URL}${post.media}`} alt="media" />
                 )}
               </div>
             )}

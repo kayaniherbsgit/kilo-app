@@ -6,6 +6,9 @@ import '../styles/AudioCard.css';
 import { toast } from 'react-toastify';
 import { useAudio } from '../contexts/AudioContext';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+
 const AudioCard = ({
   lesson,
   currentIndex,
@@ -39,7 +42,7 @@ const AudioCard = ({
 
   const trackEvent = async (event, data = {}) => {
     try {
-      await axios.post('http://localhost:5000/api/analytics/track', {
+      await axios.post(`${BASE_URL}/api/analytics/track`, {
         event,
         data
       }, {
@@ -78,7 +81,7 @@ const AudioCard = ({
       setDelayedAutoPlay(true);
     }, 15000);
 
-    axios.post('http://localhost:5000/api/users/current-lesson',
+    axios.post(`${BASE_URL}/api/users/current-lesson`,
       { lessonId: lesson._id },
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     ).catch(err => console.error('Failed to save current lesson:', err.message));
@@ -120,7 +123,7 @@ const AudioCard = ({
 
         if (!completed.includes(lesson._id)) {
           onMarkComplete(lesson._id);
-          axios.post('http://localhost:5000/api/users/mark-complete',
+          axios.post(`${BASE_URL}/api/users/mark-complete`,
             { lessonId: lesson._id },
             { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
           ).catch(err => console.error('Error saving completion:', err.message));

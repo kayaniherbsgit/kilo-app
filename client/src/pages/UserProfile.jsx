@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/UserProfile.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL; // Adjust this based on your environment
+
 const UserProfile = () => {
   const { username } = useParams();
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/users/profile/${username}`, {
+        const res = await axios.get(`${BASE_URL}/api/users/profile/${username}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(res.data);

@@ -8,6 +8,9 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import LessonCard from '../components/LessonCard';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+
 const Activity = () => {
   const [completed, setCompleted] = useState([]);
   const [lessons, setLessons] = useState([]);
@@ -27,12 +30,12 @@ useEffect(() => {
 
     const fetchData = async () => {
       try {
-        const lessonsRes = await axios.get('http://localhost:5000/api/lessons');
+        const lessonsRes = await axios.get(`${BASE_URL}/api/lessons`);
         const sortedLessons = lessonsRes.data.sort((a, b) => a.day - b.day);
         setLessons(sortedLessons);
 
         if (storedUser?.username) {
-          const progressRes = await axios.get(`http://localhost:5000/api/users/state/${storedUser.username}`);
+          const progressRes = await axios.get(`${BASE_URL}/api/users/state/${storedUser.username}`);
           setCompleted(progressRes.data.completedLessons || []);
         }
       } catch (err) {
@@ -66,7 +69,7 @@ useEffect(() => {
 
     const fetchTimeline = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/users/activity/${storedUser.username}`);
+        const res = await axios.get(`${BASE_URL}/api/users/activity/${storedUser.username}`);
         const grouped = groupTimeline(res.data || []);
         setTimeline(grouped);
       } catch (err) {

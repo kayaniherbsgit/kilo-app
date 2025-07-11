@@ -6,6 +6,8 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import BackToDashboard from '../../components/admin/BackToDashboard';
 import '../../styles/admin/AdminLessons.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const AdminLessons = () => {
   const [lessons, setLessons] = useState([]);
   const [search, setSearch] = useState('');
@@ -15,7 +17,7 @@ const AdminLessons = () => {
 
   const fetchLessons = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/lessons', {
+      const res = await axios.get(`${BASE_URL}/api/lessons`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -36,7 +38,7 @@ const AdminLessons = () => {
   const handleDelete = async () => {
     if (!confirmDeleteId) return;
     try {
-      await axios.delete(`http://localhost:5000/api/lessons/${confirmDeleteId}`, {
+      await axios.delete(`${BASE_URL}/api/lessons/${confirmDeleteId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setConfirmDeleteId(null);
@@ -56,7 +58,7 @@ const AdminLessons = () => {
     try {
       const order = reordered.map((l) => l._id);
       await axios.patch(
-        'http://localhost:5000/api/lessons/reorder',
+        `${BASE_URL}/api/lessons/reorder`,
         { order },
         { headers: { Authorization: `Bearer ${token}` } }
       );

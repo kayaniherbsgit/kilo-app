@@ -1,6 +1,8 @@
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const trackEvent = async (event, data = {}) => {
   try {
-    await axios.post('http://localhost:5000/api/analytics/track', {
+    await axios.post(`${BASE_URL}/api/analytics/track`, {
       event,
       data,
     }, {

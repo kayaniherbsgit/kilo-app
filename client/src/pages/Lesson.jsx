@@ -2,70 +2,66 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const Lesson = () => {
   const { id } = useParams();
   const [lesson, setLesson] = useState(null);
   const [unlockedStep, setUnlockedStep] = useState(0);
 
   useEffect(() => {
-  axios
-    .get(`http://localhost:5000/api/lessons/${id}`)
-    .then((res) => {
-      const lessonData = res.data;
+    axios
+      .get(`${BASE_URL}/api/lessons/${id}`)
+      .then((res) => {
+        const lessonData = res.data;
 
-      // 👇 Inject main audio as first step if not already part of steps
-      const mainAudioStep = {
-        type: 'audio',
-        src: lessonData.audio,
-      };
+        const mainAudioStep = {
+          type: 'audio',
+          src: lessonData.audio,
+        };
 
-      const fullSteps = [mainAudioStep, ...(lessonData.steps || [])];
+        const fullSteps = [mainAudioStep, ...(lessonData.steps || [])];
 
-      setLesson({
-        ...lessonData,
-        steps: fullSteps,
-      });
+        setLesson({
+          ...lessonData,
+          steps: fullSteps,
+        });
 
-      // Load previous step progress
-      const savedStep = localStorage.getItem(`lesson-${id}-step`);
-      if (savedStep) setUnlockedStep(parseInt(savedStep));
-    })
-    .catch((err) => console.error('Error fetching lesson:', err));
-}, [id]);
+        const savedStep = localStorage.getItem(`lesson-${id}-step`);
+        if (savedStep) setUnlockedStep(parseInt(savedStep));
+      })
+      .catch((err) => console.error('Error fetching lesson:', err));
+  }, [id]);
 
+  const handleStepComplete = async (index) => {
+    if (index === unlockedStep) {
+      let nextStep = unlockedStep + 1;
 
-const handleStepComplete = async (index) => {
-  if (index === unlockedStep) {
-    let nextStep = unlockedStep + 1;
+      if (index === 0 && lesson && lesson.steps.length > 1) {
+        nextStep = lesson.steps.length;
+      }
 
-    // If the first step was completed, unlock all remaining steps
-    if (index === 0 && lesson && lesson.steps.length > 1) {
-      nextStep = lesson.steps.length;
-    }
+      setUnlockedStep(nextStep);
+      localStorage.setItem(`lesson-${id}-step`, nextStep);
 
-    setUnlockedStep(nextStep);
-    localStorage.setItem(`lesson-${id}-step`, nextStep);
-
-    // Auto-mark lesson complete if that was the final step
-    if (lesson && nextStep === lesson.steps.length) {
-      try {
-        await axios.post(
-          'http://localhost:5000/api/users/mark-complete',
-          { lessonId: lesson._id },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          }
-        );
-        console.log('✅ Lesson fully completed');
-      } catch (err) {
-        console.error('❌ Error marking complete:', err);
+      if (lesson && nextStep === lesson.steps.length) {
+        try {
+          await axios.post(
+            `${BASE_URL}/api/users/mark-complete`,
+            { lessonId: lesson._id },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            }
+          );
+          console.log('✅ Lesson fully completed');
+        } catch (err) {
+          console.error('❌ Error marking complete:', err);
+        }
       }
     }
-  }
-};
-
+  };
 
   if (!lesson) {
     return <p style={{ color: '#fff', textAlign: 'center' }}>⏳ Loading lesson...</p>;
@@ -97,7 +93,7 @@ const handleStepComplete = async (index) => {
             {step.type === 'audio' && (
               <audio
                 controls
-                src={`http://localhost:5000${step.src}`}
+                src={`${BASE_URL}${step.src}`}
                 onEnded={() => handleStepComplete(index)}
                 style={{ width: '100%' }}
               />
@@ -112,7 +108,7 @@ const handleStepComplete = async (index) => {
             {step.type === 'pdf' && (
               <div>
                 <a
-                  href={`http://localhost:5000${step.src}`}
+                  href={`${BASE_URL}${step.src}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => handleStepComplete(index)}

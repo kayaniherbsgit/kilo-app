@@ -12,6 +12,9 @@ import notificationSound from '../assets/notification.mp3';
 import '../styles/Home.css';
 import AudioCard from '../components/AudioCard';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+
 const Home = () => {
   const [user, setUser] = useState(null);
   const [lessons, setLessons] = useState([]);
@@ -37,12 +40,12 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [lessonsRes, stateRes, streakRes, notifRes, leaderboardRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/lessons'),
-          axios.get(`http://localhost:5000/api/users/state/${user.username}`),
-          axios.get(`http://localhost:5000/api/users/streak/${user.username}`),
-          axios.get(`http://localhost:5000/api/notifications/unread/${user.username}`),
-          axios.get('http://localhost:5000/api/community/leaderboard')
-        ]);
+          aaxios.get(`${BASE_URL}/api/lessons`),
+          axios.get(`${BASE_URL}/api/users/state/${user.username}`),
+          axios.get(`${BASE_URL}/api/users/streak/${user.username}`),
+          axios.get(`${BASE_URL}/api/notifications/unread/${user.username}`),
+          axios.get(`${BASE_URL}/api/community/leaderboard`)
+ ]);
 
         const sortedLessons = lessonsRes.data.sort((a, b) => a.day - b.day);
         setLessons(sortedLessons);
@@ -90,7 +93,7 @@ const Home = () => {
       const lessonMap = JSON.parse(localStorage.getItem('userLessonMap')) || {};
       lessonMap[user.username] = lessonId;
       localStorage.setItem('userLessonMap', JSON.stringify(lessonMap));
-      await axios.post('http://localhost:5000/api/users/current-lesson', {
+      await axios.post(`${BASE_URL}/api/users/current-lesson`, {
         lessonId
       }, {
         headers: { Authorization: `Bearer ${user?.token}` }
@@ -102,7 +105,7 @@ const Home = () => {
     if (!completed.includes(lessonId)) {
       const updated = [...completed, lessonId];
       setCompleted(updated);
-      await axios.post('http://localhost:5000/api/users/mark-complete', {
+      await axios.post(`${BASE_URL}/api/users/mark-complete`, {
         lessonId
       }, {
         headers: { Authorization: `Bearer ${user?.token}` }
@@ -158,10 +161,11 @@ const Home = () => {
               src={
                 user?.avatar?.startsWith('http')
                   ? user.avatar
-                  : `http://localhost:5000${user?.avatar || '/uploads/default.png'}`
+                  : `${BASE_URL}${user?.avatar || '/uploads/default.png'}`
+
               }
               onError={(e) => {
-                e.target.src = 'http://localhost:5000/uploads/default.png';
+                    e.target.src = `${BASE_URL}/uploads/default.png`;
               }}
               alt="avatar"
               style={{ width: 30, height: 30, borderRadius: '50%' }}

@@ -3,6 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "../../styles/admin/AdminDashboard.css";
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+
 const AdminOverview = () => {
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -14,7 +17,7 @@ const AdminOverview = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/stats', {
+        const res = await axios.get(`${BASE_URL}/api/admin/stats`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },

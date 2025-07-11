@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import BackToDashboard from '../../components/admin/BackToDashboard';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const SendNotification = () => {
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ title: '', message: '', target: 'all' });
@@ -12,10 +14,14 @@ const SendNotification = () => {
   }, []);
 
   const fetchUsers = async () => {
-    const res = await axios.get('http://localhost:5000/api/users/all', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setUsers(res.data);
+    try {
+      const res = await axios.get(`${BASE_URL}/api/users/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUsers(res.data);
+    } catch (err) {
+      console.error('❌ Failed to fetch users:', err);
+    }
   };
 
   const handleSend = async (e) => {
@@ -24,14 +30,14 @@ const SendNotification = () => {
 
     try {
       await axios.post(
-        'http://localhost:5000/api/admin/notifications',
+        `${BASE_URL}/api/admin/notifications`,
         form,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       alert('✅ Notification sent!');
       setForm({ title: '', message: '', target: 'all' });
     } catch (err) {
-      console.error(err);
+      console.error('❌ Failed to send notification:', err);
       alert('❌ Failed to send notification.');
     }
   };

@@ -3,6 +3,8 @@ import BottomNav from '../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const fonts = [
   { label: 'Classic Serif', className: 'font-serif' },
   { label: 'Modern Sans', className: 'font-sans' },
@@ -45,9 +47,7 @@ const Profile = () => {
 
     const fetchProgress = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/users/state/${storedUser.username}`
-        );
+        const res = await axios.get(`${BASE_URL}/api/users/state/${storedUser.username}`);
         setCompletedCount(res.data.completedLessons.length);
         setXp(res.data.xp || 0);
         setBadges(res.data.badges || []);
@@ -62,18 +62,14 @@ const Profile = () => {
       }
 
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/users/streak/${storedUser.username}`
-        );
+        const res = await axios.get(`${BASE_URL}/api/users/streak/${storedUser.username}`);
         setStreak(res.data.streak || 0);
       } catch (err) {
         console.error('❌ Failed to fetch streak:', err);
       }
 
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/lessons/count`
-        );
+        const res = await axios.get(`${BASE_URL}/api/lessons/count`);
         setTotalLessons(res.data.total);
       } catch (err) {
         console.error('❌ Failed to fetch total lessons:', err);
@@ -89,40 +85,35 @@ const Profile = () => {
   };
 
   return (
-    <div
-      style={{
-        padding: '1.5rem',
-        paddingBottom: '6rem',
-        background: 'var(--bg)',
-        color: 'var(--text)',
-      }}
-    >
-      {/* Header with Settings Icon */}
+    <div style={{
+      padding: '1.5rem',
+      paddingBottom: '6rem',
+      background: 'var(--bg)',
+      color: 'var(--text)',
+    }}>
+      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
         <h2>👤 My Profile</h2>
         <button
-  onClick={() => navigate('/settings')}
-  style={{
-    background: '#238314',
-    color: '#fff',
-    padding: '0.5rem 1.2rem',
-    borderRadius: '8px',
-    marginTop: '0.5rem',
-    border: 'none',
-  }}
->
-  ⚙️
-</button>
-
+          onClick={() => navigate('/settings')}
+          style={{
+            background: '#238314',
+            color: '#fff',
+            padding: '0.5rem 1.2rem',
+            borderRadius: '8px',
+            marginTop: '0.5rem',
+            border: 'none',
+          }}
+        >
+          ⚙️
+        </button>
       </div>
 
-      {/* Avatar + Username */}
+      {/* Avatar & Username */}
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <img
-          src={`http://localhost:5000${userData?.avatar || '/uploads/default.png'}`}
-          onError={(e) => {
-            e.target.src = 'http://localhost:5000/uploads/default.png';
-          }}
+          src={`${BASE_URL}${userData?.avatar || '/uploads/default.png'}`}
+          onError={(e) => { e.target.src = `${BASE_URL}/uploads/default.png`; }}
           alt="avatar"
           style={{ width: 50, height: 50, borderRadius: '50%' }}
         />
@@ -130,7 +121,6 @@ const Profile = () => {
         <p style={{ color: 'var(--subtext)', fontSize: '0.85rem' }}>
           @{userData.username?.toLowerCase()}
         </p>
-
         <button
           onClick={() => navigate('/profile-settings')}
           style={{
@@ -165,6 +155,7 @@ const Profile = () => {
         </div>
       )}
 
+      {/* Metrics */}
       <div className="card">
         <h4>🔥 Streak</h4>
         <p>You’ve completed lessons {streak} days in a row.</p>
@@ -209,6 +200,7 @@ const Profile = () => {
         </div>
       )}
 
+      {/* Logout */}
       <div className="card" style={{ textAlign: 'center' }}>
         <button
           onClick={logout}
@@ -231,3 +223,5 @@ const Profile = () => {
 };
 
 export default Profile;
+// Note: This code assumes you have a BottomNav component and the necessary styles in place.
+// Make sure to adjust the BASE_URL and other configurations as per your setup.

@@ -5,6 +5,8 @@ import axios from 'axios';
 import supabase from '../../utils/supabaseClient';
 import "../../styles/admin/AdminUploadLesson.css";
 
+const BASE_URL = import.meta.env.VITE_API_URL; // Adjust this based on your environment
+
 const AdminUploadLesson = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
@@ -83,7 +85,7 @@ const uploadToSupabase = async (file, folder = 'lessons') => {
 
       // Post to backend
       const res = await axios.post(
-        'http://localhost:5000/api/lessons',
+                `${BASE_URL}/api/lessons`,
         lessonData,
         {
           headers: {

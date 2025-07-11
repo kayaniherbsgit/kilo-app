@@ -2,6 +2,8 @@
 import React from 'react';
 import DropZone from './DropZone';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const UploadForm = ({
   lessonData,
   setLessonData,
@@ -25,11 +27,11 @@ const UploadForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!lessonData.audio) {
-  alert("❌ You forgot to add the audio file!");
-  return;
-}
 
+    if (!lessonData.audio) {
+      alert("❌ You forgot to add the audio file!");
+      return;
+    }
 
     const formData = new FormData();
     formData.append('title', lessonData.title);
@@ -47,8 +49,8 @@ const UploadForm = ({
 
     try {
       const endpoint = editLesson
-        ? `http://localhost:5000/api/lessons/${lessonData._id}`
-        : 'http://localhost:5000/api/lessons';
+        ? `${BASE_URL}/api/lessons/${lessonData._id}`
+        : `${BASE_URL}/api/lessons`;
 
       const method = editLesson ? 'PUT' : 'POST';
 
@@ -64,7 +66,7 @@ const UploadForm = ({
 
       const data = await res.json();
       alert(`Lesson ${editLesson ? 'updated' : 'uploaded'} successfully!`);
-      handleSubmitSuccess?.(data); // optional callback
+      handleSubmitSuccess?.(data);
     } catch (err) {
       console.error('❌ Upload error:', err);
       alert('Upload failed. Check console.');
@@ -107,10 +109,15 @@ const UploadForm = ({
         onChange={(e) => setLessonData({ ...lessonData, level: e.target.value })}
         required
       />
+
       <DropZone label="🎧 Upload Audio File" accept="audio/*" onFileDrop={handleDrop('audio')} />
       <DropZone label="🖼️ Upload Thumbnail" accept="image/*" onFileDrop={handleDrop('thumbnail')} />
+
       {preview && <img src={preview} alt="Preview" className="thumbnail-preview" />}
-      <button type="submit">{editLesson ? 'Update Lesson' : 'Upload Lesson'}</button>
+
+      <button type="submit">
+        {editLesson ? 'Update Lesson' : 'Upload Lesson'}
+      </button>
     </form>
   );
 };

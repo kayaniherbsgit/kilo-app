@@ -39,7 +39,7 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    await axios.post('http://localhost:5000/api/auth/register', data, {
+    await axios.post(`${BASE_URL}/api/auth/register`, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 

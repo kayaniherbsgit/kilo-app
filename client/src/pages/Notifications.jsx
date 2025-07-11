@@ -3,13 +3,15 @@ import axios from 'axios';
 import BottomNav from '../components/BottomNav';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     if (user?.username) {
-      axios.get(`http://localhost:5000/api/notifications/${user.username}`)
+      axios.get(`${BASE_URL}/api/notifications/${user.username}`)
         .then(res => setNotifications(res.data));
     }
   }, [user]);

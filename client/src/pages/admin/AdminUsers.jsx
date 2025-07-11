@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const BASE_URL = import.meta.env.VITE_API_URL; // Adjust this based on your environment
+
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
@@ -16,7 +18,7 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/users/all', {
+      const res = await axios.get(`${BASE_URL}/api/users/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data);
@@ -28,7 +30,7 @@ const AdminUsers = () => {
   const deleteUser = async (id, username) => {
     if (!window.confirm(`⚠️ Delete ${username}? This cannot be undone.`)) return;
     try {
-      await axios.delete(`http://localhost:5000/api/users/${id}`, {
+      await axios.delete(`${BASE_URL}/api/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert(`${username} deleted successfully.`);
@@ -42,7 +44,7 @@ const AdminUsers = () => {
 const approveUser = async (id, username) => {
   try {
     const res = await axios.put(
-      `http://localhost:5000/api/users/${id}/approve`, 
+        `${BASE_URL}/api/users/${id}/approve`,
       {}, 
       {
         headers: { Authorization: `Bearer ${token}` },

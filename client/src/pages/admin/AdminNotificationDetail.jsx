@@ -1,9 +1,10 @@
-// src/pages/admin/AdminDashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { FaBell } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "../../styles/admin/AdminDashboard.css";
+
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const AdminDashboard = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/notifications', {
+      const res = await axios.get(`${BASE_URL}/api/admin/notifications`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotifications(res.data);
@@ -24,7 +25,7 @@ const AdminDashboard = () => {
 
   const markAsRead = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/admin/notifications/${id}/mark-read`, {}, {
+      await axios.patch(`${BASE_URL}/api/admin/notifications/${id}/mark-read`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotifications((prev) =>

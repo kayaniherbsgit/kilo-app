@@ -4,7 +4,8 @@ import "../../styles/admin/AdminNotifications.css";
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const BASE_URL = import.meta.env.VITE_API_URL;
+const socket = io(BASE_URL);
 
 const AdminNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -18,7 +19,7 @@ const AdminNotifications = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/notifications', {
+      const res = await axios.get(`${BASE_URL}/api/admin/notifications`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotifications(res.data);
@@ -29,17 +30,19 @@ const AdminNotifications = () => {
 
   useEffect(() => {
     fetchNotifications();
+
     socket.on('notificationsUpdated', () => {
       fetchNotifications();
       audioRef.current?.play();
       document.title = '🔔 New Notification!';
     });
+
     return () => socket.off('notificationsUpdated');
   }, []);
 
   const handleMarkAsRead = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/admin/notifications/${id}/mark-read`, {}, {
+      await axios.put(`${BASE_URL}/api/admin/notifications/${id}/mark-read`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchNotifications();
@@ -50,7 +53,7 @@ const AdminNotifications = () => {
 
   const handleMarkAllAsRead = async () => {
     try {
-      await axios.put('http://localhost:5000/api/admin/notifications/mark-all-read', {}, {
+      await axios.put(`${BASE_URL}/api/admin/notifications/mark-all-read`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchNotifications();
@@ -62,7 +65,7 @@ const AdminNotifications = () => {
   const handleDeleteAll = async () => {
     if (!window.confirm('Are you sure you want to delete all notifications?')) return;
     try {
-      await axios.delete('http://localhost:5000/api/admin/notifications/delete-all', {
+      await axios.delete(`${BASE_URL}/api/admin/notifications/delete-all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchNotifications();
@@ -77,7 +80,7 @@ const AdminNotifications = () => {
     const now = new Date();
     const date = new Date(dateStr);
     const isToday = now.toDateString() === date.toDateString();
-    const isYesterday = new Date(now.setDate(now.getDate() - 1)).toDateString() === date.toDateString();
+    const isYesterday = new Date(new Date().setDate(now.getDate() - 1)).toDateString() === date.toDateString();
     return isToday ? 'Today' : isYesterday ? 'Yesterday' : 'Earlier';
   };
 
@@ -102,6 +105,7 @@ const AdminNotifications = () => {
         groups[group].push(note);
       }
     });
+
     return Object.entries(groups);
   };
 

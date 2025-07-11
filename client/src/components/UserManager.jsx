@@ -1,7 +1,17 @@
 // components/UserManager.jsx
 import React from 'react';
 
-const UserManager = ({ users, searchQuery, setSearchQuery, sortByStreak, setSortByStreak, exportCSV, setSelectedUser }) => {
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+const UserManager = ({
+  users,
+  searchQuery,
+  setSearchQuery,
+  sortByStreak,
+  setSortByStreak,
+  exportCSV,
+  setSelectedUser
+}) => {
   const filteredUsers = users
     .filter(user => user.username.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => (sortByStreak ? (b.streak || 0) - (a.streak || 0) : 0));
@@ -24,7 +34,7 @@ const UserManager = ({ users, searchQuery, setSearchQuery, sortByStreak, setSort
         {filteredUsers.map((user, i) => (
           <li key={i} onClick={() => setSelectedUser(user)}>
             <img
-              src={`http://localhost:5000${user.avatar && user.avatar !== '' ? user.avatar : '/uploads/default.png'}`}
+              src={`${BASE_URL}${user.avatar && user.avatar !== '' ? user.avatar : '/uploads/default.png'}`}
               alt="avatar"
               className="avatar-img"
             />

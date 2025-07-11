@@ -2,6 +2,8 @@
 import React from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const LessonManager = ({
   lessons, setLessons, searchQuery, setSearchQuery, itemsPerPage, setItemsPerPage, page, setPage,
   handleEditLesson, handleDeleteLesson, handleBulkDelete, selectedLessons
@@ -38,7 +40,7 @@ const LessonManager = ({
           reordered.splice(result.destination.index, 0, removed);
           setLessons(reordered);
 
-          fetch('http://localhost:5000/api/admin/reorder-lessons', {
+          fetch(`${BASE_URL}/api/admin/reorder-lessons`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -77,7 +79,12 @@ const LessonManager = ({
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             {lesson.thumbnail && (
                               <img
-                                src={lesson.thumbnail} alt="thumbnail"
+                                src={
+                                  lesson.thumbnail?.startsWith('http')
+                                    ? lesson.thumbnail
+                                    : `${BASE_URL}${lesson.thumbnail}`
+                                }
+                                alt="thumbnail"
                                 className="lesson-thumb"
                               />
                             )}
@@ -93,7 +100,13 @@ const LessonManager = ({
                           </p>
                           {lesson.audio && (
                             <audio controls style={{ width: '100%', marginTop: '10px' }}>
-                              <source src={lesson.audio} />
+                              <source
+                                src={
+                                  lesson.audio?.startsWith('http')
+                                    ? lesson.audio
+                                    : `${BASE_URL}${lesson.audio}`
+                                }
+                              />
                             </audio>
                           )}
                           <div style={{ marginTop: '10px', display: 'flex', gap: '1rem' }}>

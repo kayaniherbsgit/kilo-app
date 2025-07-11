@@ -6,6 +6,8 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { supabase } from '../../supabaseClient'; // 👈 Make sure you have this file
 import '../../styles/admin/EditLesson.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL; // Adjust this based on your environment
+
 const EditLesson = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ const EditLesson = () => {
   const [newStepContent, setNewStepContent] = useState('');
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/lessons/${id}`, {
+    axios.get(`${BASE_URL}/api/lessons/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     }).then(res => {
       const data = res.data;
@@ -86,7 +88,7 @@ const EditLesson = () => {
         ],
       };
 
-      await axios.put(`http://localhost:5000/api/lessons/${id}`, updatedLesson, {
+      await axios.put(`${BASE_URL}/api/lessons/${id}`, updatedLesson, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

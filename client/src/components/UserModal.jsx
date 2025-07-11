@@ -1,6 +1,8 @@
 import React from 'react';
 import '../styles/UserModal.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const UserModal = ({ user, onClose }) => {
   if (!user) return null;
 
@@ -8,7 +10,7 @@ const UserModal = ({ user, onClose }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <img
-          src={`http://localhost:5000/uploads/${user.avatar || 'default.png'}`}
+          src={`${BASE_URL}/uploads/${user.avatar || 'default.png'}`}
           alt="avatar"
           className="user-avatar"
         />
