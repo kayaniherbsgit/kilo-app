@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+
+// List of Tanzanian regions for the dropdown
+// This list can be expanded or modified as needed
+// Source: https://en.wikipedia.org/wiki/Regions_of_Tanzania
+// Note: Ensure the list is up-to-date with the latest administrative divisions
+// as regions can change over time.
+// This list is based on the current administrative regions of Tanzania as of 2023.
+// It includes all 26 regions, which are the primary administrative divisions in Tanzania.  
+
 const tanzaniaRegions = [
   "Arusha", "Dar es Salaam", "Dodoma", "Geita", "Iringa", "Kagera", "Katavi",
   "Kigoma", "Kilimanjaro", "Lindi", "Manyara", "Mara", "Mbeya", "Morogoro",
