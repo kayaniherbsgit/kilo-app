@@ -40,7 +40,7 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [lessonsRes, stateRes, streakRes, notifRes, leaderboardRes] = await Promise.all([
-          aaxios.get(`${BASE_URL}/api/lessons`),
+          axios.get(`${BASE_URL}/api/lessons`),
           axios.get(`${BASE_URL}/api/users/state/${user.username}`),
           axios.get(`${BASE_URL}/api/users/streak/${user.username}`),
           axios.get(`${BASE_URL}/api/notifications/unread/${user.username}`),
