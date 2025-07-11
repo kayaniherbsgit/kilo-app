@@ -65,7 +65,8 @@ const Home = () => {
         setAudioProgress(stateRes.data.audioProgress || {});
         setStreak(streakRes.data.streak || 0);
         setUnreadCount(notifRes.data.unreadCount || 0);
-        setTopUsers(leaderboardRes.data || []);
+        console.log("📊 leaderboardRes:", leaderboardRes.data);
+        setTopUsers(Array.isArray(leaderboardRes.data) ? leaderboardRes.data : leaderboardRes.data.topUsers || []);
 
         if (streakRes.data.streak === 7) {
           confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
@@ -226,10 +227,11 @@ const Home = () => {
         <h4>🌍 Community Activity</h4>
         <p style={{ fontSize: '0.9rem', color: 'var(--subtext)' }}>Check top streaks across the app 🚀</p>
         <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem' }}>
-          {topUsers.slice(0, 3).map((_, i) => (
+          {Array.isArray(topUsers) && topUsers.slice(0, 3).map((_, i) => (
             <li key={i}>🏅 User #{i + 1}</li>
           ))}
         </ul>
+
         <button onClick={() => navigate('/community')} className="neon-btn" style={{ marginTop: '1rem' }}>
           Open Community
         </button>
