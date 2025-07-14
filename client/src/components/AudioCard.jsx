@@ -8,7 +8,6 @@ import { useAudio } from '../contexts/AudioContext';
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-
 const AudioCard = ({
   lesson,
   currentIndex,
@@ -19,7 +18,7 @@ const AudioCard = ({
   completed,
 }) => {
   const [progress, setProgress] = useState(0);
-  const [isSeventyFiveReached, setIsSeventyFiveReached] = useState(false);
+  const [isEightyPercentReached, setIsEightyPercentReached] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [resumePrompt, setResumePrompt] = useState(false);
   const [resumeTime, setResumeTime] = useState(0);
@@ -34,10 +33,7 @@ const AudioCard = ({
   const delayTimerRef = useRef(null);
   const [stepIndex, setStepIndex] = useState(0);
 
-  const steps = Array.isArray(lesson.steps) && lesson.steps.length > 0
-    ? lesson.steps
-    : [];
-
+  const steps = Array.isArray(lesson.steps) && lesson.steps.length > 0 ? lesson.steps : [];
   const currentStep = steps[stepIndex] || {};
 
   const trackEvent = async (event, data = {}) => {
@@ -56,12 +52,8 @@ const AudioCard = ({
   };
 
   useEffect(() => {
-    console.log('🧠 AudioCard loaded with lesson:', lesson);
-    console.log('🧠 Steps:', steps);
-    console.log('🧠 Current Step:', currentStep);
-
     setProgress(0);
-    setIsSeventyFiveReached(false);
+    setIsEightyPercentReached(false);
     setShowAutoPlay(false);
     setAutoPlayCancelled(false);
     setDelayedAutoPlay(false);
@@ -90,6 +82,10 @@ const AudioCard = ({
   }, [lesson]);
 
   useEffect(() => {
+    if (isCompleted) setIsEightyPercentReached(true);
+  }, [isCompleted]);
+
+  useEffect(() => {
     if (delayedAutoPlay && audioRef.current && audioRef.current.paused) {
       audioRef.current.play().catch(err => {
         console.warn('Auto-play blocked:', err.message);
@@ -108,9 +104,9 @@ const AudioCard = ({
       setProgress(pct);
       localStorage.setItem(`lesson-progress-${lesson._id}`, currentTime);
 
-      if (pct >= 75 && !isSeventyFiveReached) {
-        setIsSeventyFiveReached(true);
-        trackEvent('audio_75_percent', { lessonId: lesson._id, stepIndex, time: currentTime });
+      if (pct >= 80 && !isEightyPercentReached) {
+        setIsEightyPercentReached(true);
+        trackEvent('audio_80_percent', { lessonId: lesson._id, stepIndex, time: currentTime });
       }
 
       if (pct >= 99) {
@@ -142,14 +138,6 @@ const AudioCard = ({
       }
     };
 
-    const handlePlay = () => {
-      trackEvent('audio_play', { lessonId: lesson._id, stepIndex, time: audio.currentTime });
-    };
-
-    const handlePause = () => {
-      trackEvent('audio_pause', { lessonId: lesson._id, stepIndex, time: audio.currentTime });
-    };
-
     const handleEnd = () => {
       trackEvent('audio_ended', { lessonId: lesson._id, stepIndex, time: audio.currentTime });
 
@@ -177,17 +165,12 @@ const AudioCard = ({
     };
 
     audio.addEventListener('timeupdate', handleUpdate);
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
     audio.addEventListener('ended', handleEnd);
-
     return () => {
       audio.removeEventListener('timeupdate', handleUpdate);
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('ended', handleEnd);
     };
-  }, [audioRef, completed, lesson._id, onMarkComplete, stepIndex, currentStep, isSeventyFiveReached]);
+  }, [audioRef, completed, lesson._id, onMarkComplete, stepIndex, currentStep, isEightyPercentReached]);
 
   const handleNextStep = () => {
     if (stepIndex < steps.length - 1) {
@@ -198,7 +181,7 @@ const AudioCard = ({
   };
 
   return (
-    <div className={`card audio-card-container ${isCompleted ? 'lesson-completed' : ''}`}>
+    <div className="audio-card-container">
       {showConfetti && <Confetti width={width} height={height} />}
 
       {resumePrompt && (
@@ -242,95 +225,74 @@ const AudioCard = ({
         </div>
       )}
 
-      <div className="audio-card-content">
-        {/* ⚠️ Show fallback if no steps */}
-        {(!Array.isArray(steps) || steps.length === 0) && (
-          <div
-            style={{
-              padding: '1.5rem',
-              background: '#222',
-              color: '#fff',
-              textAlign: 'center',
-              borderRadius: '10px',
-              marginBottom: '1.5rem',
-            }}
-          >
-            ⚠️ Somo hili halina content bado. Tafadhali jaribu tena baadaye au wasiliana na admin.
-          </div>
-        )}
+      <h3 className="lesson-title">{lesson.title}</h3>
+      {lesson.description && <p className="lesson-description">{lesson.description}</p>}
 
-        {lesson.thumbnail && stepIndex === 0 && (
-          <img
-            src={lesson.thumbnail}
-            alt="Lesson Thumbnail"
-            className="lesson-thumbnail"
-            style={{
-              width: '100%',
-              maxHeight: '220px',
-              borderRadius: '12px',
-              objectFit: 'cover',
-              marginBottom: '1rem',
-            }}
-          />
-        )}
+      {lesson.thumbnail && stepIndex === 0 && (
+        <img
+          src={lesson.thumbnail}
+          alt="Lesson Thumbnail"
+          className="lesson-thumbnail"
+        />
+      )}
 
-        <h3 className="lesson-title">{lesson.title}</h3>
-
-        {lesson.description && stepIndex === 0 && (
-          <p className="lesson-description">{lesson.description}</p>
-        )}
-
-        {currentStep.type === 'text' && (
-          <div className="text-step-box">
-            <p style={{ whiteSpace: 'pre-wrap' }}>{currentStep.content}</p>
-            <button className="neon-btn small" onClick={handleNextStep}>⏭ Endelea</button>
-          </div>
-        )}
-
-        {currentStep.type === 'audio' && (
-          <audio
-            key={lesson._id + stepIndex}
-            ref={audioRef}
-            controls
-            src={currentStep.src}
-            style={{ width: '100%', borderRadius: '10px' }}
-          />
-        )}
-
-        {currentStep.type === 'pdf' && (
-          <a className="neon-btn small" target="_blank" href={currentStep.src} rel="noreferrer">
-            📥 Open PDF
-          </a>
-        )}
-
-        {currentStep.type === 'questions' && (
-          <div className="question-box">
-            {currentStep.questions.map((q, i) => (
-              <p key={i}>❓ {q}</p>
-            ))}
-            <button onClick={handleNextStep} className="neon-btn small">⏭ Endelea</button>
-          </div>
-        )}
-
-        <div className="nav-buttons-wrapper">
-          {currentIndex > 0 && (
-            <button onClick={onPrev} className="neon-btn small prev-btn">⬅️ Previous</button>
-          )}
-          {stepIndex >= steps.length - 1 && currentIndex < totalLessons - 1 && (
-            <button
-              onClick={onNext}
-              className={`neon-btn small ${isSeventyFiveReached ? 'enabled' : 'disabled'}`}
-              disabled={!isSeventyFiveReached}
-            >
-              ➡️ Next Lesson
-            </button>
-          )}
-          {stepIndex >= steps.length - 1 && !isSeventyFiveReached && (
-            <p className="audio-warning">
-              ⏳ Sikiliza angalau 75% ya somo ili kufungua somo linalofuata.
-            </p>
-          )}
+      {currentStep.type === 'text' && (
+        <div className="text-step-box">
+          <p style={{ whiteSpace: 'pre-wrap' }}>{currentStep.content}</p>
+          <button className="neon-btn small" onClick={handleNextStep}>⏭ Endelea</button>
         </div>
+      )}
+
+      {currentStep.type === 'audio' && (
+        <audio
+          key={lesson._id + stepIndex}
+          ref={audioRef}
+          controls
+          src={currentStep.src}
+          style={{ width: '100%' }}
+        />
+      )}
+
+      {currentStep.type === 'pdf' && (
+        <a className="neon-btn small" target="_blank" href={currentStep.src} rel="noreferrer">
+          📥 Open PDF
+        </a>
+      )}
+
+      {currentStep.type === 'questions' && (
+        <div className="question-box">
+          {currentStep.questions.map((q, i) => (
+            <p key={i}>❓ {q}</p>
+          ))}
+          <button onClick={handleNextStep} className="neon-btn small">⏭ Endelea</button>
+        </div>
+      )}
+
+      <div className="nav-buttons-wrapper">
+        {currentIndex > 0 && (
+          <button onClick={onPrev} className="neon-btn small prev-btn">⬅️ Previous</button>
+        )}
+        {stepIndex >= steps.length - 1 && currentIndex < totalLessons - 1 && (
+          <button
+            onClick={onNext}
+            className="neon-btn small"
+            style={{
+              backgroundColor: isEightyPercentReached ? '#048547' : '#555',
+              color: '#fff',
+              cursor: isEightyPercentReached ? 'pointer' : 'not-allowed',
+              opacity: isEightyPercentReached ? 1 : 0.6,
+              boxShadow: isEightyPercentReached ? '0 0 10px #048547' : 'none',
+            }}
+            disabled={!isEightyPercentReached}
+          >
+            ➡️ Next Lesson
+          </button>
+        )}
+        {stepIndex >= steps.length - 1 && !isEightyPercentReached && (
+          <p className="audio-warning">
+            ⏳ Sikiliza angalau 80% ya somo ili kufungua somo linalofuata.
+          </p>
+        )}
       </div>
     </div>
   );

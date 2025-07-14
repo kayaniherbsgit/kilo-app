@@ -14,34 +14,33 @@ const Login = () => {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const res = await axios.post(
-        `${BASE_URL}/api/auth/login`,
-        formData,
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+  try {
+    const res = await axios.post(`${BASE_URL}/api/auth/login`, formData, {
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      toast.success('Login successful!');
+    const fullUser = { ...res.data.user, token: res.data.token };
+    localStorage.setItem('user', JSON.stringify(fullUser));
+    localStorage.setItem('token', res.data.token);
 
-      setTimeout(() => {
-        if (res.data.user.isAdmin) {
-          navigate('/admin');
-        } else {
-          navigate('/home');
-        }
-      }, 1000);
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+
+    setTimeout(() => {
+      if (res.data.user.isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/home');
+      }
+    }, 1000);
+  } catch (error) {
+    toast.error(error?.response?.data?.message || 'Login failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>

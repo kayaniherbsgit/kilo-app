@@ -28,11 +28,19 @@ const Home = () => {
   const bellRef = useRef();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (!storedUser) return navigate('/login');
-    setUser(storedUser);
-  }, []);
+useEffect(() => {
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+
+  // ⛔ If user or token is missing, log out and redirect
+  if (!storedUser || !storedUser.token) {
+    console.warn("⛔ No token found in localStorage, logging out.");
+    localStorage.removeItem('user');
+    navigate('/login');
+    return;
+  }
+
+  setUser(storedUser);
+}, []);
 
   useEffect(() => {
     if (!user?.username) return;
