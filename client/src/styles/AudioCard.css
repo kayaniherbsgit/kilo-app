@@ -260,3 +260,23 @@
   justify-content: space-between;
   margin-bottom: 0.5rem;
 }
+
+.reflection-input {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+.preview-box {
+  background: #f8f8f8;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
+.audio-section {
+  border-top: 1px dashed #999;
+  padding-top: 1rem;
+}

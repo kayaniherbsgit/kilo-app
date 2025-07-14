@@ -5,6 +5,7 @@ import axios from 'axios';
 import '../styles/AudioCard.css';
 import { toast } from 'react-toastify';
 import { useAudio } from '../contexts/AudioContext';
+import Day2InteractiveStep from './Day2InteractiveStep';
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -26,6 +27,7 @@ const AudioCard = ({
   const [showAutoPlay, setShowAutoPlay] = useState(false);
   const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
   const [delayedAutoPlay, setDelayedAutoPlay] = useState(false);
+  const [showReflection, setShowReflection] = useState(false);
   const [width, height] = useWindowSize();
   const isCompleted = completed.includes(lesson._id);
   const { audioRef } = useAudio();
@@ -35,6 +37,7 @@ const AudioCard = ({
 
   const steps = Array.isArray(lesson.steps) && lesson.steps.length > 0 ? lesson.steps : [];
   const currentStep = steps[stepIndex] || {};
+  const isDay2 = lesson.title?.toLowerCase().includes("hatua ya malengo");
 
   const trackEvent = async (event, data = {}) => {
     try {
@@ -58,12 +61,14 @@ const AudioCard = ({
     setAutoPlayCancelled(false);
     setDelayedAutoPlay(false);
     setStepIndex(0);
+    setShowReflection(false);
 
     if (countdownRef.current) clearInterval(countdownRef.current);
     if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
 
     const saved = localStorage.getItem(`lesson-progress-${lesson._id}`);
     const resumedFlag = sessionStorage.getItem(`resumed-${lesson._id}`);
+
     if (saved && !resumedFlag && parseFloat(saved) > 5) {
       setResumeTime(parseFloat(saved));
       setResumePrompt(true);
@@ -73,10 +78,13 @@ const AudioCard = ({
       setDelayedAutoPlay(true);
     }, 15000);
 
-    axios.post(`${BASE_URL}/api/users/current-lesson`,
-      { lessonId: lesson._id },
-      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-    ).catch(err => console.error('Failed to save current lesson:', err.message));
+    axios.post(`${BASE_URL}/api/users/current-lesson`, {
+      lessonId: lesson._id
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    }).catch(err => console.error('Failed to save current lesson:', err.message));
 
     localStorage.setItem('lastPlayedLessonId', lesson._id);
   }, [lesson]);
@@ -119,10 +127,13 @@ const AudioCard = ({
 
         if (!completed.includes(lesson._id)) {
           onMarkComplete(lesson._id);
-          axios.post(`${BASE_URL}/api/users/mark-complete`,
-            { lessonId: lesson._id },
-            { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-          ).catch(err => console.error('Error saving completion:', err.message));
+          axios.post(`${BASE_URL}/api/users/mark-complete`, {
+            lessonId: lesson._id
+          }, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          }).catch(err => console.error('Error saving completion:', err.message));
         }
 
         if (!sessionStorage.getItem(`toast-shown-${lesson._id}`)) {
@@ -140,7 +151,6 @@ const AudioCard = ({
 
     const handleEnd = () => {
       trackEvent('audio_ended', { lessonId: lesson._id, stepIndex, time: audio.currentTime });
-
       if (stepIndex < steps.length - 1) {
         setShowAutoPlay(true);
         setAutoPlayTimer(10);
@@ -166,6 +176,7 @@ const AudioCard = ({
 
     audio.addEventListener('timeupdate', handleUpdate);
     audio.addEventListener('ended', handleEnd);
+
     return () => {
       audio.removeEventListener('timeupdate', handleUpdate);
       audio.removeEventListener('ended', handleEnd);
@@ -183,7 +194,6 @@ const AudioCard = ({
   return (
     <div className="audio-card-container">
       {showConfetti && <Confetti width={width} height={height} />}
-
       {resumePrompt && (
         <div className="resume-modal">
           <div className="resume-box">
@@ -204,7 +214,6 @@ const AudioCard = ({
           </div>
         </div>
       )}
-
       {showAutoPlay && (
         <div className="auto-play-overlay">
           <div className="countdown-box">
@@ -224,50 +233,53 @@ const AudioCard = ({
           </div>
         </div>
       )}
-
-      <h3 className="lesson-title">{lesson.title}</h3>
-      {lesson.description && <p className="lesson-description">{lesson.description}</p>}
-
-      {lesson.thumbnail && stepIndex === 0 && (
-        <img
-          src={lesson.thumbnail}
-          alt="Lesson Thumbnail"
-          className="lesson-thumbnail"
+      {!isDay2 || !showReflection ? (
+        <>
+          <h3 className="lesson-title">{lesson.title}</h3>
+          {lesson.description && <p className="lesson-description">{lesson.description}</p>}
+          {lesson.thumbnail && stepIndex === 0 && (
+            <img
+              src={lesson.thumbnail}
+              alt="Lesson Thumbnail"
+              className="lesson-thumbnail"
+            />
+          )}
+          {currentStep.type === 'text' && (
+            <div className="text-step-box">
+              <p style={{ whiteSpace: 'pre-wrap' }}>{currentStep.content}</p>
+              <button className="neon-btn small" onClick={handleNextStep}>⏭ Continue</button>
+            </div>
+          )}
+          {currentStep.type === 'audio' && (
+            <audio
+              key={lesson._id + stepIndex}
+              ref={audioRef}
+              controls
+              src={currentStep.src}
+              style={{ width: '100%' }}
+            />
+          )}
+          {isDay2 && isEightyPercentReached && (
+            <button
+              className="neon-btn enabled"
+              style={{ marginTop: '1rem' }}
+              onClick={() => setShowReflection(true)}
+            >
+              🧠 Jibu Maswali Haya
+            </button>
+          )}
+        </>
+      ) : (
+        <Day2InteractiveStep
+          lessonId={lesson._id}
+          step={currentStep}
+          audioRef={audioRef}
+          onComplete={() => {
+            setIsEightyPercentReached(true);
+            toast.success('Day 2 Reflection Completed! ✅');
+          }}
         />
       )}
-
-      {currentStep.type === 'text' && (
-        <div className="text-step-box">
-          <p style={{ whiteSpace: 'pre-wrap' }}>{currentStep.content}</p>
-          <button className="neon-btn small" onClick={handleNextStep}>⏭ Endelea</button>
-        </div>
-      )}
-
-      {currentStep.type === 'audio' && (
-        <audio
-          key={lesson._id + stepIndex}
-          ref={audioRef}
-          controls
-          src={currentStep.src}
-          style={{ width: '100%' }}
-        />
-      )}
-
-      {currentStep.type === 'pdf' && (
-        <a className="neon-btn small" target="_blank" href={currentStep.src} rel="noreferrer">
-          📥 Open PDF
-        </a>
-      )}
-
-      {currentStep.type === 'questions' && (
-        <div className="question-box">
-          {currentStep.questions.map((q, i) => (
-            <p key={i}>❓ {q}</p>
-          ))}
-          <button onClick={handleNextStep} className="neon-btn small">⏭ Endelea</button>
-        </div>
-      )}
-
       <div className="nav-buttons-wrapper">
         {currentIndex > 0 && (
           <button onClick={onPrev} className="neon-btn small prev-btn">⬅️ Previous</button>
@@ -290,7 +302,7 @@ const AudioCard = ({
         )}
         {stepIndex >= steps.length - 1 && !isEightyPercentReached && (
           <p className="audio-warning">
-            ⏳ Sikiliza angalau 80% ya somo ili kufungua somo linalofuata.
+            ⏳ Listen to at least 80% of the audio to unlock the next lesson.
           </p>
         )}
       </div>
