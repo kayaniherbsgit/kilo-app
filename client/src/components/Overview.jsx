@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/import "../../styles/admin/AdminDashboard.css";s"; // optional if you want styles here
+import "../styles/../../styles/admin/AdminDashboard.css"; // optional if you want styles here
 
 const Overview = () => {
   return (
