@@ -19,7 +19,7 @@ const AudioCard = ({
   completed,
 }) => {
   const [progress, setProgress] = useState(0);
-  const [isEightyPercentReached, setIsEightyPercentReached] = useState(false);
+  const [isEightyPercentReached, setIsEightyPercentReached] = useState(completed.includes(lesson._id));
   const [showConfetti, setShowConfetti] = useState(false);
   const [resumePrompt, setResumePrompt] = useState(false);
   const [resumeTime, setResumeTime] = useState(0);
@@ -90,7 +90,6 @@ const AudioCard = ({
   }, [lesson]);
 
   useEffect(() => {
-    if (isCompleted) setIsEightyPercentReached(true);
   }, [isCompleted]);
 
   useEffect(() => {
