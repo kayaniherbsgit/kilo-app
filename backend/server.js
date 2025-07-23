@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
-const fs = require('fs'); // ✅ Added for folder check
+const fs = require('fs');
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -41,17 +41,30 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Serve uploads statically (thumbnails & audio)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ✅ Main API Routes
+// ✅ Import routes
+const authRoutes = require('./routes/authRoutes');
+const lessonRoutes = require('./routes/lessonRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const userRoutes = require('./routes/userRoutes');
+const communityRoutes = require('./routes/communityRoutes');
+const analyticsRoutes = require('./routes/analytics');
+const adminRoutes = require('./routes/adminRoutes');
+const globalSettingRoutes = require('./routes/globalUserSettingRoutes');
+const day2Routes = require('./routes/day2Routes');
+
+// ✅ Register routes
+app.use('/api/auth', authRoutes);
+app.use('/api/lessons', lessonRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/community', communityRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/global-user-setting', globalSettingRoutes);
+app.use('/api', day2Routes); // 👈 Day2 Reflection Save
+
+// ✅ Main route
 app.get('/', (req, res) => res.send('🚀 Kilo App Backend is running!'));
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/lessons', require('./routes/lessonRoutes'));
-app.use('/api/notifications', require('./routes/notificationRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api', require('./routes/notificationRoutes')); // still used?
-app.use('/api/community', require('./routes/communityRoutes'));
-app.use('/api/analytics', require('./routes/analytics'));
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/global-user-setting', require('./routes/globalUserSettingRoutes'));
 
 // ✅ Auto-create admin if not exists
 const createAdminIfNotExists = require('./utils/createAdminIfNotExists');
@@ -66,22 +79,22 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ MongoDB + server start
+// ✅ Connect to MongoDB and start server
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(async () => {
-  console.log('✅ MongoDB connected');
-  await createAdminIfNotExists();
-  const PORT = process.env.PORT || 5000;
-  server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+  .then(async () => {
+    console.log('✅ MongoDB connected');
+    await createAdminIfNotExists();
+    const PORT = process.env.PORT || 5000;
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:', err);
   });
-})
-.catch((err) => {
-  console.error('❌ MongoDB connection error:', err);
-});
 
 // ✅ Socket.io connection
 io.on('connection', (socket) => {

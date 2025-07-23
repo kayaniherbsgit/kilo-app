@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import '../styles/Day2Reflection.css';
 import finalAudioSrc from '../assets/audio/lesson2-final.opus';
 import bonusAudioSrc from '../assets/audio/lesson2-bonus.opus';
+
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const questions = [
   "Unatamani kuona nini kunatokea kwenye Mahusiano Yako?",
@@ -20,6 +23,8 @@ const Day2InteractiveStep = ({ onComplete }) => {
   const [canPlayBonus, setCanPlayBonus] = useState(false);
   const [finalComplete, setFinalComplete] = useState(false);
   const [bonusComplete, setBonusComplete] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const toggleInput = (index) => {
     const updated = [...showInput];
@@ -66,6 +71,33 @@ const Day2InteractiveStep = ({ onComplete }) => {
     return () => audio.removeEventListener('timeupdate', updateProgress);
   }, [canPlayBonus, bonusComplete, onComplete]);
 
+  const handleSubmitAnswers = async () => {
+    try {
+      setIsSubmitting(true);
+
+      const payload = {
+        lesson: "Hatua Ya Malengo",
+        answers: questions.map((q, i) => ({
+          question: q,
+          answer: answers[i],
+        })),
+      };
+
+      const res = await axios.post(`${BASE_URL}/api/responses/day2`, payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      setSubmitSuccess(true);
+    } catch (err) {
+      console.error('Failed to submit answers:', err.message);
+      alert("Imeshindikana kutuma majibu. Tafadhali jaribu tena.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="day2-box">
       <div className="day2-header">
@@ -73,14 +105,12 @@ const Day2InteractiveStep = ({ onComplete }) => {
         <h4>Hapa Nimekuelekeza Jinsi Ya Kuweka Malengo Yako🗒</h4>
       </div>
 
-      {/* 1️⃣ Final Audio */}
       <div>
         <h4>🔊 Sikiliza Audio Yote</h4>
         <audio ref={finalAudioRef} controls src={finalAudioSrc} />
         <p>🎯 Sikiliza hadi 80% ili kufungua maswali</p>
       </div>
 
-      {/* 2️⃣ Questions */}
       {finalComplete && !showPreview && (
         <div className="questions-box">
           {questions.map((q, i) => (
@@ -108,7 +138,6 @@ const Day2InteractiveStep = ({ onComplete }) => {
         </div>
       )}
 
-      {/* 3️⃣ Preview and Bonus Audio */}
       {showPreview && (
         <div className="preview-box">
           <h4>🔍 Mapitio Ya Majibu</h4>
@@ -126,9 +155,24 @@ const Day2InteractiveStep = ({ onComplete }) => {
 
       {canPlayBonus && (
         <div>
-          <h4>💎 Bonus Audio</h4>
+          <h4 className="pink-title">💎 Bonus Audio</h4>
           <audio ref={bonusAudioRef} controls src={bonusAudioSrc} />
           <p>🌟 Sikiliza audio hii ya ziada kwa undani zaidi</p>
+
+          {submitSuccess ? (
+            <p style={{ color: '#4ade80', fontWeight: 'bold', marginTop: '1rem' }}>
+              ✅ Majibu yako yamesharekewa salama!
+            </p>
+          ) : (
+            <button
+              className="neon-btn green"
+              onClick={handleSubmitAnswers}
+              disabled={isSubmitting}
+              style={{ marginTop: '1.2rem' }}
+            >
+              📤 {isSubmitting ? "Inatuma..." : "Share Majibu Yako"}
+            </button>
+          )}
         </div>
       )}
     </div>
