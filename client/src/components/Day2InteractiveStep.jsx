@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import '../styles/Day2Reflection.css';
+import finalAudioSrc from '../assets/audio/lesson2-final.opus';
+import bonusAudioSrc from '../assets/audio/lesson2-bonus.opus';
 
 const questions = [
   "Unatamani kuona nini kunatokea kwenye Mahusiano Yako?",
@@ -7,17 +10,16 @@ const questions = [
   "Mambo gani Unatakiwa Kuzingatia au Kufanya Ili Utimize Maono yako Haya?"
 ];
 
-const bonusAudio = "https://your-link.com/audio2.mp3";
-const finalAudio = "https://your-link.com/audio3.mp3";
+const Day2InteractiveStep = ({ onComplete }) => {
+  const finalAudioRef = useRef(null);
+  const bonusAudioRef = useRef(null);
 
-const Day2InteractiveStep = ({ onComplete, audioRef }) => {
   const [answers, setAnswers] = useState(Array(4).fill(''));
   const [showInput, setShowInput] = useState(Array(4).fill(false));
   const [showPreview, setShowPreview] = useState(false);
   const [canPlayBonus, setCanPlayBonus] = useState(false);
-  const [canPlayFinal, setCanPlayFinal] = useState(false);
-  const [bonusComplete, setBonusComplete] = useState(false);
   const [finalComplete, setFinalComplete] = useState(false);
+  const [bonusComplete, setBonusComplete] = useState(false);
 
   const toggleInput = (index) => {
     const updated = [...showInput];
@@ -34,66 +36,80 @@ const Day2InteractiveStep = ({ onComplete, audioRef }) => {
   const allAnswered = answers.every(ans => ans.trim() !== '');
 
   useEffect(() => {
-    const audio = audioRef.current;
+    const audio = finalAudioRef.current;
+    if (!audio || finalComplete) return;
+
+    const updateProgress = () => {
+      const pct = (audio.currentTime / audio.duration) * 100;
+      if (pct >= 80 && !finalComplete) {
+        setFinalComplete(true);
+      }
+    };
+
+    audio.addEventListener('timeupdate', updateProgress);
+    return () => audio.removeEventListener('timeupdate', updateProgress);
+  }, [finalComplete]);
+
+  useEffect(() => {
+    const audio = bonusAudioRef.current;
     if (!audio || !canPlayBonus || bonusComplete) return;
 
     const updateProgress = () => {
       const pct = (audio.currentTime / audio.duration) * 100;
       if (pct >= 80 && !bonusComplete) {
         setBonusComplete(true);
-        setCanPlayFinal(true);
+        onComplete();
       }
     };
 
     audio.addEventListener('timeupdate', updateProgress);
     return () => audio.removeEventListener('timeupdate', updateProgress);
-  }, [canPlayBonus, bonusComplete, audioRef]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !canPlayFinal || finalComplete) return;
-
-    const updateFinalProgress = () => {
-      const pct = (audio.currentTime / audio.duration) * 100;
-      if (pct >= 80 && !finalComplete) {
-        setFinalComplete(true);
-        onComplete(); // Unlock next lesson
-      }
-    };
-
-    audio.addEventListener('timeupdate', updateFinalProgress);
-    return () => audio.removeEventListener('timeupdate', updateFinalProgress);
-  }, [canPlayFinal, finalComplete, audioRef, onComplete]);
+  }, [canPlayBonus, bonusComplete, onComplete]);
 
   return (
     <div className="day2-box">
-      <h4>🧠 Jibu Maswali Haya Kwa Kuandika Kwenye Notebook 🗒</h4>
+      <div className="day2-header">
+        <span className="brain-icon">🧠</span>
+        <h4>Hapa Nimekuelekeza Jinsi Ya Kuweka Malengo Yako🗒</h4>
+      </div>
 
-      {questions.map((q, i) => (
-        <div key={i} className="question">
-          <p>❓ {q}</p>
-          {!showInput[i] && (
-            <button className="neon-btn small" onClick={() => toggleInput(i)}>
-              ✍️ Answer Question
+      {/* 1️⃣ Final Audio */}
+      <div>
+        <h4>🔊 Sikiliza Audio Yote</h4>
+        <audio ref={finalAudioRef} controls src={finalAudioSrc} />
+        <p>🎯 Sikiliza hadi 80% ili kufungua maswali</p>
+      </div>
+
+      {/* 2️⃣ Questions */}
+      {finalComplete && !showPreview && (
+        <div className="questions-box">
+          {questions.map((q, i) => (
+            <div key={i} className="question">
+              <p>❓ {q}</p>
+              {!showInput[i] && (
+                <button className="neon-btn small" onClick={() => toggleInput(i)}>
+                  ✍️ Answer Question
+                </button>
+              )}
+              {showInput[i] && (
+                <textarea
+                  placeholder="Andika jibu lako hapa..."
+                  value={answers[i]}
+                  onChange={(e) => handleChange(i, e.target.value)}
+                />
+              )}
+            </div>
+          ))}
+          {allAnswered && (
+            <button className="neon-btn green" onClick={() => setShowPreview(true)}>
+              ✅ Hakikisha Majibu Yako
             </button>
           )}
-          {showInput[i] && (
-            <textarea
-              placeholder="Andika jibu lako hapa..."
-              value={answers[i]}
-              onChange={(e) => handleChange(i, e.target.value)}
-            />
-          )}
         </div>
-      ))}
-
-      {allAnswered && !showPreview && (
-        <button className="neon-btn green" onClick={() => setShowPreview(true)}>
-          ✅ Preview Majibu
-        </button>
       )}
 
-      {showPreview && !canPlayBonus && (
+      {/* 3️⃣ Preview and Bonus Audio */}
+      {showPreview && (
         <div className="preview-box">
           <h4>🔍 Mapitio Ya Majibu</h4>
           {questions.map((q, i) => (
@@ -103,27 +119,16 @@ const Day2InteractiveStep = ({ onComplete, audioRef }) => {
             </div>
           ))}
           <button className="neon-btn green" onClick={() => setCanPlayBonus(true)}>
-            🎧 Niko Tayari, Cheza Audio
-          </button>
-          <button className="neon-btn small" onClick={() => setShowPreview(false)}>
-            ✏️ Badilisha
+            🎧 Majibu Yako Sawa, Tuendelee
           </button>
         </div>
       )}
 
-      {canPlayBonus && !canPlayFinal && (
+      {canPlayBonus && (
         <div>
-          <h4>🎧 Bonus Audio</h4>
-          <audio ref={audioRef} controls src={bonusAudio} />
-          <p>👉 Sikiliza angalau 80% ili kufungua audio ya mwisho</p>
-        </div>
-      )}
-
-      {canPlayFinal && (
-        <div>
-          <h4>🔊 Final Audio</h4>
-          <audio ref={audioRef} controls src={finalAudio} />
-          <p>✅ Sikiliza hadi 80% kumaliza somo hili kikamilifu</p>
+          <h4>💎 Bonus Audio</h4>
+          <audio ref={bonusAudioRef} controls src={bonusAudioSrc} />
+          <p>🌟 Sikiliza audio hii ya ziada kwa undani zaidi</p>
         </div>
       )}
     </div>

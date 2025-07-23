@@ -1,0 +1,123 @@
+.day2-box {
+  background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(4, 133, 71, 0.4);
+  border: 1px solid #048547;
+  color: #f0f0f0;
+  margin-top: 2rem;
+  animation: fadeInUp 0.7s ease;
+}
+
+.day2-box h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #ff69b4;
+  position: relative;
+}
+
+@keyframes rotateGlow {
+  0% { transform: translateX(-50%) rotate(0deg); opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { transform: translateX(-50%) rotate(360deg); opacity: 1; }
+}
+
+.question {
+  background-color: #1e1e1e;
+  border-left: 5px solid #00cc66;
+  padding: 1.2rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 10px rgba(0, 204, 102, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.question:hover {
+  transform: scale(1.01);
+}
+
+.question p {
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+  color: #ddd;
+}
+
+.question textarea {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 10px;
+  border: 1px solid #2a2a2a;
+  background: #111;
+  color: #fff;
+  resize: vertical;
+  font-size: 0.95rem;
+  box-shadow: 0 0 6px rgba(0, 255, 150, 0.15);
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.question textarea:focus {
+  outline: none;
+  border: 1px solid #00e676;
+  box-shadow: 0 0 10px rgba(0, 255, 150, 0.5);
+}
+
+.preview-box {
+  background-color: #151515;
+  border: 1px dashed #00ff88;
+  padding: 1.2rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+  box-shadow: 0 0 12px rgba(0, 255, 120, 0.3);
+}
+
+.preview-box h4 {
+  color: #b4ff39;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.preview-box p {
+  margin-bottom: 0.7rem;
+  color: #eee;
+}
+
+.preview-box strong {
+  color: #00e676;
+}
+
+.day2-box audio {
+  width: 100%;
+  margin-top: 1.2rem;
+  border-radius: 10px;
+  background-color: #111;
+}
+
+.neon-btn.green {
+  background-color: #00e676;
+  color: #000;
+  font-weight: 600;
+  box-shadow: 0 0 10px #00e676aa;
+  margin-top: 1rem;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+
+.neon-btn.green:hover {
+  background-color: #1fff99;
+  transform: scale(1.04);
+  box-shadow: 0 0 14px #1fff99aa;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

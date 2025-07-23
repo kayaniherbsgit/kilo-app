@@ -264,7 +264,7 @@ const AudioCard = ({
               style={{ marginTop: '1rem' }}
               onClick={() => setShowReflection(true)}
             >
-              🧠 Jibu Maswali Haya
+              Fahamu Jinsi Ya Kuweka Malengo Yako
             </button>
           )}
         </>
