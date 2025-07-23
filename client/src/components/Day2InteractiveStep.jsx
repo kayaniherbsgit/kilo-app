@@ -98,19 +98,21 @@ const Day2InteractiveStep = ({ onComplete }) => {
     }
   };
 
-  return (
-    <div className="day2-box">
-      <div className="day2-header">
-        <span className="brain-icon">🧠</span>
-        <h4>Hapa Nimekuelekeza Jinsi Ya Kuweka Malengo Yako🗒</h4>
-      </div>
+return (
+  <div className="day2-box">
+    <div className="day2-header">
+      <span className="brain-icon">🧠</span>
+      <h4>Hapa Nimekuelekeza Jinsi Ya Kuweka Malengo Yako🗒</h4>
+    </div>
 
-      <div>
-        <h4>🔊 Sikiliza Audio Yote</h4>
-        <audio ref={finalAudioRef} controls src={finalAudioSrc} />
-        <p>🎯 Sikiliza hadi 80% ili kufungua maswali</p>
-      </div>
+    <div>
+      <h4>🔊 Sikiliza Audio Yote</h4>
+      <audio ref={finalAudioRef} controls src={finalAudioSrc} />
+      <p>🎯 Sikiliza hadi 80% ili kufungua maswali</p>
+    </div>
 
+    {/* ✅ WRAPPER FOR QUESTION + PREVIEW */}
+    <div className="interactive-content">
       {finalComplete && !showPreview && (
         <div className="questions-box">
           {questions.map((q, i) => (
@@ -152,31 +154,34 @@ const Day2InteractiveStep = ({ onComplete }) => {
           </button>
         </div>
       )}
-
-      {canPlayBonus && (
-        <div>
-          <h4 className="pink-title">💎 Bonus Audio</h4>
-          <audio ref={bonusAudioRef} controls src={bonusAudioSrc} />
-          <p>🌟 Sikiliza audio hii ya ziada kwa undani zaidi</p>
-
-          {submitSuccess ? (
-            <p style={{ color: '#4ade80', fontWeight: 'bold', marginTop: '1rem' }}>
-              ✅ Majibu yako yamesharekewa salama!
-            </p>
-          ) : (
-            <button
-              className="neon-btn green"
-              onClick={handleSubmitAnswers}
-              disabled={isSubmitting}
-              style={{ marginTop: '1.2rem' }}
-            >
-              📤 {isSubmitting ? "Inatuma..." : "Share Majibu Yako"}
-            </button>
-          )}
-        </div>
-      )}
     </div>
-  );
+
+    {/* ✅ BONUS AUDIO SECTION */}
+    {canPlayBonus && (
+      <div>
+        <h4 className="pink-title">💎 Bonus Audio</h4>
+        <audio ref={bonusAudioRef} controls src={bonusAudioSrc} />
+        <p>🌟 Sikiliza audio hii ya ziada kwa undani zaidi</p>
+
+        {submitSuccess ? (
+          <p style={{ color: '#4ade80', fontWeight: 'bold', marginTop: '1rem' }}>
+            ✅ Majibu yako yamesharekewa salama!
+          </p>
+        ) : (
+          <button
+            className="neon-btn green"
+            onClick={handleSubmitAnswers}
+            disabled={isSubmitting}
+            style={{ marginTop: '1.2rem' }}
+          >
+            📤 {isSubmitting ? "Inatuma..." : "Share Majibu Yako"}
+          </button>
+        )}
+      </div>
+    )}
+  </div>
+);
+
 };
 
 export default Day2InteractiveStep;

@@ -26,35 +26,29 @@
 
 .question {
   background-color: #1e1e1e;
-  border-left: 5px solid #00cc66;
-  padding: 1.2rem 1rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 0 10px rgba(0, 204, 102, 0.2);
-  transition: transform 0.2s ease;
+  border-left: 4px solid #00cc66;
+  padding: 1.5rem;
+  border-radius: 14px;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 0 12px rgba(0, 204, 102, 0.25);
+  transition: transform 0.3s ease;
 }
+
 
 .question:hover {
   transform: scale(1.01);
 }
 
 .question p {
-  font-size: 1rem;
-  margin-bottom: 0.6rem;
-  color: #ddd;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 0.8rem;
+  color: #f2f2f2;
 }
 
 .question textarea {
-  width: 100%;
-  padding: 0.9rem;
-  border-radius: 10px;
-  border: 1px solid #2a2a2a;
-  background: #111;
-  color: #fff;
-  resize: vertical;
-  font-size: 0.95rem;
-  box-shadow: 0 0 6px rgba(0, 255, 150, 0.15);
-  transition: border 0.3s, box-shadow 0.3s;
+  margin-top: 0.5rem;
+  min-height: 120px;
 }
 
 .question textarea:focus {
@@ -70,7 +64,28 @@
   border-radius: 12px;
   margin-top: 2rem;
   box-shadow: 0 0 12px rgba(0, 255, 120, 0.3);
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
 }
+
+.neon-btn.small {
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  font-weight: bold;
+  background-color: #00cc66;
+  color: black;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #00cc66aa;
+  transition: all 0.2s ease;
+}
+
+.neon-btn.small:hover {
+  background-color: #00e676;
+  transform: scale(1.05);
+}
+
 
 .preview-box h4 {
   color: #b4ff39;
@@ -120,4 +135,13 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.interactive-content {
+  min-height: 400px; /* adjust depending on your content */
+  transition: all 0.3s ease;
+}
+
+.question {
+  animation: fadeInUp 0.4s ease;
 }
