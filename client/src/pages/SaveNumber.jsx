@@ -2,12 +2,11 @@ import { useEffect } from "react";
 
 const SaveNumber = () => {
   useEffect(() => {
-    // Instantly open/download the vCard file
+    // ✅ Instantly open/download the vCard file (no ./public)
     window.location.replace("/kayanicontact.vcf");
   }, []);
 
-  // Nothing to show (no UI)
-  return null;
+  return null; // No UI, just redirect
 };
 
 export default SaveNumber;
