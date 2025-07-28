@@ -29,6 +29,8 @@ import Settings from './components/Settings';
 import Homepage from './pages/Homepage';
 import ProgramIntro from './pages/ProgramIntro';
 import AboutMenProgram from './pages/AboutMenProgram';
+import SaveNumber from './pages/SaveNumber';
+
 
 
 const App = () => {
@@ -41,6 +43,8 @@ const App = () => {
         <Route path="/" element={<Homepage />} />
         <Route path="/program-intro" element={<ProgramIntro />} />
         <Route path="/about-men-program" element={<AboutMenProgram />} />
+        <Route path="/save-number" element={<SaveNumber />} />
+
 
 
         {/* 🔐 Auth Routes */}
