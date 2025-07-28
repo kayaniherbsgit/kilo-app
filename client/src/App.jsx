@@ -31,21 +31,20 @@ import ProgramIntro from './pages/ProgramIntro';
 import AboutMenProgram from './pages/AboutMenProgram';
 import SaveNumber from './pages/SaveNumber';
 
-
-
 const App = () => {
   const location = useLocation();
   
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+
         {/* 🌐 Public Homepage Route */}
         <Route path="/" element={<Homepage />} />
         <Route path="/program-intro" element={<ProgramIntro />} />
         <Route path="/about-men-program" element={<AboutMenProgram />} />
+
+        {/* ✅ 📥 NEW: Auto-save contact route */}
         <Route path="/save-number" element={<SaveNumber />} />
-
-
 
         {/* 🔐 Auth Routes */}
         <Route path="/register" element={<Register />} />
@@ -73,6 +72,7 @@ const App = () => {
         <Route path="/admin/send-notification" element={<AdminSendNotification />} />
         <Route path="/admin/notifications" element={<AdminNotifications />} />
         <Route path="/admin/notifications/:id" element={<AdminNotificationDetail />} />
+
       </Routes>
     </AnimatePresence>
   );
