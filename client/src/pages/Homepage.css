@@ -610,3 +610,52 @@ html {
 .section:nth-child(odd) {
   background-color: #121212; /* slightly different shade */
 }
+
+.hero-buttons {
+  display: flex;
+  gap: 1.5rem; /* more space between buttons */
+  justify-content: center;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* 🔘 Base style for BOTH buttons */
+.hero-btn,
+.save-contact-btn {
+  padding: 1rem 2.2rem;
+  border-radius: 24px;   /* more pill-like, modern */
+  font-weight: 700;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;           /* space between icon & text */
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* 🌱 Program button – Kayani Green */
+.hero-btn {
+  background: linear-gradient(135deg, #34a853, #5fe271);
+  color: black;
+}
+.hero-btn:hover {
+  background: linear-gradient(135deg, #2c8b45, #4ad960);
+  transform: translateY(-2px);
+}
+
+/* 🟢 WhatsApp Contact Button */
+.save-contact-btn {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: white;
+}
+.save-contact-btn:hover {
+  background: linear-gradient(135deg, #1ebe5d, #0f705c);
+  transform: translateY(-2px);
+}
+
+/* ✅ WhatsApp Icon Style */
+.whatsapp-icon {
+  width: 20px;
+  height: 20px;
+}

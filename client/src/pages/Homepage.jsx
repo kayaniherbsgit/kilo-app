@@ -12,6 +12,8 @@ const content = {
       title: 'Healing. Naturally.',
       subtitle: '🌿 Restoring Africa with Pure Herbal Wisdom',
       button: 'Explore Programs',
+            contactButton: '📞 Contact Dr. Kayani'
+
     },
     mission: {
       title: 'Our Mission',
@@ -46,6 +48,8 @@ const content = {
       title: 'Jitibu Changamoto Zako Za Kiafya Kwa Njia Asilia',
       subtitle: '🌿 Usiendelee kuteseka wakati tiba iko karibu nawe.\nKutoka kwenye mimea, viungo, mizizi hadi mazoea ya mababu — tiba asilia haipambwi, lakini ina nguvu ya kweli.',
       button: 'Angalia Tiba Zetu',
+            contactButton: '📞 Wasiliana na Dr. Kayani'
+
     },
     mission: {
       title: '🌿 Dhamira Yetu',
@@ -174,27 +178,44 @@ const Homepage = () => {
         </AnimatePresence>
       </header>
 
-      {/* Hero */}
- <section
-        className="hero"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      >
-        <div className="hero-overlay" />
-        <motion.div
-          className="hero-content"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          <h1>{t.hero.title}</h1>
-          <div className="subtitle">
-            {t.hero.subtitle.split('\n').map((line, index) => (
-              <p key={index}>{line}</p>
-            ))}
-          </div>
-          <a href="#programs" className="hero-btn">{t.hero.button}</a>
-        </motion.div>
-      </section>
+<section
+  className="hero"
+  style={{ backgroundImage: `url(${heroBg})` }}
+>
+  <div className="hero-overlay" />
+  <motion.div
+    className="hero-content"
+    initial={{ opacity: 0, y: 50 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+  >
+    <h1>{t.hero.title}</h1>
+    <div className="subtitle">
+      {t.hero.subtitle.split('\n').map((line, index) => (
+        <p key={index}>{line}</p>
+      ))}
+    </div>
+
+<div className="hero-buttons">
+  {/* 🌱 Explore Programs Button */}
+  <a href="#programs" className="hero-btn">{t.hero.button}</a>
+
+  {/* 🟢 WhatsApp Contact Button */}
+  <a href="/kayanicontact.vcf" download className="save-contact-btn">
+    <img 
+      src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+      alt="WhatsApp" 
+      className="whatsapp-icon"
+    />
+    {t.hero.contactButton.replace("📞", "")}
+  </a>
+</div>
+
+
+
+  </motion.div>
+</section>
+
 
       {/* Mission Section */}
       <motion.section className="section mission" id="mission" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
