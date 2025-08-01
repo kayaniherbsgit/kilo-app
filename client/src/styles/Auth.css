@@ -1,97 +1,165 @@
+/* ✅ Main Container */
 .auth-container {
-  background-color: #ffffff;
-  color: #000;
-  min-height: 100vh;
+  display: flex;
+  height: 100vh;
+  background: #fff; /* Full white background */
+  font-family: 'Inter', sans-serif;
+}
+
+/* ✅ Left Image Section */
+.auth-image {
+  flex: 1;
+  background: url('/images/hero.jpg') center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  border-right: 1px solid #f0f0f0; /* Clean divider line */
 }
 
+.brand-text {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+/* ✅ Right Form Section */
+.auth-form-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+}
+
+/* ✅ Form Box (Floating Card Look) */
 .auth-box {
-  background-color: #f5f5f5;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
-
-.auth-box h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #1c651b;
-}
-
-.auth-box input[type="text"],
-.auth-box input[type="password"],
-.auth-box input[type="file"] {
   width: 100%;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  color: #000;
+  max-width: 420px;
+  padding: 2rem 2.5rem;
+  background: #ffffff;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
+/* ✅ Title */
+.auth-box h2 {
+  margin-bottom: 1.8rem;
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #222;
+}
+
+/* ✅ All Inputs & Dropdown */
+.auth-box input,
+.auth-box select {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background-color: #f9f9f9;
+}
+
+.auth-box input:focus,
+.auth-box select:focus {
+  outline: none;
+  border-color: #333;
+  background-color: #fff;
+}
+
+/* ✅ File Upload Styling */
+.auth-box input[type="file"] {
+  padding: 8px;
+  border: none;
+  background: transparent;
+  margin-bottom: 1.5rem;
+}
+
+/* Hide ugly native file button */
+.auth-box input[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+.auth-box input[type="file"]::before {
+  content: '📁 Upload Avatar';
+  display: inline-block;
+  background: #eee;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.auth-box input[type="file"]:hover::before {
+  background: #ddd;
+}
+
+/* ✅ Button Styling */
 .auth-box button {
-  padding: 0.75rem 2rem;
-  margin: 0 auto; /* center horizontally */
-  margin-top: 1rem;
-  background-color: #34a853;
+  width: 100%;
+  padding: 14px;
+  background: #000;
+  color: white;
   border: none;
   border-radius: 10px;
-  color: #fff;
-  font-size: 1rem;
   font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(52, 168, 83, 0.2);
-  transition: all 0.3s ease;
-  display: block;
+  transition: background 0.3s ease;
+  margin-top: 0.5rem;
 }
-
-
 
 .auth-box button:hover {
-  background-color: #1c651b;
-  box-shadow: 0 6px 12px rgba(28, 101, 27, 0.3);
+  background: #333;
 }
 
-.auth-box form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-
-.auth-box .switch-link {
+/* ✅ Forgot Password Link */
+.forgot-link {
+  display: block;
   margin-top: 1rem;
-  text-align: center;
   font-size: 0.9rem;
+  color: #c00;
 }
 
-.auth-box .switch-link a {
-  color: #1c651b;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.auth-box .switch-link a:hover {
-  text-decoration: underline;
-}
-
-.switch-link {
-  margin-top: 1rem;
-  text-align: center;
+/* ✅ Switch Text (Login/Register) */
+.switch-text {
+  margin-top: 1.5rem;
   font-size: 0.9rem;
+  color: #555;
 }
 
-.switch-link a {
-  color: #1c651b;
+.switch-text a {
+  color: #c00;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: bold;
 }
 
-.switch-link a:hover {
-  text-decoration: underline;
+/* ✅ MOBILE: Stack Layout */
+@media (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+  }
+
+  .auth-image {
+    display: none;
+    border-right: none; /* Remove line when hidden */
+  }
+
+  .auth-form-container {
+    flex: unset;
+    height: 100vh;
+    padding: 2rem;
+  }
+
+  .auth-box {
+    box-shadow: none;
+    padding: 1.5rem;
+  }
 }
